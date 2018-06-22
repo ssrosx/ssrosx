@@ -125,6 +125,7 @@ return [
     'invoice_table_name'              => 'サービス',
     'invoice_table_price'             => '金額',
     'invoice_table_create_date'       => '購入日',
+	'invoice_table_expire_at'		  => '有効期限',	
     'invoice_table_status'            => '状態',
     'invoice_table_none'              => 'データなし',
     'invoice_table_closed'            => '閉鎖された',
@@ -164,5 +165,6 @@ return [
     'console'                         => '管理センター',
     'profile'                         => '個人設定',
     'logout'                          => 'ログアウト',
-    'promote'                         => 'プロモーションリンクで登録および有効化されたユーザーは :traffic のデータ通信量を受け取ることができます。また、 :traffic のデータ通信量を得ることもできます。消費すると、その支出額の :referral_percent% を報酬として受け取ることができます。',
+    'promote_link'                    => 'あなたの普及のリンクを通じて登録してアクティブにして、あなたたちの双方はすべて :traffic の流量の奨励を獲得します；彼らが消費する時、あなたは彼らの消費金額の :referral_percent% を獲得することを奨励します。',
+    'promote_invite_code'             => 'お客様の招待コードの登録をアクティブにして、あなた達の双方は獲得して :traffic 流量奨励;彼らが消费の時、あなたは獲得して彼らの消費金額の :referral_percent% ご褒美として。',
 ];
