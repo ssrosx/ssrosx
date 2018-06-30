@@ -19,6 +19,7 @@
                         </div>
                         <div class="actions">
                             <div class="btn-group btn-group-devided">
+                                <button class="btn sbold red" onclick="exportSSJson()"> 导出JSON </button>
                                 <button class="btn sbold blue" onclick="batchAddUsers()"> 批量生成 </button>
                                 <button class="btn sbold blue" onclick="addUser()"> 添加用户 </button>
                             </div>
@@ -77,6 +78,8 @@
                                     <th> 用户名 </th>
                                     <th> 端口 </th>
                                     <th> 加密方式 </th>
+                                    <th> 协议 </th>
+                                    <th> 混淆 </th>
                                     <th> 已消耗 </th>
                                     <th> 最后使用 </th>
                                     <th> 有效期 </th>
@@ -88,7 +91,7 @@
                                 <tbody>
                                     @if ($userList->isEmpty())
                                         <tr>
-                                            <td colspan="10" style="text-align: center;">暂无数据</td>
+                                            <td colspan="12" style="text-align: center;">暂无数据</td>
                                         </tr>
                                     @else
                                         @foreach ($userList as $user)
@@ -97,6 +100,8 @@
                                             <td> {{$user->username}} </td>
                                             <td> <span class="label label-danger"> {{$user->port}} </span> </td>
                                             <td> <span class="label label-default"> {{$user->method}} </span> </td>
+                                                <td> <span class="label label-default"> {{$user->protocol}} </span> </td>
+                                                <td> <span class="label label-default"> {{$user->obfs}} </span> </td>
                                             <td class="center"> {{$user->used_flow}} / {{$user->transfer_enable}} </td>
                                             <td class="center"> {{empty($user->t) ? '未使用' : date('Y-m-d H:i:s', $user->t)}} </td>
                                             <td class="center">
@@ -165,6 +170,12 @@
     <script src="/js/layer/layer.js" type="text/javascript"></script>
 
     <script type="text/javascript">
+        // 导出原版json配置
+        function exportSSJson() {
+            layer.msg("成功导出原版SS的用户配置信息，加密方式为系统默认的加密方式");
+            window.location.href = '{{url('admin/exportSSJson')}}';
+        }
+
         // 批量生成账号
         function batchAddUsers() {
             layer.confirm('将自动生成5个账号，确定继续吗？', {icon: 3, title:'警告'}, function(index) {

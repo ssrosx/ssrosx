@@ -53,7 +53,7 @@ class AdminController extends Controller
         $view['totalUserCount'] = User::query()->count(); // 总用户数
         $view['enableUserCount'] = User::query()->where('enable', 1)->count(); // 有效用户数
         $view['activeUserCount'] = User::query()->where('t', '>=', $past)->count(); // 活跃用户数
-        $view['unActiveUserCount'] = User::query()->where('t', '<=', $past)->where('enable', 1)->count(); // 不活跃用户数
+        $view['unActiveUserCount'] = User::query()->where('t', '<=', $past)->where('enable', 1)->where('t', '>', 0)->count(); // 不活跃用户数
         $view['onlineUserCount'] = User::query()->where('t', '>=', time() - 600)->count(); // 10分钟内在线用户数
         $view['expireWarningUserCount'] = User::query()->where('expire_time', '<=', date('Y-m-d', strtotime("+" . self::$config['expire_days'] . " days")))->whereIn('status', [0, 1])->where('enable', 1)->count(); // 临近过期用户数
         $view['largeTrafficUserCount'] = User::query()->whereRaw('(u + d) >= 107374182400')->whereIn('status', [0, 1])->count(); // 流量超过100G的用户
@@ -148,7 +148,7 @@ class AdminController extends Controller
 
         // 不活跃用户
         if ($unActive) {
-            $query->where('t', '<=', strtotime(date('Y-m-d', strtotime("-" . self::$config['expire_days'] . " days"))))->where('enable', 1);
+            $query->where('t', '>', 0)->where('t', '<=', strtotime(date('Y-m-d', strtotime("-" . self::$config['expire_days'] . " days"))))->where('enable', 1);
         }
 
         // 24小时内流量异常用户
@@ -247,7 +247,7 @@ class AdminController extends Controller
         } else {
             // 生成一个可用端口
             $last_user = User::query()->orderBy('id', 'desc')->first();
-            $view['last_port'] = self::$config['is_rand_port'] ? $this->getRandPort() : $last_user->port + 1;
+            $view['last_port'] = self::$config['is_rand_port'] ? $this->getRandPort() : $this->getOnlyPort();
             $view['is_rand_port'] = self::$config['is_rand_port'];
             $view['method_list'] = $this->methodList();
             $view['protocol_list'] = $this->protocolList();
@@ -267,7 +267,7 @@ class AdminController extends Controller
             for ($i = 0; $i < 5; $i++) {
                 // 生成一个可用端口
                 $last_user = User::query()->orderBy('id', 'desc')->first();
-                $port = self::$config['is_rand_port'] ? $this->getRandPort() : $last_user->port + 1;
+                $port = self::$config['is_rand_port'] ? $this->getRandPort() : $this->getOnlyPort();
 
                 $user = new User();
                 $user->username = '批量生成-' . makeRandStr();
@@ -343,6 +343,12 @@ class AdminController extends Controller
             $exists = User::query()->where('id', '<>', $id)->where('username', $username)->first();
             if ($exists) {
                 return Response::json(['status' => 'fail', 'data' => '', 'message' => '用户名已存在，请重新输入']);
+            }
+
+            // 校验端口是否已存在
+            $exists = User::query()->where('id', '<>', $id)->where('port', '>', 0)->where('port', $port)->first();
+            if ($exists) {
+                return Response::json(['status' => 'fail', 'data' => '', 'message' => '端口已存在，请重新输入']);
             }
 
             DB::beginTransaction();
@@ -702,10 +708,17 @@ class AdminController extends Controller
 
         DB::beginTransaction();
         try {
-            // 删除分组关联、节点标签
+            // 删除分组关联、节点标签、节点相关日志
             SsGroupNode::query()->where('node_id', $id)->delete();
             SsNodeLabel::query()->where('node_id', $id)->delete();
             SsNode::query()->where('id', $id)->delete();
+            SsNodeInfo::query()->where('node_id', $id)->delete();
+            SsNodeOnlineLog::query()->where('node_id', $id)->delete();
+            SsNodeTrafficDaily::query()->where('node_id', $id)->delete();
+            SsNodeTrafficHourly::query()->where('node_id', $id)->delete();
+            UserTrafficDaily::query()->where('node_id', $id)->delete();
+            UserTrafficHourly::query()->where('node_id', $id)->delete();
+            UserTrafficLog::query()->where('node_id', $id)->delete();
 
             DB::commit();
 
@@ -730,20 +743,30 @@ class AdminController extends Controller
             return Redirect::back();
         }
 
-        // 30天内的流量
+        // 查看流量
         $dailyData = [];
         $hourlyData = [];
 
-        // 节点30日内每天的流量
-        $nodeTrafficDaily = SsNodeTrafficDaily::query()->with(['info'])->where('node_id', $node->id)->orderBy('id', 'desc')->limit(30)->get();
-        foreach ($nodeTrafficDaily as $daily) {
-            $dailyData[] = round($daily->total / (1024 * 1024), 2);
+        // 节点一个月内的流量
+        $nodeTrafficDaily = SsNodeTrafficDaily::query()->with(['info'])->where('node_id', $node->id)->where('created_at', '>=', date('Y-m', time()))->orderBy('created_at', 'asc')->pluck('total')->toArray();
+        $dailyTotal = date('d', time()) - 1;//今天不算，减一
+        $dailyCount = count($nodeTrafficDaily);
+        for ($x = 0; $x < ($dailyTotal - $dailyCount); $x++) {
+            $dailyData[$x] = 0;
+        }
+        for ($x = ($dailyTotal - $dailyCount); $x < $dailyTotal; $x++) {
+            $dailyData[$x] = round($nodeTrafficDaily[$x - ($dailyTotal - $dailyCount)] / (1024 * 1024 * 1024), 3);
         }
 
-        // 节点24小时内每小时的流量
-        $nodeTrafficHourly = SsNodeTrafficHourly::query()->with(['info'])->where('node_id', $node->id)->orderBy('id', 'desc')->limit(24)->get();
-        foreach ($nodeTrafficHourly as $hourly) {
-            $hourlyData[] = round($hourly->total / (1024 * 1024), 2);
+        // 节点一天内的流量
+        $nodeTrafficHourly = SsNodeTrafficHourly::query()->with(['info'])->where('node_id', $node->id)->where('created_at', '>=', date('Y-m-d', time()))->orderBy('created_at', 'asc')->pluck('total')->toArray();
+        $hourlyTotal = date('H', time());
+        $hourlyCount = count($nodeTrafficHourly);
+        for ($x = 0; $x < ($hourlyTotal - $hourlyCount); $x++) {
+            $hourlyData[$x] = 0;
+        }
+        for ($x = ($hourlyTotal - $hourlyCount); $x < $hourlyTotal; $x++) {
+            $hourlyData[$x] = round($nodeTrafficHourly[$x - ($hourlyTotal - $hourlyCount)] / (1024 * 1024 * 1024), 3);
         }
 
         $view['trafficDaily'] = [
@@ -1102,10 +1125,10 @@ class AdminController extends Controller
         }
 
         if (!file_exists($filePath)) {
-            exit('文件不存在');
+            exit('文件不存在，请检查目录权限');
         }
 
-        return Response::download(public_path('downloads/convert.json'));
+        return Response::download($filePath);
     }
 
     // 数据导入
@@ -1266,6 +1289,47 @@ class AdminController extends Controller
         return Response::view('admin/export', $view);
     }
 
+    // 导出原版SS用户配置信息
+    public function exportSSJson(Request $request)
+    {
+        $userList = User::query()->where('port', '>', 0)->get();
+        $defaultMethod = $this->getDefaultMethod();
+
+        $json = '';
+        if (!$userList->isEmpty()) {
+            $tmp = [];
+            foreach ($userList as $key => $user) {
+                $tmp[] = '"' . $user->port . '":"' . $user->passwd . '"';
+            }
+
+            $userPassword = implode(",\n\t\t", $tmp);
+            $json = <<<EOF
+{
+	"server":"0.0.0.0",
+    "local_address":"127.0.0.1",
+    "local_port":1080,
+    "port_password":{
+        {$userPassword}
+    },
+    "timeout":300,
+    "method":"{$defaultMethod}",
+    "fast_open":false
+}
+EOF;
+        }
+
+        // 生成JSON文件
+        $fileName = makeRandStr('16') . '_shadowsocks.json';
+        $filePath = public_path('downloads/' . $fileName);
+        file_put_contents($filePath, $json);
+
+        if (!file_exists($filePath)) {
+            exit('文件生成失败，请检查目录权限');
+        }
+
+        return Response::download($filePath);
+    }
+
     // 修改个人资料
     public function profile(Request $request)
     {
@@ -1325,16 +1389,27 @@ class AdminController extends Controller
             $dailyData = [];
             $hourlyData = [];
 
-            // 每个节点30日内每天的流量
-            $userTrafficDaily = UserTrafficDaily::query()->with(['node'])->where('user_id', $user->id)->where('node_id', $node->id)->orderBy('id', 'desc')->limit(30)->get();
-            foreach ($userTrafficDaily as $daily) {
-                $dailyData[] = round($daily->total / (1024 * 1024), 2);
+
+            // 节点一个月内的流量
+            $userTrafficDaily = UserTrafficDaily::query()->with(['info'])->where('user_id', $user->id)->where('node_id', $node->id)->where('created_at', '>=', date('Y-m', time()))->orderBy('created_at', 'asc')->pluck('total')->toArray();
+            $dailyTotal = date('d', time()) - 1;//今天不算，减一
+            $dailyCount = count($userTrafficDaily);
+            for ($x = 0; $x < ($dailyTotal - $dailyCount); $x++) {
+                $dailyData[$x] = 0;
+            }
+            for ($x = ($dailyTotal - $dailyCount); $x < $dailyTotal; $x++) {
+                $dailyData[$x] = round($userTrafficDaily[$x - ($dailyTotal - $dailyCount)] / (1024 * 1024 * 1024), 3);
             }
 
-            // 每个节点24小时内每小时的流量
-            $userTrafficHourly = UserTrafficHourly::query()->with(['node'])->where('user_id', $user->id)->where('node_id', $node->id)->orderBy('id', 'desc')->limit(24)->get();
-            foreach ($userTrafficHourly as $hourly) {
-                $hourlyData[] = round($hourly->total / (1024 * 1024), 2);
+            // 节点一天内的流量
+            $userTrafficHourly = UserTrafficHourly::query()->with(['info'])->where('user_id', $user->id)->where('node_id', $node->id)->where('created_at', '>=', date('Y-m-d', time()))->orderBy('created_at', 'asc')->pluck('total')->toArray();
+            $hourlyTotal = date('H', time());
+            $hourlyCount = count($userTrafficHourly);
+            for ($x = 0; $x < ($hourlyTotal - $hourlyCount); $x++) {
+                $hourlyData[$x] = 0;
+            }
+            for ($x = ($hourlyTotal - $hourlyCount); $x < $hourlyTotal; $x++) {
+                $hourlyData[$x] = round($userTrafficHourly[$x - ($hourlyTotal - $hourlyCount)] / (1024 * 1024 * 1024), 3);
             }
 
             $trafficDaily[$node->id] = [
@@ -1358,9 +1433,8 @@ class AdminController extends Controller
     // 生成SS端口
     public function makePort(Request $request)
     {
-        $last_user = User::query()->orderBy('id', 'desc')->first();
-        $last_port = self::$config['is_rand_port'] ? $this->getRandPort() : $last_user->port + 1;
-        echo $last_port;
+        $new_port = self::$config['is_rand_port'] ? $this->getRandPort() : $this->getOnlyPort();
+        echo $new_port;
         exit;
     }
 

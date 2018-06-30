@@ -19,6 +19,7 @@ Route::group(['middleware' => ['forbidden', 'user', 'admin']], function () {
     Route::get('admin/userList', 'AdminController@userList'); // 账号列表
     Route::any('admin/addUser', 'AdminController@addUser'); // 添加账号
     Route::post('admin/batchAddUsers', 'AdminController@batchAddUsers'); // 批量生成账号
+    Route::get('admin/exportSSJson', 'AdminController@exportSSJson'); // 导出原版SS的json配置信息
     Route::any('admin/editUser', 'AdminController@editUser'); // 编辑账号
     Route::post('admin/delUser', 'AdminController@delUser'); // 删除账号
     Route::get('admin/nodeList', 'AdminController@nodeList'); // 节点列表
@@ -91,6 +92,9 @@ Route::group(['middleware' => ['forbidden', 'user', 'admin']], function () {
     Route::post("admin/switchToUser", "AdminController@switchToUser"); // 转换成某个用户的身份
     Route::any("admin/decompile", "AdminController@decompile"); // SS(R)链接反解析
     Route::any("payment/callbackList", "PaymentController@callbackList"); // 有赞云支付回调日志
+    Route::get("marketing/emailList", "MarketingController@emailList"); // 邮件消息列表
+    Route::get("marketing/pushList", "MarketingController@pushList"); // 推送消息列表
+    Route::post("marketing/addPushMarketing", "MarketingController@addPushMarketing"); // 推送消息
 });
 
 Route::group(['middleware' => ['forbidden', 'user']], function () {

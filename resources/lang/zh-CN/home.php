@@ -22,7 +22,7 @@ return [
     'no_need_invite_codes'            => '现在无需邀请码',
 
     // 首页
-    'ratio_tips'                      => '推荐使用支持节点订阅的客户端，通过订阅功能可以在客户端快速同步节点信息。',
+    'ratio_tips'                      => '推荐使用支持节点订阅功能的客户端，通过订阅功能可以在客户端快速同步节点信息。',
     'subscribe_button'                => '获取订阅地址',
     'account_info'                    => '账号信息',
     'account_level'                   => '等级',
@@ -90,15 +90,15 @@ return [
     'service_days'                    => '有效期',
     'service_buy_button'              => '购买',
     'day'                             => '天',
-    'coupon'                          => '充值券',
+    'coupon'                          => '优惠券',
     'redeem_coupon'                   => '使用',
     'service_type_1'                  => '流量包',
     'service_type_2'                  => '套餐',
 
     // 流量日志
-    'traffic_log_tips'                => '提示：流量统计图更新会有延迟。按天统计图在次日更新，按小时统计图在次小时更新。',
-    'traffic_log_30days'              => '最近 30 天的流量使用情况',
-    'traffic_log_24hours'             => '最近 24 小时的流量使用情况',
+    'traffic_log_tips'                => '提示：流量统计图更新会有延迟。按天统计图在次日更新，按小时统计图在次小时更新。（每月1日月流量不显示流量）',
+    'traffic_log_30days'              => '本月流量使用情况',
+    'traffic_log_24hours'             => '今日流量使用情况',
     'traffic_log_keywords'            => '使用流量',
     'traffic_log_unit'                => '单位 / MB',
     'traffic_log_max'                 => '使用高峰',

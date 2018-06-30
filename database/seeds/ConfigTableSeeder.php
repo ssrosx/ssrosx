@@ -19,7 +19,7 @@ class ConfigTableSeeder extends Seeder
         DB::insert("INSERT INTO `config` VALUES ('6', 'website_name', 'SSROSX');");
         DB::insert("INSERT INTO `config` VALUES ('7', 'is_reset_password', 1);");
         DB::insert("INSERT INTO `config` VALUES ('8', 'reset_password_times', 3);");
-        DB::insert("INSERT INTO `config` VALUES ('9', 'website_url', 'http://www.ssrosx.com');");
+        DB::insert("INSERT INTO `config` VALUES ('9', 'website_url', 'https://www.ssrosx.com');");
         DB::insert("INSERT INTO `config` VALUES ('10', 'is_active_register', 1);");
         DB::insert("INSERT INTO `config` VALUES ('11', 'active_times', 3);");
         DB::insert("INSERT INTO `config` VALUES ('12', 'login_add_score', 1);");
@@ -69,5 +69,9 @@ class ConfigTableSeeder extends Seeder
         DB::insert("INSERT INTO `config` VALUES ('56', 'website_customer_service', '');");
         DB::insert("INSERT INTO `config` VALUES ('57', 'register_ip_limit', 5);");
         DB::insert("INSERT INTO `config` VALUES ('58', 'goods_purchase_limit_strategy', 'none');");
+        DB::insert("INSERT INTO `config` VALUES ('59', 'is_push_bear', 0);");
+        DB::insert("INSERT INTO `config` VALUES ('60', 'push_bear_send_key', '');");
+        DB::insert("INSERT INTO `config` VALUES ('61', 'push_bear_qrcode', '');");
+        DB::insert("INSERT INTO `config` VALUES ('62', 'is_ban_status', 0);");
     }
 }
