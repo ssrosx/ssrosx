@@ -916,6 +916,7 @@ CREATE TABLE `ss_ads_traffic` (
   `user_id` int(11) NOT NULL COMMENT '用户ID',
   `ads_sn` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '广告订单ID',
   `traffic` int(11) NOT NULL DEFAULT '0' COMMENT '流量值（单位：M）',
+  `receive` TINYINT(4) NOT NULL DEFAULT '0' COMMENT '领取：0-未领取、1-已领取',
   `created_at` datetime DEFAULT NULL COMMENT '创建时间',
   `updated_at` datetime DEFAULT NULL COMMENT '最后一起更新时间',
   PRIMARY KEY (`id`)
