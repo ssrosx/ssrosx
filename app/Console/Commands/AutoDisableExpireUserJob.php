@@ -21,10 +21,10 @@ class autoDisableExpireUserJob extends Command
     {
         // 到期账号禁用
       $config = $this->systemConfig();
+
       if ($config['is_ban_status']) {
         User::query()->where('enable', 1)->where('expire_time', '<=', date('Y-m-d'))->update(['enable' => 0, 'status' => -1]);
-      }
-      else{
+        } else {
         User::query()->where('enable', 1)->where('expire_time', '<=', date('Y-m-d'))->update(['enable' => 0]);
       }
 

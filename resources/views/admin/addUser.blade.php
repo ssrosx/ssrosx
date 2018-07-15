@@ -40,23 +40,23 @@
                                                 </div>
                                             </div>
                                             <div class="form-group">
-                                                <label for="usage" class="col-md-3 control-label">用途</label>
+                                                <label class="col-md-3 control-label">用途</label>
                                                 <div class="col-md-8">
-                                                    <div class="mt-radio-inline">
-                                                        <label class="mt-radio">
-                                                            <input type="radio" name="usage" value="1"> 手机
+                                                    <div class="mt-checkbox-inline">
+                                                        <label class="mt-checkbox">
+                                                            <input type="checkbox" name="usage" value="1" checked> 手机
                                                             <span></span>
                                                         </label>
-                                                        <label class="mt-radio">
-                                                            <input type="radio" name="usage" value="2"> 电脑
+                                                        <label class="mt-checkbox">
+                                                            <input type="checkbox" name="usage" value="2"> 电脑
                                                             <span></span>
                                                         </label>
-                                                        <label class="mt-radio">
-                                                            <input type="radio" name="usage" value="3"> 路由器
+                                                        <label class="mt-checkbox">
+                                                            <input type="checkbox" name="usage" value="3"> 路由器
                                                             <span></span>
                                                         </label>
-                                                        <label class="mt-radio">
-                                                            <input type="radio" name="usage" value="4" checked> 其他
+                                                        <label class="mt-checkbox">
+                                                            <input type="checkbox" name="usage" value="4"> 平板
                                                             <span></span>
                                                         </label>
                                                     </div>
@@ -67,7 +67,7 @@
                                                 <div class="col-md-8">
                                                     <div class="mt-radio-inline">
                                                         <label class="mt-radio">
-                                                            <input type="radio" name="pay_way" value="0" checked> 免费
+                                                            <input type="radio" name="pay_way" value="0"> 免费
                                                             <span></span>
                                                         </label>
                                                         <label class="mt-radio">
@@ -75,11 +75,15 @@
                                                             <span></span>
                                                         </label>
                                                         <label class="mt-radio">
-                                                            <input type="radio" name="pay_way" value="2"> 半年付
+                                                            <input type="radio" name="pay_way" value="2" checked> 季付
                                                             <span></span>
                                                         </label>
                                                         <label class="mt-radio">
-                                                            <input type="radio" name="pay_way" value="3"> 年付
+                                                            <input type="radio" name="pay_way" value="3"> 半年付
+                                                            <span></span>
+                                                        </label>
+                                                        <label class="mt-radio">
+                                                            <input type="radio" name="pay_way" value="4"> 年付
                                                             <span></span>
                                                         </label>
                                                     </div>
@@ -306,6 +310,7 @@
     <script type="text/javascript">
         // 用户标签选择器
         $('#labels').select2({
+            theme: 'bootstrap',
             placeholder: '设置后则可见相同标签的节点',
             allowClear: true
         });
@@ -325,7 +330,6 @@
             var _token = '{{csrf_token()}}';
             var username = $('#username').val();
             var password = $('#password').val();
-            var usage = $("input:radio[name='usage']:checked").val();
             var pay_way = $("input:radio[name='pay_way']:checked").val();
             var labels = $('#labels').val();
             var enable_time = $('#enable_time').val();
@@ -347,6 +351,15 @@
             var obfs_param = $('#obfs_param').val();
             var speed_limit_per_con = $('#speed_limit_per_con').val();
             var speed_limit_per_user = $('#speed_limit_per_user').val();
+
+            // 用途
+            var usage = '';
+            $.each($("input:checkbox[name='usage']"), function(){
+                if (this.checked) {
+                    usage += $(this).val() + ',';
+                }
+            });
+            usage = usage.substring(0, usage.length - 1);
 
             $.ajax({
                 type: "POST",

@@ -73,5 +73,6 @@ class ConfigTableSeeder extends Seeder
         DB::insert("INSERT INTO `config` VALUES ('60', 'push_bear_send_key', '');");
         DB::insert("INSERT INTO `config` VALUES ('61', 'push_bear_qrcode', '');");
         DB::insert("INSERT INTO `config` VALUES ('62', 'is_ban_status', 0);");
+        DB::insert("INSERT INTO `config` VALUES ('63', 'ads_add_traffic', 1);");
     }
 }

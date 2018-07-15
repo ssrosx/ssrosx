@@ -123,8 +123,8 @@ CREATE TABLE `user` (
   `gender` tinyint(4) NOT NULL DEFAULT '1' COMMENT '性别：0-女、1-男',
   `wechat` varchar(30) DEFAULT '' COMMENT '微信',
   `qq` varchar(20) DEFAULT '' COMMENT 'QQ',
-  `usage` tinyint(4) NOT NULL DEFAULT '4' COMMENT '用途：1-手机、2-电脑、3-路由器、4-其他',
-  `pay_way` tinyint(4) NOT NULL DEFAULT '0' COMMENT '付费方式：0-免费、1-月付、2-半年付、3-年付',
+  `usage` VARCHAR(10) NOT NULL DEFAULT '4' COMMENT '用途：1-手机、2-电脑、3-路由器、4-其他',
+  `pay_way` tinyint(4) NOT NULL DEFAULT '0' COMMENT '付费方式：0-免费、1-季付、2-月付、3-半年付、4-年付',
   `balance` int(11) NOT NULL DEFAULT '0' COMMENT '余额，单位分',
   `score` int(11) NOT NULL DEFAULT '0' COMMENT '积分',
   `enable_time` date DEFAULT NULL COMMENT '开通日期',
@@ -301,7 +301,7 @@ INSERT INTO `config` VALUES ('27', 'reset_traffic', 1);
 INSERT INTO `config` VALUES ('28', 'default_days', 7);
 INSERT INTO `config` VALUES ('29', 'subscribe_max', 3);
 INSERT INTO `config` VALUES ('30', 'min_port', 10000);
-INSERT INTO `config` VALUES ('31', 'max_port', 40000);
+INSERT INTO `config` VALUES ('31', 'max_port', 20000);
 INSERT INTO `config` VALUES ('32', 'is_captcha', 0);
 INSERT INTO `config` VALUES ('33', 'is_traffic_ban', 1);
 INSERT INTO `config` VALUES ('34', 'traffic_ban_value', 10);
@@ -333,7 +333,14 @@ INSERT INTO `config` VALUES ('59', 'is_push_bear', 0);
 INSERT INTO `config` VALUES ('60', 'push_bear_send_key', '');
 INSERT INTO `config` VALUES ('61', 'push_bear_qrcode', '');
 INSERT INTO `config` VALUES ('62', 'is_ban_status', 0);
-
+INSERT INTO `config` VALUES ('63', 'is_namesilo', 0);
+INSERT INTO `config` VALUES ('64', 'namesilo_key', '');
+INSERT INTO `config` VALUES ('65', 'website_logo', '');
+INSERT INTO `config` VALUES ('66', 'website_home_logo', '');
+INSERT INTO `config` VALUES ('67', 'ads_add_traffic', 1);
+INSERT INTO `config` VALUES ('68', 'ads_add_traffic_range', 5);
+INSERT INTO `config` VALUES ('69', 'min_rand_traffic', 10);
+INSERT INTO `config` VALUES ('70', 'max_rand_traffic', 20);
 
 -- ----------------------------
 -- Table structure for `article`
@@ -500,7 +507,7 @@ CREATE TABLE `order` (
   `amount` int(11) NOT NULL DEFAULT '0' COMMENT '订单总价，单位分',
   `expire_at` datetime DEFAULT NULL COMMENT '过期时间',
   `is_expire` tinyint(4) NOT NULL DEFAULT '0' COMMENT '是否已过期：0-未过期、1-已过期',
-  `pay_way` tinyint(4) NOT NULL DEFAULT '1' COMMENT '支付方式：1-余额支付、2-有赞云支付',
+  `pay_way` tinyint(4) NOT NULL DEFAULT '1' COMMENT '支付方式：1-余额支付、2-有赞云支付、3-Apple支付、4-Google支付',
   `status` tinyint(4) NOT NULL DEFAULT '0' COMMENT '订单状态：-1-已关闭、0-待支付、1-已支付待确认、2-已完成',
   `created_at` datetime DEFAULT NULL COMMENT '创建时间',
   `updated_at` datetime DEFAULT NULL COMMENT '最后一次更新时间',
