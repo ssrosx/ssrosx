@@ -491,27 +491,6 @@
                                                     </div>
                                                     <div class="form-group">
                                                         <div class="col-md-6">
-                                                            <label for="is_server_chan" class="col-md-3 control-label">ServerChan</label>
-                                                            <div class="col-md-9">
-                                                                <input type="checkbox" class="make-switch" @if($is_server_chan) checked @endif id="is_server_chan" data-on-color="success" data-off-color="danger" data-on-text="启用" data-off-text="关闭">
-                                                                <span class="help-block"> 推送节点宕机提醒、用户流量异常警告（<a href="http://sc.ftqq.com" target="_blank">绑定微信</a>） </span>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-6">
-                                                            <label for="server_chan_key" class="col-md-3 control-label">SCKEY</label>
-                                                            <div class="col-md-9">
-                                                                <div class="input-group">
-                                                                    <input class="form-control" type="text" name="server_chan_key" value="{{$server_chan_key}}" id="server_chan_key" placeholder="请到ServerChan申请" />
-                                                                    <span class="input-group-btn">
-                                                                        <button class="btn btn-success" type="button" onclick="setServerChanKey()">修改</button>
-                                                                    </span>
-                                                                </div>
-                                                                <span class="help-block"> 启用ServerChan，请务必填入本值（<a href="http://sc.ftqq.com" target="_blank">申请SCKEY</a>） </span>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <div class="col-md-6">
                                                             <label for="is_namesilo" class="col-md-3 control-label">Namesilo</label>
                                                             <div class="col-md-9">
                                                                 <input type="checkbox" class="make-switch" @if($is_namesilo) checked @endif id="is_namesilo" data-on-color="success" data-off-color="danger" data-on-text="启用" data-off-text="关闭">
@@ -528,6 +507,27 @@
                                                                     </span>
                                                                 </div>
                                                                 <span class="help-block"> 域名必须是<a href="https://www.namesilo.com/?rid=326ec20pa" target="_blank">www.namesilo.com</a>上购买的 </span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <div class="col-md-6">
+                                                            <label for="is_server_chan" class="col-md-3 control-label">ServerChan</label>
+                                                            <div class="col-md-9">
+                                                                <input type="checkbox" class="make-switch" @if($is_server_chan) checked @endif id="is_server_chan" data-on-color="success" data-off-color="danger" data-on-text="启用" data-off-text="关闭">
+                                                                <span class="help-block"> 推送节点宕机提醒、用户流量异常警告（<a href="http://sc.ftqq.com" target="_blank">绑定微信</a>） </span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <label for="server_chan_key" class="col-md-3 control-label">SCKEY</label>
+                                                            <div class="col-md-9">
+                                                                <div class="input-group">
+                                                                    <input class="form-control" type="text" name="server_chan_key" value="{{$server_chan_key}}" id="server_chan_key" placeholder="请到ServerChan申请" />
+                                                                    <span class="input-group-btn">
+                                                                        <button class="btn btn-success" type="button" onclick="setServerChanKey()">修改</button>
+                                                                    </span>
+                                                                </div>
+                                                                <span class="help-block"> 启用ServerChan，请务必填入本值（<a href="http://sc.ftqq.com" target="_blank">申请SCKEY</a>） </span>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -563,6 +563,13 @@
                                                                     </span>
                                                                 </div>
                                                                 <span class="help-block"> 创建消息通道后，在二维码上点击右键“复制图片地址”，展示于个人中心 </span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <label for="is_tcp_check" class="col-md-3 control-label">TCP阻断探测</label>
+                                                            <div class="col-md-9">
+                                                                <input type="checkbox" class="make-switch" @if($is_tcp_check) checked @endif id="is_tcp_check" data-on-color="success" data-off-color="danger" data-on-text="启用" data-off-text="关闭">
+                                                                <span class="help-block"> 自动检测是否被墙TCP阻断并提醒 </span>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -614,7 +621,7 @@
                                                             <label for="is_traffic_ban" class="col-md-3 control-label">异常自动封号</label>
                                                             <div class="col-md-9">
                                                                 <input type="checkbox" class="make-switch" @if($is_traffic_ban) checked @endif id="is_traffic_ban" data-on-color="success" data-off-color="danger" data-on-text="启用" data-off-text="关闭">
-                                                                <span class="help-block"> 24小时内流量超过异常阈值则自动封号（仅禁用SSR(R)） </span>
+                                                                <span class="help-block"> 1小时内流量超过异常阈值则自动封号（仅禁用SSR(R)） </span>
                                                             </div>
                                                         </div>
                                                         <div class="col-md-6">
@@ -627,7 +634,7 @@
                                                                         <button class="btn btn-success" type="button" onclick="setTrafficBanValue()">修改</button>
                                                                     </span>
                                                                 </div>
-                                                                <span class="help-block"> 24小时内超过该值，则触发自动封号 </span>
+                                                                <span class="help-block"> 1小时内超过该值，则触发自动封号 </span>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -649,14 +656,14 @@
                                                             <label for="auto_release_port" class="col-md-3 control-label">端口自动释放</label>
                                                             <div class="col-md-9">
                                                                 <input type="checkbox" class="make-switch" @if($auto_release_port) checked @endif id="auto_release_port" data-on-color="success" data-off-color="danger" data-on-text="启用" data-off-text="关闭">
-                                                                <span class="help-block"> 被禁用的用户端口自动释放，重新启用用户则需要手动分配端口并手动重启一次SSR(R) </span>
+                                                                <span class="help-block"> 被封禁的用户端口自动释放 </span>
                                                             </div>
                                                         </div>
                                                         <div class="col-md-6">
-                                                            <label for="is_ban_status" class="col-md-3 control-label">过期自动封号</label>
+                                                            <label for="is_ban_status" class="col-md-3 control-label">过期自动封禁</label>
                                                             <div class="col-md-9">
-                                                                <input type="checkbox" class="make-switch" @if($is_ban_status) checked @endif id="is_ban_status" data-on-color="success" data-off-color="danger" data-on-text="启用" data-off-text="关闭">
-                                                                <span class="help-block"> 被禁用SSR(R)的用户在账号到期时同时封禁账号（账号将无法登录）</span>
+                                                                <input type="checkbox" class="make-switch" @if($is_ban_status) checked @endif id="is_ban_status" data-on-color="danger" data-off-color="danger" data-on-text="封禁整个账号" data-off-text="仅封禁代理">
+                                                                <span class="help-block"> (慎重)封禁整个账号会重置账号的所有数据且会导致用户无法登录 </span>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -797,7 +804,7 @@
                                                 <div class="portlet-body">
                                                     <div class="form-group">
                                                         <div class="col-md-6">
-                                                            <label for="ads_add_traffic" class="col-md-3 control-label">看广告得流量</label>
+                                                            <label for="ads_add_traffic" class="col-md-3 control-label">广告得流量</label>
                                                             <div class="col-md-9">
                                                                 <input type="checkbox" class="make-switch" @if($ads_add_traffic) checked @endif id="ads_add_traffic" data-on-color="success" data-off-color="danger" data-on-text="启用" data-off-text="关闭">
                                                                 <span class="help-block"> 点击广告根据流量范围随机得到流量 </span>
@@ -813,7 +820,7 @@
                                                                         <button class="btn btn-success" type="button" onclick="setAdsAddTrafficRange()">修改</button>
                                                                     </span>
                                                                 </div>
-                                                                <span class="help-block"> 间隔多久广告才会加流量 </span>
+                                                                <span class="help-block"> 间隔多久才会出现广告 </span>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -829,6 +836,17 @@
                                                             </div>
                                                         </div>
                                                         <div class="col-md-6">
+                                                            <label for="ads_daily_count" class="col-md-3 control-label">广告上限</label>
+                                                            <div class="col-md-9">
+                                                                <div class="input-group">
+                                                                    <input class="form-control" type="text" name="ads_daily_count" value="{{$ads_daily_count}}" id="ads_daily_count" />
+                                                                    <span class="input-group-addon">个</span>
+                                                                    <span class="input-group-btn">
+                                                                        <button class="btn btn-success" type="button" onclick="setAdsDailyCount()">修改</button>
+                                                                    </span>
+                                                                </div>
+                                                                <span class="help-block"> 每日广告上限数量 </span>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -1113,6 +1131,21 @@
             }
         });
 
+        // 启用、禁用TCP阻断探测
+        $('#is_tcp_check').on({
+            'switchChange.bootstrapSwitch': function(event, state) {
+                var is_tcp_check = state ? 1 : 0;
+
+                $.post("{{url('admin/setConfig')}}", {_token:'{{csrf_token()}}', name:'is_tcp_check', value:is_tcp_check}, function (ret) {
+                    layer.msg(ret.message, {time:1000}, function() {
+                        if (ret.status == 'fail') {
+                            window.location.reload();
+                        }
+                    });
+                });
+            }
+        });
+
         // 启用、禁用订阅异常自动封禁
         $('#is_subscribe_ban').on({
             'switchChange.bootstrapSwitch': function(event, state) {
@@ -1252,8 +1285,8 @@
         function setTrafficBanValue() {
             var traffic_ban_value = $("#traffic_ban_value").val();
 
-            if (traffic_ban_value < 0) {
-                layer.msg('不能小于0', {time:1000});
+            if (traffic_ban_value < 1) {
+                layer.msg('不能小于1', {time:1000});
                 return ;
             }
 
@@ -1446,6 +1479,55 @@
             }
 
             $.post("{{url('admin/setConfig')}}", {_token:'{{csrf_token()}}', name:'max_rand_score', value:max_rand_score}, function (ret) {
+                layer.msg(ret.message, {time:1000}, function() {
+                    if (ret.status == 'fail') {
+                        window.location.reload();
+                    }
+                });
+            });
+        });
+
+
+        // 设置最小流量
+        $("#min_rand_traffic").change(function () {
+            var min_rand_traffic = $(this).val();
+            var max_rand_traffic = $("#max_rand_traffic").val();
+
+            if (parseInt(min_rand_traffic) < 0) {
+                layer.msg('最小流量小于0', {time:1000});
+                return ;
+            }
+
+            if (parseInt(min_rand_traffic) >= parseInt(max_rand_traffic)) {
+                layer.msg('最小流量必须小于最大流量', {time:1000});
+                return ;
+            }
+
+            $.post("{{url('admin/setConfig')}}", {_token:'{{csrf_token()}}', name:'min_rand_traffic', value:min_rand_traffic}, function (ret) {
+                layer.msg(ret.message, {time:1000}, function() {
+                    if (ret.status == 'fail') {
+                        window.location.reload();
+                    }
+                });
+            });
+        });
+
+        // 设置最大流量
+        $("#max_rand_traffic").change(function () {
+            var min_rand_traffic = $("#min_rand_traffic").val();
+            var max_rand_traffic = $(this).val();
+
+            if (parseInt(max_rand_traffic) > 200) {
+                layer.msg('最大流量不能大于200', {time:1000});
+                return ;
+            }
+
+            if (parseInt(min_rand_traffic) >= parseInt(max_rand_traffic)) {
+                layer.msg('最大流量必须大于最小流量', {time:1000});
+                return ;
+            }
+
+            $.post("{{url('admin/setConfig')}}", {_token:'{{csrf_token()}}', name:'max_rand_traffic', value:max_rand_traffic}, function (ret) {
                 layer.msg(ret.message, {time:1000}, function() {
                     if (ret.status == 'fail') {
                         window.location.reload();
@@ -1737,6 +1819,24 @@
             }
 
             $.post("{{url('admin/setConfig')}}", {_token:'{{csrf_token()}}', name:'ads_add_traffic_range', value:ads_add_traffic_range}, function (ret) {
+                layer.msg(ret.message, {time:1000}, function() {
+                    if (ret.status == 'fail') {
+                        window.location.reload();
+                    }
+                });
+            });
+        }
+
+        // 每日广告上限
+        function setAdsDailyCount() {
+            var ads_daily_count = parseInt($("#ads_daily_count").val());
+
+            if (ads_daily_count < 0) {
+                layer.msg('不能小于0', {time:1000});
+                return ;
+            }
+
+            $.post("{{url('admin/setConfig')}}", {_token:'{{csrf_token()}}', name:'ads_daily_count', value:ads_daily_count}, function (ret) {
                 layer.msg(ret.message, {time:1000}, function() {
                     if (ret.status == 'fail') {
                         window.location.reload();

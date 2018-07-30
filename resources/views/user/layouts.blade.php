@@ -54,6 +54,7 @@
         <a href="javascript:;" class="menu-toggler responsive-toggler" data-toggle="collapse" data-target=".navbar-collapse"> </a>
         <!-- END RESPONSIVE MENU TOGGLER -->
         <!-- BEGIN PAGE TOP -->
+        @if(Session::get('user')['is_admin'])
         <div class="page-top">
             <!-- BEGIN TOP NAVIGATION MENU -->
             <div class="top-menu">
@@ -67,11 +68,9 @@
                             <!-- DOC: Do not remove below empty space(&nbsp;) as its purposely used -->
                             <img alt="" class="img-circle" src="/assets/images/avatar.png" /> </a>
                         <ul class="dropdown-menu dropdown-menu-default">
-                            @if(Session::get('user')['is_admin'])
                                 <li>
                                     <a href="{{url('admin')}}"> <i class="icon-settings"></i>{{trans('home.console')}}</a>
                                 </li>
-                            @endif
                             <li>
                                 <a href="{{url('user/profile')}}"> <i class="icon-user"></i>{{trans('home.profile')}}</a>
                             </li>
@@ -86,6 +85,7 @@
             </div>
             <!-- END TOP NAVIGATION MENU -->
         </div>
+        @endif
         <!-- END PAGE TOP -->
     </div>
     <!-- END HEADER INNER -->
@@ -135,16 +135,10 @@
                         <span class="title">{{trans('home.tickets')}}</span>
                     </a>
                 </li>
-                <li class="nav-item {{in_array(Request::path(), ['user/invite']) ? 'active open' : ''}}">
-                    <a href="{{url('user/invite')}}" class="nav-link nav-toggle">
-                        <i class="icon-user-follow"></i>
-                        <span class="title">{{trans('home.invite_code')}}</span>
-                    </a>
-                </li>
-                <li class="nav-item {{in_array(Request::path(), ['user/trafficLog']) ? 'active open' : ''}}">
-                    <a href="{{url('user/trafficLog')}}" class="nav-link nav-toggle">
-                        <i class="icon-speedometer"></i>
-                        <span class="title">{{trans('home.traffic_log')}}</span>
+                <li class="nav-item {{in_array(Request::path(), ['logout']) ? 'active open' : ''}}">
+                    <a href="{{url('logout')}}" class="nav-link nav-toggle">
+                        <i class="icon-key"></i>
+                        <span class="title">{{trans('home.logout')}}</span>
                     </a>
                 </li>
                 @if(Session::get('referral_status'))

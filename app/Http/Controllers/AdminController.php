@@ -38,24 +38,17 @@ use DB;
 
 class AdminController extends Controller
 {
-    protected static $config;
-
-    function __construct()
-    {
-        self::$config = $this->systemConfig();
-    }
-
     public function index(Request $request)
     {
-        $past = strtotime(date('Y-m-d', strtotime("-" . self::$config['expire_days'] . " days")));
+        $past = strtotime(date('Y-m-d', strtotime("-" . $this->systemConfig['expire_days'] . " days")));
 
-        $view['expireDays'] = self::$config['expire_days'];
+        $view['expireDays'] = $this->systemConfig['expire_days'];
         $view['totalUserCount'] = User::query()->count(); // 总用户数
         $view['enableUserCount'] = User::query()->where('enable', 1)->count(); // 有效用户数
         $view['activeUserCount'] = User::query()->where('t', '>=', $past)->count(); // 活跃用户数
         $view['unActiveUserCount'] = User::query()->where('t', '<=', $past)->where('enable', 1)->where('t', '>', 0)->count(); // 不活跃用户数
         $view['onlineUserCount'] = User::query()->where('t', '>=', time() - 600)->count(); // 10分钟内在线用户数
-        $view['expireWarningUserCount'] = User::query()->where('expire_time', '<=', date('Y-m-d', strtotime("+" . self::$config['expire_days'] . " days")))->whereIn('status', [0, 1])->where('enable', 1)->count(); // 临近过期用户数
+        $view['expireWarningUserCount'] = User::query()->where('expire_time', '<=', date('Y-m-d', strtotime("+" . $this->systemConfig['expire_days'] . " days")))->whereIn('status', [0, 1])->where('enable', 1)->count(); // 临近过期用户数
         $view['largeTrafficUserCount'] = User::query()->whereRaw('(u + d) >= 107374182400')->whereIn('status', [0, 1])->count(); // 流量超过100G的用户
 
         // 24小时内流量异常用户
@@ -63,7 +56,7 @@ class AdminController extends Controller
         $userTotalTrafficList = UserTrafficHourly::query()->where('node_id', 0)->where('total', '>', 104857600)->where('created_at', '>=', date('Y-m-d H:i:s', time() - 24 * 60 * 60))->groupBy('user_id')->selectRaw("user_id, sum(total) as totalTraffic")->get(); // 只统计100M以上的记录，加快速度
         if (!$userTotalTrafficList->isEmpty()) {
             foreach ($userTotalTrafficList as $vo) {
-                if ($vo->totalTraffic > (self::$config['traffic_ban_value'] * 1024 * 1024 * 1024)) {
+                if ($vo->totalTraffic > ($this->systemConfig['traffic_ban_value'] * 1024 * 1024 * 1024)) {
                     $tempUsers[] = $vo->user_id;
                 }
             }
@@ -138,7 +131,7 @@ class AdminController extends Controller
 
         // 临近过期提醒
         if ($expireWarning) {
-            $query->whereIn('status', [0, 1])->where('expire_time', '<=', date('Y-m-d', strtotime("+" . self::$config['expire_days'] . " days")));
+            $query->whereIn('status', [0, 1])->where('expire_time', '<=', date('Y-m-d', strtotime("+" . $this->systemConfig['expire_days'] . " days")));
         }
 
         // 当前在线
@@ -148,7 +141,7 @@ class AdminController extends Controller
 
         // 不活跃用户
         if ($unActive) {
-            $query->where('t', '>', 0)->where('t', '<=', strtotime(date('Y-m-d', strtotime("-" . self::$config['expire_days'] . " days"))))->where('enable', 1);
+            $query->where('t', '>', 0)->where('t', '<=', strtotime(date('Y-m-d', strtotime("-" . $this->systemConfig['expire_days'] . " days"))))->where('enable', 1);
         }
 
         // 24小时内流量异常用户
@@ -157,7 +150,7 @@ class AdminController extends Controller
             $userTotalTrafficList = UserTrafficHourly::query()->where('node_id', 0)->where('total', '>', 104857600)->where('created_at', '>=', date('Y-m-d H:i:s', time() - 24 * 60 * 60))->groupBy('user_id')->selectRaw("user_id, sum(total) as totalTraffic")->get(); // 只统计100M以上的记录，加快速度
             if (!$userTotalTrafficList->isEmpty()) {
                 foreach ($userTotalTrafficList as $vo) {
-                    if ($vo->totalTraffic > (self::$config['traffic_ban_value'] * 1024 * 1024 * 1024)) {
+                    if ($vo->totalTraffic > ($this->systemConfig['traffic_ban_value'] * 1024 * 1024 * 1024)) {
                         $tempUsers[] = $vo->user_id;
                     }
                 }
@@ -174,7 +167,7 @@ class AdminController extends Controller
             // 流量异常警告
             $time = date('Y-m-d H:i:s', time() - 24 * 60 * 60);
             $totalTraffic = UserTrafficHourly::query()->where('user_id', $user->id)->where('node_id', 0)->where('created_at', '>=', $time)->sum('total');
-            $user->trafficWarning = $totalTraffic > (self::$config['traffic_ban_value'] * 1024 * 1024 * 1024) ? 1 : 0;
+            $user->trafficWarning = $totalTraffic > ($this->systemConfig['traffic_ban_value'] * 1024 * 1024 * 1024) ? 1 : 0;
         }
 
         $view['userList'] = $userList;
@@ -192,18 +185,9 @@ class AdminController extends Controller
                 return Response::json(['status' => 'fail', 'data' => '', 'message' => '用户名已存在，请重新输入']);
             }
 
-            // 密码为空时则生成随机密码
-            $password = $request->get('password');
-            if (empty($password)) {
-                $str = makeRandStr();
-                $password = md5($str);
-            } else {
-                $password = md5($password);
-            }
-
             $user = new User();
             $user->username = trim($request->get('username'));
-            $user->password = $password;
+            $user->password = trim($request->get('password')) ? md5(trim($request->get('password'))) : md5(makeRandStr()); // 密码为空时则生成随机密码
             $user->port = $request->get('port');
             $user->passwd = empty($request->get('passwd')) ? makeRandStr() : $request->get('passwd'); // SS密码为空时生成默认密码
             $user->transfer_enable = toGB($request->get('transfer_enable', 0));
@@ -246,9 +230,8 @@ class AdminController extends Controller
             }
         } else {
             // 生成一个可用端口
-            $last_user = User::query()->orderBy('id', 'desc')->first();
-            $view['last_port'] = self::$config['is_rand_port'] ? $this->getRandPort() : $this->getOnlyPort();
-            $view['is_rand_port'] = self::$config['is_rand_port'];
+            $view['last_port'] = $this->systemConfig['is_rand_port'] ? $this->getRandPort() : $this->getOnlyPort();
+            $view['is_rand_port'] = $this->systemConfig['is_rand_port'];
             $view['method_list'] = $this->methodList();
             $view['protocol_list'] = $this->protocolList();
             $view['obfs_list'] = $this->obfsList();
@@ -266,8 +249,7 @@ class AdminController extends Controller
         try {
             for ($i = 0; $i < 5; $i++) {
                 // 生成一个可用端口
-                $last_user = User::query()->orderBy('id', 'desc')->first();
-                $port = self::$config['is_rand_port'] ? $this->getRandPort() : $this->getOnlyPort();
+                $port = $this->systemConfig['is_rand_port'] ? $this->getRandPort() : $this->getOnlyPort();
 
                 $user = new User();
                 $user->username = '批量生成-' . makeRandStr();
@@ -287,8 +269,8 @@ class AdminController extends Controller
                 $user->save();
 
                 // 初始化默认标签
-                if (count(self::$config['initial_labels_for_user']) > 0) {
-                    $labels = explode(',', self::$config['initial_labels_for_user']);
+                if (count($this->systemConfig['initial_labels_for_user']) > 0) {
+                    $labels = explode(',', $this->systemConfig['initial_labels_for_user']);
                     foreach ($labels as $label) {
                         $userLabel = new UserLabel();
                         $userLabel->user_id = $user->id;
@@ -386,11 +368,11 @@ class AdminController extends Controller
 
                 User::query()->where('id', $id)->update($data);
 
+                // 重新生成用户标签
+                if (!empty($labels)) {
                 // 先删除该用户所有的标签
                 UserLabel::query()->where('user_id', $id)->delete();
 
-                // 生成用户标签
-                if (!empty($labels)) {
                     foreach ($labels as $label) {
                         $userLabel = new UserLabel();
                         $userLabel->user_id = $id;
@@ -440,7 +422,7 @@ class AdminController extends Controller
     {
         $id = $request->get('id');
 
-        if ($id == 1) {
+        if ($id === 1) {
             return Response::json(['status' => 'fail', 'data' => '', 'message' => '系统管理员不可删除']);
         }
 
@@ -474,7 +456,7 @@ class AdminController extends Controller
             $totalTraffic = SsNodeTrafficDaily::query()->where('node_id', $node->id)->sum('total');
             $node->transfer = flowAutoShow($totalTraffic);
 
-            // 负载（10分钟以内）
+            // 负载（10分钟以内） TODO:待改造
             $node_info = SsNodeInfo::query()->where('node_id', $node->id)->where('log_time', '>=', strtotime("-10 minutes"))->orderBy('id', 'desc')->first();
             $node->load = empty($node_info) || empty($node_info->load) ? '宕机' : $node_info->load;
         }
@@ -653,8 +635,10 @@ class AdminController extends Controller
 
                 // 生成节点标签
                 $labels = $request->get('labels');
-                SsNodeLabel::query()->where('node_id', $id)->delete(); // 删除所有该节点的标签
                 if (!empty($labels)) {
+                    // 删除所有该节点的标签
+                    SsNodeLabel::query()->where('node_id', $id)->delete();
+
                     foreach ($labels as $label) {
                         $ssNodeLabel = new SsNodeLabel();
                         $ssNodeLabel->node_id = $id;
@@ -711,9 +695,9 @@ class AdminController extends Controller
         DB::beginTransaction();
         try {
             // 删除分组关联、节点标签、节点相关日志
+            SsNode::query()->where('id', $id)->delete();
             SsGroupNode::query()->where('node_id', $id)->delete();
             SsNodeLabel::query()->where('node_id', $id)->delete();
-            SsNode::query()->where('id', $id)->delete();
             SsNodeInfo::query()->where('node_id', $id)->delete();
             SsNodeOnlineLog::query()->where('node_id', $id)->delete();
             SsNodeTrafficDaily::query()->where('node_id', $id)->delete();
@@ -781,8 +765,16 @@ class AdminController extends Controller
             'hourlyData' => "'" . implode("','", $hourlyData) . "'"
         ];
 
+        // 本月天数数据
+        $monthDays = [];
+        $monthHasDays = date("t");
+        for ($i = 1; $i <= $monthHasDays; $i++) {
+            $monthDays[] = $i;
+        }
+
         $view['nodeName'] = $node->name;
         $view['nodeServer'] = $node->server;
+        $view['monthDays'] = "'" . implode("','", $monthDays) . "'";
 
         return Response::view('admin/nodeMonitor', $view);
     }
@@ -1435,7 +1427,7 @@ EOF;
     // 生成SS端口
     public function makePort(Request $request)
     {
-        $new_port = self::$config['is_rand_port'] ? $this->getRandPort() : $this->getOnlyPort();
+        $new_port = $this->systemConfig['is_rand_port'] ? $this->getRandPort() : $this->getOnlyPort();
         echo $new_port;
         exit;
     }
@@ -1830,7 +1822,7 @@ EOF;
         }
 
         // 屏蔽异常配置
-        if (!array_key_exists($name, self::$config)) {
+        if (!array_key_exists($name, $this->systemConfig)) {
             return Response::json(['status' => 'fail', 'data' => '', 'message' => '设置失败：配置不存在']);
         }
 
@@ -1864,7 +1856,7 @@ EOF;
         return Response::json(['status' => 'success', 'data' => '', 'message' => '设置成功']);
     }
 
-    // 设置微信、支付宝二维码
+    // 设置微信、支付宝二维码（已废弃）
     public function setQrcode(Request $request)
     {
         // 微信二维码
@@ -2058,27 +2050,19 @@ EOF;
     public function handleUserBalance(Request $request)
     {
         if ($request->method() == 'POST') {
-            $user_id = $request->get('user_id');
+            $userId = $request->get('user_id');
             $amount = $request->get('amount');
 
-            if (empty($user_id) || empty($amount)) {
+            if (empty($userId) || empty($amount)) {
                 return Response::json(['status' => 'fail', 'data' => '', 'message' => '充值异常']);
             }
 
             DB::beginTransaction();
             try {
-                $user = User::query()->where('id', $user_id)->first();
+                $user = User::query()->where('id', $userId)->first();
 
                 // 写入余额变动日志
-                $userBalanceLog = new UserBalanceLog();
-                $userBalanceLog->user_id = $user_id;
-                $userBalanceLog->order_id = 0;
-                $userBalanceLog->before = $user->balance;
-                $userBalanceLog->after = $user->balance + $amount;
-                $userBalanceLog->amount = $amount;
-                $userBalanceLog->desc = '后台手动充值';
-                $userBalanceLog->created_at = date('Y-m-d H:i:s');
-                $userBalanceLog->save();
+                $this->addUserBalanceLog($userId, 0, $user->balance, $user->balance + $amount, $amount, '后台手动充值');
 
                 // 加减余额
                 if ($amount < 0) {

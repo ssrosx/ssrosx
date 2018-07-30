@@ -8,9 +8,9 @@ use App\Http\Models\SsNodeTrafficDaily;
 use App\Http\Models\UserTrafficLog;
 use Log;
 
-class AutoStatisticsNodeDailyTrafficJob extends Command
+class AutoStatisticsNodeDailyTraffic extends Command
 {
-    protected $signature = 'autoStatisticsNodeDailyTrafficJob';
+    protected $signature = 'autoStatisticsNodeDailyTraffic';
     protected $description = '自动统计节点每日流量';
 
     public function __construct()
@@ -20,12 +20,17 @@ class AutoStatisticsNodeDailyTrafficJob extends Command
 
     public function handle()
     {
+        $jobStartTime = microtime(true);
+
         $nodeList = SsNode::query()->where('status', 1)->orderBy('id', 'asc')->get();
         foreach ($nodeList as $node) {
             $this->statisticsByNode($node->id);
         }
 
-        Log::info('定时任务：' . $this->description);
+        $jobEndTime = microtime(true);
+        $jobUsedTime = round(($jobEndTime - $jobStartTime) , 4);
+
+        Log::info('执行定时任务【' . $this->description . '】，耗时' . $jobUsedTime . '秒');
     }
 
     private function statisticsByNode($node_id)

@@ -31,16 +31,11 @@
         @endif
         <div class="row">
             <div class="col-md-8">
-                <div class="well" style="background-color: #FFF;">
-                    {{trans('home.ratio_tips')}}
-                    <button class="btn btn-sm blue" onclick="subscribe()"> {{trans('home.subscribe_button')}} </button>
-                </div>
                 <div class="row widget-row">
                     @if(!$nodeList->isEmpty())
                         @foreach($nodeList as $node)
                             <div class="col-md-4">
                                 <div class="widget-thumb widget-bg-color-white text-uppercase margin-bottom-20 ">
-                                    <h4 class="widget-thumb-heading">{{$node->name}}</h4>
                                     <div class="widget-thumb-wrap">
                                         <div style="float:left;display: inline-block;padding-right:15px;">
                                             @if($node->country_code)
@@ -50,15 +45,13 @@
                                             @endif
                                         </div>
                                         <div class="widget-thumb-body">
-                                            <span class="widget-thumb-subtitle"><a data-toggle="modal" href="#txt_{{$node->id}}">{{$node->server ? $node->server : $node->ip}}</a></span>
+                                            <span class="widget-thumb-subtitle"><a data-toggle="modal">{{$node->name}}</a></span>
                                             <span class="widget-thumb-body-stat">
                                                 @if($node->online_status)
                                                     <a class="btn btn-sm green">正常</a>
                                                 @else
                                                     <a class="btn btn-sm red">宕机</a>
                                                 @endif
-                                                <a class="btn btn-sm green btn-outline" data-toggle="modal" href="#link_{{$node->id}}"> <i class="fa fa-paper-plane"></i> </a>
-                                                <a class="btn btn-sm green btn-outline" data-toggle="modal" href="#qrcode_{{$node->id}}"> <i class="fa fa-qrcode"></i> </a>
                                             </span>
                                         </div>
                                     </div>
@@ -94,12 +87,6 @@
                         </li>
                     @endif
                     <li class="list-group-item">
-                        {{trans('home.account_balance')}}：{{$info['balance']}}
-                        <span class="badge badge-danger">
-                            <a href="javascript:;" data-toggle="modal" data-target="#charge_modal" style="color:#FFF;">{{trans('home.recharge')}}</a>
-                        </span>
-                    </li>
-                    <li class="list-group-item">
                         {{trans('home.account_expire')}}：{{date('Y-m-d 0:0:0') > $info['expire_time'] ? trans('home.expired') : $info['expire_time']}}
                     </li>
                     <li class="list-group-item">
@@ -109,12 +96,7 @@
                         {{trans('home.account_last_login')}}：{{empty($info['last_login']) ? trans('home.never_loggedin') : date('Y-m-d H:i:s', $info['last_login'])}}
                     </li>
                     <li class="list-group-item">
-                        {{trans('home.account_bandwidth_usage')}}：{{$info['usedTransfer']}}（{{$info['totalTransfer']}}）@if($info['traffic_reset_day']) &ensp;{{trans('home.account_reset_notice', ['reset_day' => $info['traffic_reset_day']])}}  @endif
-                        <div class="progress progress-striped active" style="margin-bottom:0;" title="{{trans('home.account_total_traffic')}} {{$info['totalTransfer']}}，{{trans('home.account_usage_traffic')}} {{$info['usedTransfer']}}">
-                            <div class="progress-bar progress-bar-danger" role="progressbar" aria-valuenow="{{$info['usedPercent'] * 100}}" aria-valuemin="0" aria-valuemax="100" style="width: {{$info['usedPercent'] * 100}}%">
-                                <span class="sr-only"> {{$info['usedTransfer']}} / {{$info['totalTransfer']}} </span>
-                            </div>
-                        </div>
+                        {{trans('home.account_bandwidth_unused')}}：{{$info['unusedTransfer']}} @if($info['traffic_reset_day']) &ensp;{{trans('home.account_reset_notice', ['reset_day' => $info['traffic_reset_day']])}}  @endif
                     </li>
                 </ul>
 

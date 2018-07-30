@@ -24,7 +24,7 @@ class CreateGoodsTable extends Migration
             $table->string('logo', 255)->default('')->comment('商品图片地址');
             $table->bigInteger('traffic')->default('0')->comment('商品内含多少流量，单位Mib');
             $table->integer('score')->default('0')->comment('商品价值多少积分');
-            $table->tinyInteger('type')->default('1')->comment('商品类型：1-流量包、2-套餐');
+            $table->tinyInteger('type')->default('1')->comment('商品类型：1-流量包、2-套餐、3-广告流量');
             $table->integer('price')->default('0')->comment('商品售价，单位分');
             $table->string('desc', 255)->default('')->nullable()->comment('商品描述');
             $table->integer('days')->default('30')->comment('有效期');

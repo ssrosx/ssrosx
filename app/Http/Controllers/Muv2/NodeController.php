@@ -10,87 +10,80 @@ use App\Http\Models\SsNodeOnlineLog;
 use App\Http\Models\User;
 use App\Http\Models\UserLabel;
 use App\Http\Models\UserTrafficLog;
-use App\Http\V2ray\V2rayGenerator;
+use App\Http\V2Ray\Generator;
 use Illuminate\Http\Request;
 use Response;
 
 class NodeController extends Controller
 {
-    protected static $config;
     protected static $userLevel;
 
-    function __construct()
-    {
-        self::$config = $this->systemConfig();
-    }
-
-    //V2ray 用户
+    // 获取节点用户列表
     public function users(Request $request)
     {
-        $node_id = $request->route('id');
-        $ssr_node = SsNode::query()->where('id',$node_id)->first();//节点是否存在
-        if($ssr_node == null){
-            $res = [
-                "ret" => 0
-            ];
+        $nodeId = $request->route('id');
 
-            return Response::json($res,400);
+        $node = SsNode::query()->where('id', $nodeId)->first(); // 节点是否存在
+        if (!$node) {
+            return Response::json([
+                "ret" => 0
+            ], 400);
         }
 
-        //找出该节点的标签id
-        $ssr_node_label = SsNodeLabel::query()->where('node_id', $node_id)->pluck('label_id');
+        // 找出该节点的标签
+        $nodeLabels = SsNodeLabel::query()->where('node_id', $nodeId)->pluck('label_id');
 
-        //找出有这个标签的用户
-        $user_with_label = UserLabel::query()->whereIn('label_id', $ssr_node_label)->pluck('user_id');
+        // 找出有相同标签的用户
+        $userLabels = UserLabel::query()->whereIn('label_id', $nodeLabels)->pluck('user_id');
 
         //提取用户信息
-        $userids = User::query()->whereIn('id', $user_with_label)->where('enable', 1)->where('id', '<>', self::$config['free_node_users_id'])->pluck('id')->toArray();
-        $users = User::query()->where('id', '<>', self::$config['free_node_users_id'])->select(
-            "id","username","passwd","t","u","d","transfer_enable",
-            "port","protocol","obfs","enable","expire_time as expire_time_d","method",
-                "v2ray_uuid", "v2ray_level", "v2ray_alter_id")->get();
+        $userIds = User::query()->where('enable', 1)->whereIn('id', $userLabels)->where('id', '<>', $this->systemConfig['free_node_users_id'])->pluck('id')->toArray();
+        $users = User::query()->where('id', '<>', $this->systemConfig['free_node_users_id'])->select(
+            "id", "username", "passwd", "t", "u", "d", "transfer_enable",
+            "port", "protocol", "obfs", "enable", "expire_time as expire_time_d", "method",
+            "v2ray_uuid", "v2ray_level", "v2ray_alter_id")->get();
 
         $data = [];
-        foreach($users as $user){
-            //datetime 转timestamp
-            $user['switch']=1;
-            $user['email']=$user['username'];
-            $user['expire_time']=strval((new \DateTime($user['expire_time_d']))->getTimestamp());
-            if(in_array($user->id,$userids)){
+        foreach ($users as $user) {
+            $user['switch'] = 1;
+            $user['email'] = $user['username'];
+            $user['expire_time'] = strval((new \DateTime($user['expire_time_d']))->getTimestamp()); // datetime 转timestamp
+
+            if (in_array($user->id, $userIds)) {
                 $user->enable = 1;
             } else {
                 $user->enable = 0;
             }
 
-            //v2ray用户信息
+            // 用户信息
             $user->v2ray_user = [
-                "uuid" => $user->v2ray_uuid,
-                "email" => sprintf("%s@sspanel.xyz", $user->v2ray_uuid),
+                "uuid"     => $user->v2ray_uuid,
+                "email"    => sprintf("%s@sspanel.xyz", $user->v2ray_uuid),
                 "alter_id" => $user->v2ray_alter_id,
-                "level" => $user->v2ray_level,
-                ];
+                "level"    => $user->v2ray_level,
+            ];
 
             array_push($data, $user);
         }
 
-        if(self::$config['is_free_node']){
-            if(self::$config['free_node_id'] == $node_id){
-                $user = User::query()->whereIn('id', $user_with_label)->where('id', self::$config['free_node_users_id'])->select(
-                        "id","enable","username","passwd","t","u","d","transfer_enable",
-                        "port","protocol","obfs","enable","expire_time as expire_time_d","method",
-                        "v2ray_uuid", "v2ray_level", "v2ray_alter_id")->first();
+        if ($this->systemConfig['is_free_node']) {
+            if ($this->systemConfig['free_node_id'] == $nodeId) {
+                $user = User::query()->whereIn('id', $userLabels)->where('id', $this->systemConfig['free_node_users_id'])->select(
+                    "id", "enable", "username", "passwd", "t", "u", "d", "transfer_enable",
+                    "port", "protocol", "obfs", "enable", "expire_time as expire_time_d", "method",
+                    "v2ray_uuid", "v2ray_level", "v2ray_alter_id")->first();
 
                 //datetime 转timestamp
-                $user['switch']=1;
-                $user['email']=$user['username'];
-                $user['expire_time']=strval((new \DateTime($user['expire_time_d']))->getTimestamp());
+                $user['switch'] = 1;
+                $user['email'] = $user['username'];
+                $user['expire_time'] = strval((new \DateTime($user['expire_time_d']))->getTimestamp());
 
                 //v2ray用户信息
                 $user->v2ray_user = [
-                    "uuid" => $user->v2ray_uuid,
-                    "email" => sprintf("%s@sspanel.xyz", $user->v2ray_uuid),
+                    "uuid"     => $user->v2ray_uuid,
+                    "email"    => sprintf("%s@sspanel.xyz", $user->v2ray_uuid),
                     "alter_id" => $user->v2ray_alter_id,
-                    "level" => $user->v2ray_level,
+                    "level"    => $user->v2ray_level,
                 ];
 
                 array_push($data, $user);
@@ -101,140 +94,137 @@ class NodeController extends Controller
         $uptime = time();
 
         $log = new SsNodeInfo();
-        $log->node_id = $node_id;
+        $log->node_id = $nodeId;
         $log->load = $load;
         $log->uptime = $uptime;
         $log->log_time = time();
         $log->save();
 
-        $res = [
-            'msg' => 'ok',
+        return Response::json([
+            'msg'  => 'ok',
             'data' => $data,
-        ];
-
-        return Response::json($res);
+        ]);
     }
 
-    //写在线用户日志
+    // 写在线用户日志
     public function onlineUserLog(Request $request)
     {
-        $node_id =$request->route('id');
+        $nodeId = $request->route('id');
         $count = $request->get('count');
         $log = new SsNodeOnlineLog();
-        $log->node_id = $node_id;
+        $log->node_id = $nodeId;
         $log->online_user = $count;
         $log->log_time = time();
 
         if (!$log->save()) {
-            $res = [
+            return response()->json([
                 "ret" => 0,
                 "msg" => "update failed",
-            ];
-
-            return response()->json($res);
+            ]);
         }
 
-        $res = [
+        return response()->json([
             "ret" => 1,
             "msg" => "ok",
-        ];
-
-        return response()->json($res);
+        ]);
     }
 
-    //节点信息
+    // 节点信息
     public function info(Request $request)
     {
-        $node_id = $request->route('id');
+        $nodeId = $request->route('id');
         $load = $request->get('load');
         $uptime = $request->get('uptime');
 
         $log = new SsNodeInfo();
-        $log->node_id = $node_id;
+        $log->node_id = $nodeId;
         $log->load = $load;
         $log->uptime = $uptime;
         $log->log_time = time();
 
         if (!$log->save()) {
-            $res = [
+            return response()->json([
                 "ret" => 0,
                 "msg" => "update failed",
-            ];
-
-            return response()->json($res);
+            ]);
         }
 
-        $res = [
+        return response()->json([
             "ret" => 1,
             "msg" => "ok",
-        ];
-
-        return response()->json($res);
+        ]);
     }
 
-    //PostTraffic
+    // PostTraffic
     public function postTraffic(Request $request)
     {
         $nodeId = $request->route('id');
-        $node = SsNode::query()->where('id',$nodeId)->first();
-        $rate = $node->traffic_rate;
         $input = $request->getContent();
-        $datas = json_decode($input, true);
+        $data = json_decode($input, true);
 
-        foreach ($datas as $data){
-            $user = User::query()->where('id',$data['user_id'])->first();
+        $node = SsNode::query()->where('id', $nodeId)->first();
+
+        foreach ($data as $vo) {
+            $user = User::query()->where('id', $vo['user_id'])->first();
             if (!$user) {
                 continue;
             }
 
             $user->t = time();
-            $user->u = $user->u + ($data['u'] * $rate);
-            $user->d = $user->d + ($data['d'] * $rate);
+            $user->u = $user->u + ($vo['u'] * $node->traffic_rate);
+            $user->d = $user->d + ($vo['d'] * $node->traffic_rate);
             $user->save();
 
-            // 写usertrafficlog
-            $totalTraffic = flowAutoShow(($data['u'] + $data['d']) * $rate);
-            $traffic = new UserTrafficLog();
-            $traffic->user_id = $data['user_id'];
-            $traffic->u = $data['u'];
-            $traffic->d = $data['d'];
-            $traffic->node_id = $nodeId;
-            $traffic->rate = $rate;
-            $traffic->traffic = $totalTraffic;
-            $traffic->log_time = time();
-            $traffic->save();
+            // 记录流量日志
+            $this->addUserTrafficLog($vo['user_id'], $nodeId, $vo['u'], $vo['d'], $node->traffic_rate);
         }
 
-        $res = [
+        return response()->json([
             'ret' => 1,
             "msg" => "ok",
-        ];
-
-        return response()->json($res);
+        ]);
     }
 
-    //V2ray Users
+    // V2ray Users
     public function v2rayUsers(Request $request)
     {
-        $node = SsNode::query()->where('id',$request->route('id'))->first();
-        $users = User::query()->where('enable',1)->where('id','<>',self::$config['free_node_users_id'])->get();
+        $nodeId = $request->route('id');
 
-        $v = new V2rayGenerator();
-        $v->setPort($node->v2ray_port);
+        $node = SsNode::query()->where('id', $nodeId)->first();
+        $users = User::query()->whereIn('status', [0, 1])->where('enable', 1)->where('id', '<>', $this->systemConfig['free_node_users_id'])->get();
 
-        foreach ($users as $user){
+        $v2ray = new Generator();
+        $v2ray->setPort($node->v2ray_port);
+
+        foreach ($users as $user) {
             $email = sprintf("%s@sspanel.io", $user->v2ray_uuid);
-            $v->addUser($user->v2ray_uuid, $user->v2ray_level, $user->v2ray_alter_id, $email);
+            $v2ray->addUser($user->v2ray_uuid, $user->v2ray_level, $user->v2ray_alter_id, $email);
         }
 
-        if(self::$config['is_free_node']){
-            if($request->route('id') == self::$config['free_node_id']){
-                $freeuser = User::query()->where('enable',1)->where('id',self::$config['free_node_users_id'])->first();
+        if ($this->systemConfig['is_free_node']) {
+            if ($request->route('id') == $this->systemConfig['free_node_id']) {
+                $freeuser = User::query()->where('enable', 1)->where('id', $this->systemConfig['free_node_users_id'])->first();
                 $email = sprintf("%s@sspanel.io", $freeuser->v2ray_uuid);
-                $v->addUser($freeuser->v2ray_uuid, $freeuser->v2ray_level, $freeuser->v2ray_alter_id, $email);
+                $v2ray->addUser($freeuser->v2ray_uuid, $freeuser->v2ray_level, $freeuser->v2ray_alter_id, $email);
             }
         }
 
-        return Response::json($v->getArr());
+        return Response::json($v2ray->getArr());
+    }
+
+    // 写入流量日志
+    private function addUserTrafficLog($userId, $nodeId, $u, $d, $rate)
+    {
+        $totalTraffic = flowAutoShow(($u + $d) * $rate);
+        $traffic = new UserTrafficLog();
+        $traffic->user_id = $userId;
+        $traffic->u = $u;
+        $traffic->d = $d;
+        $traffic->node_id = $nodeId;
+        $traffic->rate = $rate;
+        $traffic->traffic = $totalTraffic;
+        $traffic->log_time = time();
+
+        return $traffic->save();
     }
 }

@@ -2,23 +2,25 @@
 
 namespace App\Http\Middleware;
 
+use Cookie;
 use Closure;
 use Redirect;
 
-class Admin
+class Affiliate
 {
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
+     * @param  \Illuminate\Http\Request $request
+     * @param  \Closure                 $next
      *
      * @return mixed
      */
     public function handle($request, Closure $next)
     {
-        if (!$request->session()->get('user')['is_admin']) {
-            return Redirect::to('login');
+        $aff = trim($request->get('aff', 0));
+        if ($aff) {
+            Cookie::queue('register_aff', $aff, 129600);
         }
 
         return $next($request);

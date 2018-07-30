@@ -42,6 +42,10 @@ CREATE TABLE `ss_node` (
   `traffic` BIGINT(20) NOT NULL DEFAULT '1000' COMMENT '每月可用流量，单位G',
   `monitor_url` VARCHAR(255) NULL DEFAULT NULL COMMENT '监控地址',
   `is_subscribe` TINYINT(4) NULL DEFAULT '1' COMMENT '是否允许用户订阅该节点：0-否、1-是',
+  `ssh_port` SMALLINT(6) UNSIGNED NOT NULL DEFAULT '22' COMMENT 'SSH端口',
+  `icmp` TINYINT(4) NOT NULL DEFAULT '1' COMMENT 'ICMP检测：-2-内外都不通、-1-内不通外通、0-外不通内通、1-内外都通',
+  `tcp` TINYINT(4) NOT NULL DEFAULT '1' COMMENT 'TCP检测：-2-内外都不通、-1-内不通外通、0-外不通内通、1-内外都通',
+  `udp` TINYINT(4) NOT NULL DEFAULT '1' COMMENT 'ICMP检测：-2-内外都不通、-1-内不通外通、0-外不通内通、1-内外都通',
   `compatible` TINYINT(4) NULL DEFAULT '0' COMMENT '兼容SS',
   `single` TINYINT(4) NULL DEFAULT '0' COMMENT '单端口多用户：0-否、1-是',
   `single_force` TINYINT(4) NULL DEFAULT NULL COMMENT '模式：0-兼容模式、1-严格模式',
@@ -106,6 +110,7 @@ CREATE TABLE `user` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `username` varchar(128) CHARACTER SET utf8mb4 NOT NULL DEFAULT '' COMMENT '用户名',
   `password` varchar(64) NOT NULL DEFAULT '' COMMENT '密码',
+  `ssruuid` varchar(128) CHARACTER SET utf8mb4 NOT NULL DEFAULT '' COMMENT 'UUID',
   `port` int(11) NOT NULL DEFAULT '0' COMMENT 'SS端口',
   `passwd` varchar(16) NOT NULL DEFAULT '' COMMENT 'SS密码',
   `transfer_enable` bigint(20) NOT NULL DEFAULT '1073741824000' COMMENT '可用流量，单位字节，默认1TiB',
@@ -338,9 +343,11 @@ INSERT INTO `config` VALUES ('64', 'namesilo_key', '');
 INSERT INTO `config` VALUES ('65', 'website_logo', '');
 INSERT INTO `config` VALUES ('66', 'website_home_logo', '');
 INSERT INTO `config` VALUES ('67', 'ads_add_traffic', 1);
-INSERT INTO `config` VALUES ('68', 'ads_add_traffic_range', 5);
+INSERT INTO `config` VALUES ('68', 'ads_add_traffic_range', 10);
 INSERT INTO `config` VALUES ('69', 'min_rand_traffic', 10);
 INSERT INTO `config` VALUES ('70', 'max_rand_traffic', 20);
+INSERT INTO `config` VALUES ('71', 'ads_daily_count', 10);
+INSERT INTO `config` VALUES ('72', 'is_tcp_check', 0);
 
 -- ----------------------------
 -- Table structure for `article`
@@ -446,7 +453,7 @@ CREATE TABLE `goods` (
   `logo` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '商品图片地址',
   `traffic` bigint(20) NOT NULL DEFAULT '0' COMMENT '商品内含多少流量，单位Mib',
   `score` int(11) NOT NULL DEFAULT '0' COMMENT '商品价值多少积分',
-  `type` tinyint(4) NOT NULL DEFAULT '1' COMMENT '商品类型：1-流量包、2-套餐',
+  `type` tinyint(4) NOT NULL DEFAULT '1' COMMENT '商品类型：1-流量包、2-套餐、3-广告流量',
   `price` int(11) NOT NULL DEFAULT '0' COMMENT '商品售价，单位分',
   `desc` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '商品描述',
   `days` int(11) NOT NULL DEFAULT '30' COMMENT '有效期',
@@ -488,6 +495,7 @@ CREATE TABLE `coupon_log` (
   `coupon_id` int(11) NOT NULL DEFAULT '0' COMMENT '优惠券ID',
   `goods_id` int(11) NOT NULL DEFAULT '0' COMMENT '商品ID',
   `order_id` int(11) NOT NULL DEFAULT '0' COMMENT '订单ID',
+  `desc` varchar(50) NOT NULL DEFAULT '' COMMENT '备注',
   `created_at` datetime DEFAULT NULL COMMENT '创建时间',
   `updated_at` datetime DEFAULT NULL COMMENT '最后更新时间',
   PRIMARY KEY (`id`)
@@ -506,8 +514,9 @@ CREATE TABLE `order` (
   `origin_amount` int(11) NOT NULL DEFAULT '0' COMMENT '订单原始总价，单位分',
   `amount` int(11) NOT NULL DEFAULT '0' COMMENT '订单总价，单位分',
   `expire_at` datetime DEFAULT NULL COMMENT '过期时间',
+  `traffic` int(11) NOT NULL DEFAULT '0' COMMENT '流量值（单位：M）',
   `is_expire` tinyint(4) NOT NULL DEFAULT '0' COMMENT '是否已过期：0-未过期、1-已过期',
-  `pay_way` tinyint(4) NOT NULL DEFAULT '1' COMMENT '支付方式：1-余额支付、2-有赞云支付、3-Apple支付、4-Google支付',
+  `pay_way` tinyint(4) NOT NULL DEFAULT '1' COMMENT '支付方式：1-余额支付、2-有赞云支付、3-Apple支付、4-Google支付、5-广告领取',
   `status` tinyint(4) NOT NULL DEFAULT '0' COMMENT '订单状态：-1-已关闭、0-待支付、1-已支付待确认、2-已完成',
   `created_at` datetime DEFAULT NULL COMMENT '创建时间',
   `updated_at` datetime DEFAULT NULL COMMENT '最后一次更新时间',
@@ -910,17 +919,6 @@ CREATE TABLE `marketing` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE='utf8mb4_unicode_ci';
 
-
-CREATE TABLE `ss_ads_traffic` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `user_id` int(11) NOT NULL COMMENT '用户ID',
-  `ads_sn` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '广告订单ID',
-  `traffic` int(11) NOT NULL DEFAULT '0' COMMENT '流量值（单位：M）',
-  `receive` TINYINT(4) NOT NULL DEFAULT '0' COMMENT '领取：0-未领取、1-已领取',
-  `created_at` datetime DEFAULT NULL COMMENT '创建时间',
-  `updated_at` datetime DEFAULT NULL COMMENT '最后一起更新时间',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;

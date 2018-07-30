@@ -33,6 +33,7 @@ return [
     'account_last_usage'              => '最近使用',
     'account_last_login'              => '最近登入',
     'account_bandwidth_usage'         => '已用流量',
+    'account_bandwidth_unused'        => '剩余流量',
     'account_total_traffic'           => '共计',
     'account_usage_traffic'           => '已使用',
     'account_reset_notice'            => '每月:reset_day日重置',
@@ -96,11 +97,11 @@ return [
     'service_type_2'                  => '套餐',
 
     // 流量日志
-    'traffic_log_tips'                => '提示：流量统计图更新会有延迟。按天统计图在次日更新，按小时统计图在次小时更新。（每月1日月流量不显示流量）',
+    'traffic_log_tips'                => '提示：流量统计更新会有延迟。按天统计于次日更新，按小时统计于次小时更新。',
     'traffic_log_30days'              => '本月流量使用情况',
     'traffic_log_24hours'             => '今日流量使用情况',
     'traffic_log_keywords'            => '使用流量',
-    'traffic_log_unit'                => '单位 / MB',
+    'traffic_log_unit'                => '单位 / G',
     'traffic_log_max'                 => '使用高峰',
 
     // 邀请码
@@ -162,6 +163,10 @@ return [
     'referral_table_none'             => '暂无数据',
     'referral_table_apply'            => '提现',
     'referral_summary'                => '合计返利 :amount 元（ :total 次），满 :money 元可以申请提现。',
+    'referral_apply_title'            => '提现记录',
+    'referral_apply_table_amount'     => '提现金额',
+    'referral_apply_table_status'     => '状态',
+    'referral_apply_table_date'       => '提现日期',
     'console'                         => '管理中心',
     'profile'                         => '个人设置',
     'logout'                          => '退出登入',

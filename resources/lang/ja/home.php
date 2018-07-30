@@ -33,6 +33,7 @@ return [
     'account_last_usage'              => '最近使用日',
     'account_last_login'              => '最近ログイン日',
     'account_bandwidth_usage'         => 'データ通信量の使用状況',
+    'account_bandwidth_unused'        => '使用されていない帯域幅',
     'account_total_traffic'           => 'データ通信量の上限',
     'account_usage_traffic'           => '使用済み',
     'account_reset_notice'            => '毎月:reset_day日にデータ通信量をリセットする',
@@ -96,11 +97,11 @@ return [
     'service_type_2'                  => 'コース',
 
     // 流量日志
-    'traffic_log_tips'                => 'ヒント：流量統計図更新は遅延がある。日の統計図を押すと翌日に更新され、時間統計図で次の時間に更新されます。',
+    'traffic_log_tips'                => '注意：データの更新が遅れている',
     'traffic_log_30days'              => '30 日内のデータ通信量消耗',
     'traffic_log_24hours'             => '24 時間内のデータ通信量消耗',
     'traffic_log_keywords'            => 'データ通信量消耗',
-    'traffic_log_unit'                => '単位/M',
+    'traffic_log_unit'                => '単位 / G',
     'traffic_log_max'                 => '最大値',
 
     // 邀请码
@@ -162,6 +163,10 @@ return [
     'referral_table_none'             => 'データなし',
     'referral_table_apply'            => '引き出しを申請する',
     'referral_summary'                => '全部 :total 件の記録があり、合計 :amount のリベートがあり、 :total に達すると現金引き出しを申請することができます。',
+    'referral_apply_title'            => '記録を現す',
+    'referral_apply_table_amount'     => '金額',
+    'referral_apply_table_status'     => '狀態',
+    'referral_apply_table_date'       => '日付',
     'console'                         => '管理センター',
     'profile'                         => '個人設定',
     'logout'                          => 'ログアウト',

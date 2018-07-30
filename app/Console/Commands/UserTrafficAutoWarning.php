@@ -6,14 +6,14 @@ use Illuminate\Console\Command;
 use App\Http\Models\Config;
 use App\Http\Models\User;
 use App\Http\Models\EmailLog;
-use App\Mail\userExpireWarning;
+use App\Mail\userTrafficWarning;
 use Mail;
 use Log;
 
-class UserExpireWarningJob extends Command
+class UserTrafficAutoWarning extends Command
 {
-    protected $signature = 'userExpireWarningJob';
-    protected $description = '自动发邮件提醒用户临近到期';
+    protected $signature = 'userTrafficAutoWarning';
+    protected $description = '用户流量超过警告阈值自动发邮件提醒';
 
     protected static $config;
 
@@ -24,23 +24,25 @@ class UserExpireWarningJob extends Command
 
     public function handle()
     {
+        $jobStartTime = microtime(true);
+
         $config = $this->systemConfig();
 
-        if ($config['expire_warning']) {
-            $userList = User::query()->where('transfer_enable', '>', 0)->whereIn('status', [0, 1])->where('enable', 1)->get();
+        if ($config['traffic_warning']) {
+            $userList = User::query()->where('status', '>=', 0)->where('enable', 1)->where('transfer_enable', '>', 0)->get();
             foreach ($userList as $user) {
                 // 用户名不是邮箱的跳过
                 if (false === filter_var($user->username, FILTER_VALIDATE_EMAIL)) {
                     continue;
                 }
 
-                $lastCanUseDays = floor(round(strtotime($user->expire_time) - strtotime(date('Y-m-d H:i:s'))) / 3600 / 24);
-                if ($lastCanUseDays > 0 && $lastCanUseDays <= $config['expire_days']) {
-                    $title = '账号过期提醒';
-                    $content = '账号还剩' . $lastCanUseDays . '天即将过期';
+                $usedPercent = round(($user->d + $user->u) / $user->transfer_enable, 2) * 100; // 已使用流量百分比
+                if ($usedPercent >= $config['traffic_warning_percent']) {
+                    $title = '流量提醒';
+                    $content = '流量已使用：' . $usedPercent . '%，请保持关注。';
 
                     try {
-                        Mail::to($user->username)->send(new userExpireWarning($config['website_name'], $lastCanUseDays));
+                        Mail::to($user->username)->send(new userTrafficWarning($config['website_name'], $usedPercent));
                         $this->sendEmailLog($user->id, $title, $content);
                     } catch (\Exception $e) {
                         $this->sendEmailLog($user->id, $title, $content, 0, $e->getMessage());
@@ -49,7 +51,10 @@ class UserExpireWarningJob extends Command
             }
         }
 
-        Log::info('定时任务：' . $this->description);
+        $jobEndTime = microtime(true);
+        $jobUsedTime = round(($jobEndTime - $jobStartTime) , 4);
+
+        Log::info('执行定时任务【' . $this->description . '】，耗时' . $jobUsedTime . '秒');
     }
 
     /**

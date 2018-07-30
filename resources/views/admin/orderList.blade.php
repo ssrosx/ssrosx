@@ -41,6 +41,7 @@
                                     <option value="2" @if(Request::get('pay_way') == '2') selected @endif>有赞云支付</option>
                                     <option value="3" @if(Request::get('pay_way') == '3') selected @endif>Apple支付</option>
                                     <option value="4" @if(Request::get('pay_way') == '4') selected @endif>Google支付</option>
+                                    <option value="5" @if(Request::get('pay_way') == '5') selected @endif>广告领取</option>
                                 </select>
                             </div>
                             <div class="col-md-2 col-sm-2">
@@ -90,7 +91,7 @@
                                                 <td> {{$order->coupon ? $order->coupon->name . ' - ' . $order->coupon->sn : ''}} </td>
                                                 <td> ￥{{$order->origin_amount}} </td>
                                                 <td> ￥{{$order->amount}} </td>
-                                                <td> {{($order->pay_way == '1' ? '余额支付' : ($order->pay_way == '2' ? '有赞云支付' : ($order->pay_way == '3' ? 'Apple支付' : 'Google支付')))}} </td>
+                                                <td> {{($order->pay_way == '1' ? '余额支付' : ($order->pay_way == '2' ? '有赞云支付' : ($order->pay_way == '3' ? 'Apple支付' : ($order->pay_way == '4' ? 'Google支付' : '广告领取'))))}} </td>
                                                 <td>
                                                     @if($order->status == '-1')
                                                         已关闭

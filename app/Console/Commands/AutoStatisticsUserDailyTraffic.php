@@ -3,15 +3,15 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
-use App\Http\Models\User;
 use App\Http\Models\SsNode;
+use App\Http\Models\User;
 use App\Http\Models\UserTrafficDaily;
 use App\Http\Models\UserTrafficLog;
 use Log;
 
-class AutoStatisticsUserDailyTrafficJob extends Command
+class AutoStatisticsUserDailyTraffic extends Command
 {
-    protected $signature = 'autoStatisticsUserDailyTrafficJob';
+    protected $signature = 'autoStatisticsUserDailyTraffic';
     protected $description = '自动统计用户每日流量';
 
     public function __construct()
@@ -21,6 +21,8 @@ class AutoStatisticsUserDailyTrafficJob extends Command
 
     public function handle()
     {
+        $jobStartTime = microtime(true);
+
         $userList = User::query()->where('status', '>=', 0)->where('enable', 1)->get();
         foreach ($userList as $user) {
             // 统计一次所有节点的总和
@@ -33,7 +35,10 @@ class AutoStatisticsUserDailyTrafficJob extends Command
             }
         }
 
-        Log::info('定时任务：' . $this->description);
+        $jobEndTime = microtime(true);
+        $jobUsedTime = round(($jobEndTime - $jobStartTime) , 4);
+
+        Log::info('执行定时任务【' . $this->description . '】，耗时' . $jobUsedTime . '秒');
     }
 
     private function statisticsByNode($user_id, $node_id = 0)

@@ -46,10 +46,20 @@ class ShopController extends Controller
             $labels = $request->get('labels');
             $status = $request->get('status');
 
-            if (empty($name) || empty($traffic)) {
+            if (($type == 1 || $type == 2) && (empty($name) || empty($traffic))) {
                 Session::flash('errorMsg', '请填写完整');
 
                 return Redirect::back()->withInput();
+            }
+
+            if ($type == 3)
+            {
+                $goods = Goods::query()->where('type', 3)->first();
+                if ($goods) {
+                    Session::flash('errorMsg', '广告流量只能创建一个');
+
+                    return Redirect::back()->withInput();
+                }
             }
 
             // 套餐必须有价格

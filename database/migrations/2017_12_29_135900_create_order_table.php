@@ -27,7 +27,7 @@ class CreateOrderTable extends Migration
             $table->integer('amount')->default('0')->comment('订单总价，单位分');
             $table->dateTime('expire_at')->nullable()->comment('过期时间');
             $table->tinyInteger('is_expire')->default('0')->comment('是否已过期：0-未过期、1-已过期');
-            $table->tinyInteger('pay_way')->default('1')->comment('支付方式：1-余额支付、2-有赞云支付、3-Apple支付、4-Google支付');
+            $table->tinyInteger('pay_way')->default('1')->comment('支付方式：1-余额支付、2-有赞云支付、3-Apple支付、4-Google支付、5-广告领取');
             $table->tinyInteger('status')->default('0')->comment('订单状态：-1-已关闭、0-待支付、1-已支付待确认、2-已完成');
             $table->dateTime('created_at')->nullable();
             $table->dateTime('updated_at')->nullable();

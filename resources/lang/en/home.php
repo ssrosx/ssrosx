@@ -5,7 +5,7 @@ return [
     'subscribe_address'               => 'My Subscribe Address',
     'copy_subscribe_address'          => 'Copy Address',
     'exchange_subscribe'              => 'Exchange Address',
-    'subscribe_warning'               => 'Warning: this subscription address is for personal use only. Do not propagate the address.',
+    'subscribe_warning'               => 'Warning: This subscription address is for personal use only. Do not propagate the address.',
     'reset_password_title'            => 'Reset Password',
     'system_down'                     => 'The system is being maintained',
     'subscribe_baned'                 => 'Your subscription function has been banned. Please contact the administrator.',
@@ -33,6 +33,7 @@ return [
     'account_last_usage'              => 'Last Usage',
     'account_last_login'              => 'Last Login',
     'account_bandwidth_usage'         => 'Bandwidth Usage',
+    'account_bandwidth_unused'        => 'Bandwidth Unused',
     'account_total_traffic'           => 'Total',
     'account_usage_traffic'           => 'Usage',
     'account_reset_notice'            => ' reset bandwidth on day :reset_day of each month',
@@ -96,11 +97,11 @@ return [
     'service_type_2'                  => 'Flow Plans',
 
     // 流量日志
-    'traffic_log_tips'                => 'Tips: The update of the flow chart will be delayed. The chart is updated on the following day, and the hourly chart is updated at the next hour.',
+    'traffic_log_tips'                => 'Tips: The update of the flow chart will be delayed.',
     'traffic_log_30days'              => '30 Days Statistics',
     'traffic_log_24hours'             => '24 Hours Statistics',
     'traffic_log_keywords'            => 'Bandwidth',
-    'traffic_log_unit'                => 'unit: M',
+    'traffic_log_unit'                => 'Unit: G',
     'traffic_log_max'                 => 'Max',
 
     // 邀请码
@@ -162,6 +163,10 @@ return [
     'referral_table_none'             => 'None Data',
     'referral_table_apply'            => 'Apply',
     'referral_summary'                => 'Total rebate :amount RMB (:total times), full :money RMB can apply for withdrawals.',
+    'referral_apply_title'            => 'Present Record',
+    'referral_apply_table_amount'     => 'Amount',
+    'referral_apply_table_status'     => 'Status',
+    'referral_apply_table_date'       => 'Date',
     'console'                         => 'Console',
     'profile'                         => 'Profile',
     'logout'                          => 'Log Out',

@@ -4,8 +4,6 @@ namespace App\Http\Controllers\Api;
 
 use App\Components\Yzy;
 use App\Http\Controllers\Controller;
-use App\Http\Models\Coupon;
-use App\Http\Models\CouponLog;
 use App\Http\Models\Goods;
 use App\Http\Models\GoodsLabel;
 use App\Http\Models\Order;
@@ -26,17 +24,10 @@ use DB;
  */
 class YzyController extends Controller
 {
-    protected static $config;
-
-    function __construct()
-    {
-        self::$config = $this->systemConfig();
-    }
-
     // 接收GET请求
     public function index(Request $request)
     {
-        \Log::info("YZY-GET:" . var_export($request->all()));
+        \Log::info("YZY-GET:" . var_export($request->all()) . '[' . $request->getClientIp() . ']');
     }
 
     // 接收POST请求
@@ -47,16 +38,16 @@ class YzyController extends Controller
         $json = file_get_contents('php://input');
         $data = json_decode($json, true);
         if (!$data) {
-            Log::info('YZY-POST:回调数据无法解析，可能是非法请求');
+            Log::info('YZY-POST:回调数据无法解析，可能是非法请求[' . $request->getClientIp() . ']');
             exit();
         }
 
         // 判断消息是否合法
         $msg = $data['msg'];
-        $sign_string = self::$config['youzan_client_id'] . "" . $msg . "" . self::$config['youzan_client_secret'];
+        $sign_string = $this->systemConfig['youzan_client_id'] . "" . $msg . "" . $this->systemConfig['youzan_client_secret'];
         $sign = md5($sign_string);
         if ($sign != $data['sign']) {
-            Log::info('YZY-POST:回调数据签名错误，可能是非法请求');
+            Log::info('YZY-POST:回调数据签名错误，可能是非法请求[' . $request->getClientIp() . ']');
             exit();
         } else {
             // 返回请求成功标识给有赞
@@ -109,22 +100,6 @@ class YzyController extends Controller
                     $order = Order::query()->with(['user'])->where('oid', $payment->oid)->first();
                     $order->status = 2;
                     $order->save();
-
-                    // 优惠券置为已使用
-                    $coupon = Coupon::query()->where('id', $order->coupon_id)->first();
-                    if ($coupon) {
-                        if ($coupon->usage == 1) {
-                            $coupon->status = 1;
-                            $coupon->save();
-                        }
-
-                        // 写入日志
-                        $couponLog = new CouponLog();
-                        $couponLog->coupon_id = $coupon->id;
-                        $couponLog->goods_id = $order->goods_id;
-                        $couponLog->order_id = $order->oid;
-                        $couponLog->save();
-                    }
 
                     // 如果买的是套餐，则先将之前购买的所有套餐置都无效，并扣掉之前所有套餐的流量
                     $goods = Goods::query()->where('id', $order->goods_id)->first();
@@ -184,7 +159,7 @@ class YzyController extends Controller
                         $referralLog->ref_user_id = $order->user->referral_uid;
                         $referralLog->order_id = $order->oid;
                         $referralLog->amount = $order->amount;
-                        $referralLog->ref_amount = $order->amount * self::$config['referral_percent'];
+                        $referralLog->ref_amount = $order->amount * $this->systemConfig['referral_percent'];
                         $referralLog->status = 0;
                         $referralLog->save();
                     }
