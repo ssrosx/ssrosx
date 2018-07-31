@@ -392,13 +392,13 @@ class UserController extends Controller
             $content = "标题：【" . $title . "】<br>内容：" . $content;
 
             // 发邮件通知管理员
+            if ($this->systemConfig['crash_warning_email']) {
             try {
-                if ($this->systemConfig['crash_warning_email']) {
                     Mail::to($this->systemConfig['crash_warning_email'])->send(new newTicket($this->systemConfig['website_name'], $emailTitle, $content));
                     $this->sendEmailLog(1, $emailTitle, $content);
-                }
             } catch (\Exception $e) {
                 $this->sendEmailLog(1, $emailTitle, $content, 0, $e->getMessage());
+            }
             }
 
             // 通过ServerChan发微信消息提醒管理员
@@ -931,7 +931,7 @@ class UserController extends Controller
                 }
 
                 // 如果买的是套餐，则先将之前购买的所有套餐置都无效，并扣掉之前所有套餐的流量，并移除之前所有套餐的标签
-                if ($goods->type == 2) {
+                if ($goods->type === 2) {
                     $existOrderList = Order::query()->with('goods')->whereHas('goods', function ($q) {
                         $q->where('type', 2);
                     })->where('user_id', $user->id)->where('oid', '<>', $order->oid)->where('is_expire', 0)->get();
@@ -962,10 +962,20 @@ class UserController extends Controller
 
                 // 写入用户标签
                 if ($goods->label) {
+                    // 用户默认标签
+                    $defaultLabels = [];
+                    if ($this->systemConfig['initial_labels_for_user']) {
+                        $defaultLabels = explode(',', $this->systemConfig['initial_labels_for_user']);
+                    }
+
                     // 取出现有的标签
                     $userLabels = UserLabel::query()->where('user_id', $user->id)->pluck('label_id')->toArray();
                     $goodsLabels = GoodsLabel::query()->where('goods_id', $goods_id)->pluck('label_id')->toArray();
-                    $newUserLabels = array_merge($userLabels, $goodsLabels);
+                    
+                    // 标签去重
+                    $newUserLabels = array_merge($userLabels, $goodsLabels, $defaultLabels);
+                    $newUserLabels = array_unique($newUserLabels);
+                    $newUserLabels = array_values($newUserLabels);
 
                     // 删除用户所有标签
                     UserLabel::query()->where('user_id', $user->id)->delete();

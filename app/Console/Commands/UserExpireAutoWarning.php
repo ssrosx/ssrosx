@@ -59,6 +59,7 @@ class UserExpireAutoWarning extends Command
 
     /**
      * 写入邮件发送日志
+     *
      * @param int $user_id 用户ID
      * @param string $title 标题
      * @param string $content 内容
@@ -78,7 +79,8 @@ class UserExpireAutoWarning extends Command
     }
 
     // 系统配置
-    private function systemConfig() {
+    private function systemConfig()
+    {
         $config = Config::query()->get();
         $data = [];
         foreach ($config as $vo) {

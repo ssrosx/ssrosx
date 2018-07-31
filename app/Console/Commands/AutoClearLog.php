@@ -55,7 +55,8 @@ class AutoClearLog extends Command
     }
 
     // 系统配置
-    private function systemConfig() {
+    private function systemConfig()
+    {
         $config = Config::query()->get();
         $data = [];
         foreach ($config as $vo) {
