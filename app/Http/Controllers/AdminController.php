@@ -48,7 +48,7 @@ class AdminController extends Controller
         $view['activeUserCount'] = User::query()->where('t', '>=', $past)->count(); // 活跃用户数
         $view['unActiveUserCount'] = User::query()->where('t', '<=', $past)->where('enable', 1)->where('t', '>', 0)->count(); // 不活跃用户数
         $view['onlineUserCount'] = User::query()->where('t', '>=', time() - 600)->count(); // 10分钟内在线用户数
-        $view['expireWarningUserCount'] = User::query()->where('expire_time', '<=', date('Y-m-d', strtotime("+" . $this->systemConfig['expire_days'] . " days")))->whereIn('status', [0, 1])->where('enable', 1)->count(); // 临近过期用户数
+        $view['expireWarningUserCount'] = User::query()->where('expire_time', '<=', date('Y-m-d H:i:s', strtotime("+" . $this->systemConfig['expire_days'] . " days")))->whereIn('status', [0, 1])->where('enable', 1)->count(); // 临近过期用户数
         $view['largeTrafficUserCount'] = User::query()->whereRaw('(u + d) >= 107374182400')->whereIn('status', [0, 1])->count(); // 流量超过100G的用户
 
         // 24小时内流量异常用户
@@ -131,7 +131,7 @@ class AdminController extends Controller
 
         // 临近过期提醒
         if ($expireWarning) {
-            $query->whereIn('status', [0, 1])->where('expire_time', '<=', date('Y-m-d', strtotime("+" . $this->systemConfig['expire_days'] . " days")));
+            $query->whereIn('status', [0, 1])->where('expire_time', '<=', date('Y-m-d H:i:s', strtotime("+" . $this->systemConfig['expire_days'] . " days")));
         }
 
         // 当前在线
@@ -162,7 +162,7 @@ class AdminController extends Controller
         foreach ($userList as &$user) {
             $user->transfer_enable = flowAutoShow($user->transfer_enable);
             $user->used_flow = flowAutoShow($user->u + $user->d);
-            $user->expireWarning = $user->expire_time <= date('Y-m-d', strtotime("+ 30 days")) ? 1 : 0; // 临近过期提醒
+            $user->expireWarning = $user->expire_time <= date('Y-m-d H:i:s', strtotime("+ 30 days")) ? 1 : 0; // 临近过期提醒
 
             // 流量异常警告
             $time = date('Y-m-d H:i:s', time() - 24 * 60 * 60);
@@ -204,8 +204,8 @@ class AdminController extends Controller
             $user->pay_way = $request->get('pay_way', 1);
             $user->balance = 0;
             $user->score = 0;
-            $user->enable_time = empty($request->get('enable_time')) ? date('Y-m-d') : $request->get('enable_time');
-            $user->expire_time = empty($request->get('expire_time')) ? date('Y-m-d', strtotime("+365 days")) : $request->get('expire_time');
+            $user->enable_time = empty($request->get('enable_time')) ? date('Y-m-d H:i:s') : $request->get('enable_time');
+            $user->expire_time = empty($request->get('expire_time')) ? date('Y-m-d H:i:s', strtotime("+365 days")) : $request->get('expire_time');
             $user->remark = clean($request->get('remark', ''));
             $user->level = $request->get('level', 1);
             $user->is_admin = $request->get('is_admin', 0);
@@ -262,8 +262,8 @@ class AdminController extends Controller
                 $user->obfs = $this->getDefaultObfs();
                 $user->usage = 1;
                 $user->transfer_enable = toGB(1000);
-                $user->enable_time = date('Y-m-d');
-                $user->expire_time = date('Y-m-d', strtotime("+365 days"));
+                $user->enable_time = date('Y-m-d H:i:s');
+                $user->expire_time = date('Y-m-d H:i:s', strtotime("+365 days"));
                 $user->reg_ip = $request->getClientIp();
                 $user->status = 0;
                 $user->save();
@@ -319,6 +319,7 @@ class AdminController extends Controller
             $enable_time = $request->get('enable_time');
             $expire_time = $request->get('expire_time');
             $remark = clean($request->get('remark'));
+            $remark = str_replace("eval", "", str_replace("atob", "", $remark));
             $level = $request->get('level');
             $is_admin = $request->get('is_admin');
 
@@ -355,8 +356,8 @@ class AdminController extends Controller
                     'usage'                => $usage,
                     'pay_way'              => $pay_way,
                     'status'               => $status,
-                    'enable_time'          => empty($enable_time) ? date('Y-m-d') : $enable_time,
-                    'expire_time'          => empty($expire_time) ? date('Y-m-d', strtotime("+365 days")) : $expire_time,
+                    'enable_time'          => empty($enable_time) ? date('Y-m-d H:i:s') : $enable_time,
+                    'expire_time'          => empty($expire_time) ? date('Y-m-d H:i:s', strtotime("+365 days")) : $expire_time,
                     'remark'               => $remark,
                     'level'                => $level,
                     'is_admin'             => $is_admin
@@ -1198,8 +1199,8 @@ class AdminController extends Controller
                     $obj->usage = 1;
                     $obj->pay_way = 3;
                     $obj->balance = 0;
-                    $obj->enable_time = date('Y-m-d');
-                    $obj->expire_time = '2099-01-01';
+                    $obj->enable_time = date('Y-m-d H:i:s');
+                    $obj->expire_time = '2099-01-01 0:0:0';
                     $obj->remark = '';
                     $obj->is_admin = 0;
                     $obj->reg_ip = $request->getClientIp();

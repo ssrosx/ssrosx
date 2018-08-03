@@ -113,7 +113,7 @@ class AutoJob extends Command
     private function blockUsers()
     {
         // 过期用户处理
-        $userList = User::query()->where('status', '>=', 0)->where('enable', 1)->where('expire_time', '<=', date('Y-m-d'))->get();
+        $userList = User::query()->where('status', '>=', 0)->where('enable', 1)->where('expire_time', '<=', date('Y-m-d H:i:s'))->get();
         if (!$userList->isEmpty()) {
             foreach ($userList as $user) {
                 if (self::$config['is_ban_status']) {
@@ -123,6 +123,7 @@ class AutoJob extends Command
                         'transfer_enable' => 0,
                         'enable'          => 0,
                         'ban_time'        => 0,
+                        'port'            => 0,
                         'status'          => -1
                     ]);
 
@@ -133,10 +134,20 @@ class AutoJob extends Command
                         'd'               => 0,
                         'transfer_enable' => 0,
                         'enable'          => 0,
-                        'ban_time'        => 0
+                        'ban_time'        => 0,
+                        'port'            => 0
                     ]);
 
                     $this->addUserBanLog($user->id, 0, '【封禁代理，清空账户】-账号已过期');
+                }
+
+                $orderList = Order::query()->where('user_id', $user->id)->where('status', 2)->where('is_expire', 0)->get();
+                if (!$orderList->isEmpty()) {
+                    foreach ($orderList as $order) {
+                        if ($order->expire_at) {
+                            Order::query()->where('oid', $order->oid)->update(['is_expire' => 1]);
+                        }
+                    }
                 }
             }
         }
@@ -173,7 +184,7 @@ class AutoJob extends Command
     // 自动清空过期的账号的标签和流量（临时封禁不移除）
     private function removeUserLabels()
     {
-        $userList = User::query()->where('enable', 0)->where('ban_time', 0)->where('expire_time', '<=', date('Y-m-d'))->get();
+        $userList = User::query()->where('enable', 0)->where('ban_time', 0)->where('expire_time', '<=', date('Y-m-d H:i:s'))->get();
         if (!$userList->isEmpty()) {
             foreach ($userList as $user) {
                 UserLabel::query()->where('user_id', $user->id)->delete();
@@ -201,7 +212,7 @@ class AutoJob extends Command
         }
 
         // 可用流量大于已用流量也解封（比如：邀请返利自动加了流量）
-        $userList = User::query()->where('status', '>=', 0)->where('enable', 0)->where('ban_time', 0)->where('expire_time', '>', date('Y-m-d'))->whereRaw("u + d < transfer_enable")->get();
+        $userList = User::query()->where('status', '>=', 0)->where('enable', 0)->where('ban_time', 0)->where('expire_time', '>', date('Y-m-d H:i:s'))->whereRaw("u + d < transfer_enable")->get();
         if (!$userList->isEmpty()) {
             foreach ($userList as $user) {
                 User::query()->where('id', $user->id)->update(['enable' => 1]);
@@ -217,7 +228,7 @@ class AutoJob extends Command
     {
         // 自动分配端口
         if (self::$config['auto_release_port']) {
-            $userList = User::query()->where('status', '>=', 0)->where('enable', 1)->where('port', 0)->get();
+            $userList = User::query()->where('enable', 1)->where('port', 0)->whereRaw("u + d < transfer_enable")->get();
             if (!$userList->isEmpty()) {
                 foreach ($userList as $user) {
                     $port = self::$config['is_rand_port'] ? $this->getRandPort() : $this->getOnlyPort();
@@ -229,7 +240,7 @@ class AutoJob extends Command
 
         // 被封禁的账号自动释放端口
         if (self::$config['auto_release_port']) {
-            $userList = User::query()->where('status', -1)->where('enable', 0)->get();
+            $userList = User::query()->where('enable', 0)->get();
             if (!$userList->isEmpty()) {
                 foreach ($userList as $user) {
                     if ($user->port) {

@@ -25,7 +25,7 @@ class AutoDecGoodsTraffic extends Command
     {
         $jobStartTime = microtime(true);
 
-        $orderList = Order::query()->with(['user', 'goods'])->where('status', 2)->where('is_expire', 0)->where('expire_at', '>=', date('Y-m-d H:i:s'))->get();
+        $orderList = Order::query()->with(['user', 'goods'])->where('status', 2)->where('is_expire', 0)->where('expire_at', '<=', date('Y-m-d H:i:s'))->get();
         if (!$orderList->isEmpty()) {
             $config = $this->systemConfig();
 
@@ -41,7 +41,7 @@ class AutoDecGoodsTraffic extends Command
                 }
 
                 // 到期自动处理
-                if ($order->expire_at && date("Y-m-d H:i:s") >= $order->expire_at) {
+                if ($order->expire_at/* && date("Y-m-d H:i:s") >= $order->expire_at*/) {
                     $traffic = $order->traffic * 1048576;
                     if ($traffic == 0)
                     {
@@ -93,8 +93,6 @@ class AutoDecGoodsTraffic extends Command
                         $userLabel->label_id = $vo;
                         $userLabel->save();
                     }
-
-
                     Order::query()->where('oid', $order->oid)->update(['is_expire' => 1]);
                 }
             }

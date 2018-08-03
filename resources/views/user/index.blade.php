@@ -30,6 +30,54 @@
             </div>
         @endif
         <div class="row">
+            <div class="col-md-4">
+                @if($is_push_bear && $push_bear_qrcode)
+                <ul class="list-group">
+                    <li class="list-group-item">
+                        <div style="text-align: center">
+                            <span> 微信扫码订阅，获取本站最新资讯 </span>
+                            <br><br>
+                            <div id="subscribe_qrcode" style="text-align: center;"></div>
+                        </div>
+                    </li>
+                </ul>
+                @endif
+
+                <ul class="list-group">
+                    <li class="list-group-item">
+                        {{trans('home.account_status')}}：{{$info['enable'] ? trans('home.enabled') : trans('home.disabled') }}
+                    </li>
+                    @if($login_add_score)
+                        <li class="list-group-item">
+                            {{trans('home.account_score')}}：{{$info['score']}}
+                            <span class="badge badge-info">
+                            <a href="javascript:;" data-toggle="modal" data-target="#exchange_modal" style="color:#FFF;">{{trans('home.redeem_coupon')}}</a>
+                        </span>
+                        </li>
+                    @endif
+                    <li class="list-group-item">
+                        {{trans('home.account_expire')}}：{{date('Y-m-d H:i:s') > $info['expire_time'] ? trans('home.expired') : $info['expire_time']}}
+                    </li>
+                    <li class="list-group-item">
+                        {{trans('home.account_last_usage')}}：{{empty($info['t']) ? trans('home.never_used') : date('Y-m-d H:i:s', $info['t'])}}
+                    </li>
+                    <li class="list-group-item">
+                        {{trans('home.account_last_login')}}：{{empty($info['last_login']) ? trans('home.never_loggedin') : date('Y-m-d H:i:s', $info['last_login'])}}
+                    </li>
+                    <li class="list-group-item">
+                        {{trans('home.account_bandwidth_unused')}}：{{$info['unusedTransfer']}} @if($info['traffic_reset_day']) &ensp;{{trans('home.account_reset_notice', ['reset_day' => $info['traffic_reset_day']])}}  @endif
+                    </li>
+                </ul>
+
+                <div class="list-group">
+                    @if($notice)
+                        <a href="{{url('user/article?id=') . $notice->id}}" class="list-group-item"> {{$notice->title}} </a>
+                    @endif
+                    @foreach($articleList as $k => $article)
+                        <a href="{{url('user/article?id=') . $article->id}}" class="list-group-item"> [{{date('m/d', strtotime($article->created_at))}}] {{str_limit($article->title, 50)}}</a>
+                    @endforeach
+                </div>
+            </div>
             <div class="col-md-8">
                 <div class="row widget-row">
                     @if(!$nodeList->isEmpty())
@@ -59,54 +107,6 @@
                             </div>
                         @endforeach
                     @endif
-                </div>
-            </div>
-            <div class="col-md-4">
-                @if($is_push_bear && $push_bear_qrcode)
-                <ul class="list-group">
-                    <li class="list-group-item">
-                        <div style="text-align: center">
-                            <span> 微信扫码订阅，获取本站最新资讯 </span>
-                            <br><br>
-                            <div id="subscribe_qrcode" style="text-align: center;"></div>
-                        </div>
-                    </li>
-                </ul>
-                @endif
-
-                <ul class="list-group">
-                    <li class="list-group-item">
-                        {{trans('home.account_status')}}：{{$info['enable'] ? trans('home.enabled') : trans('home.disabled') }}
-                    </li>
-                    @if($login_add_score)
-                        <li class="list-group-item">
-                            {{trans('home.account_score')}}：{{$info['score']}}
-                            <span class="badge badge-info">
-                            <a href="javascript:;" data-toggle="modal" data-target="#exchange_modal" style="color:#FFF;">{{trans('home.redeem_coupon')}}</a>
-                        </span>
-                        </li>
-                    @endif
-                    <li class="list-group-item">
-                        {{trans('home.account_expire')}}：{{date('Y-m-d 0:0:0') > $info['expire_time'] ? trans('home.expired') : $info['expire_time']}}
-                    </li>
-                    <li class="list-group-item">
-                        {{trans('home.account_last_usage')}}：{{empty($info['t']) ? trans('home.never_used') : date('Y-m-d H:i:s', $info['t'])}}
-                    </li>
-                    <li class="list-group-item">
-                        {{trans('home.account_last_login')}}：{{empty($info['last_login']) ? trans('home.never_loggedin') : date('Y-m-d H:i:s', $info['last_login'])}}
-                    </li>
-                    <li class="list-group-item">
-                        {{trans('home.account_bandwidth_unused')}}：{{$info['unusedTransfer']}} @if($info['traffic_reset_day']) &ensp;{{trans('home.account_reset_notice', ['reset_day' => $info['traffic_reset_day']])}}  @endif
-                    </li>
-                </ul>
-
-                <div class="list-group">
-                    @if($notice)
-                        <a href="{{url('user/article?id=') . $notice->id}}" class="list-group-item"> {{$notice->title}} </a>
-                    @endif
-                    @foreach($articleList as $k => $article)
-                        <a href="{{url('user/article?id=') . $article->id}}" class="list-group-item"> [{{date('m/d', strtotime($article->created_at))}}] {{str_limit($article->title, 50)}}</a>
-                    @endforeach
                 </div>
             </div>
         </div>

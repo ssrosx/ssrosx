@@ -325,7 +325,7 @@ class UserController extends Controller
     // 商品列表
     public function goodsList(Request $request)
     {
-        $goodsList = Goods::query()->where('status', 1)->where('is_del', 0)->where('type', '!=', 3)->orderBy('type', 'desc')->paginate(10)->appends($request->except('page'));
+        $goodsList = Goods::query()->where('status', 1)->where('is_del', 0)->where('type', '!=', 3)->orderBy('sort', 'desc')->paginate(10)->appends($request->except('page'));
         foreach ($goodsList as $goods) {
             $goods->traffic = flowAutoShow($goods->traffic * 1048576);
         }
@@ -372,6 +372,7 @@ class UserController extends Controller
     {
         $title = $request->get('title');
         $content = clean($request->get('content'));
+        $content = str_replace("eval", "", str_replace("atob", "", $content));
 
         $user = Session::get('user');
 
@@ -636,7 +637,7 @@ class UserController extends Controller
             Session::flash('errorMsg', '该账号无需激活.');
 
             return Response::view('user/active');
-        } else if (time() - strtotime($verify->created_at) >= 1800) {
+        } else if (time() - strtotime($verify->updated_at) >= 1800) {
             Session::flash('errorMsg', '该链接已过期');
 
             // 置为已失效
@@ -798,7 +799,7 @@ class UserController extends Controller
             $verify = Verify::query()->where('token', $token)->with('user')->first();
             if (empty($verify)) {
                 return Redirect::to('login');
-            } else if (time() - strtotime($verify->created_at) >= 1800) {
+            } else if (time() - strtotime($verify->updated_at) >= 1800) {
                 Session::flash('errorMsg', '该链接已过期');
 
                 // 置为已失效
@@ -952,11 +953,11 @@ class UserController extends Controller
                 // 更新账号过期时间、流量重置日
                 if ($goods->type == 2) {
                     $traffic_reset_day = in_array(date('d'), [29, 30, 31]) ? 28 : abs(date('d'));
-                    User::query()->where('id', $user->id)->update(['traffic_reset_day' => $traffic_reset_day, 'expire_time' => date('Y-m-d', strtotime("+" . $goods->days . " days")), 'enable' => 1]);
+                    User::query()->where('id', $user->id)->update(['traffic_reset_day' => $traffic_reset_day, 'expire_time' => date('Y-m-d H:i:s', strtotime("+" . $goods->days . " days")), 'enable' => 1]);
                 } else {
                     $lastCanUseDays = floor(round(strtotime($user->expire_time) - strtotime(date('Y-m-d H:i:s'))) / 3600 / 24);
                     if ($lastCanUseDays < $goods->days) {
-                        User::query()->where('id', $user->id)->update(['expire_time' => date('Y-m-d', strtotime("+" . $goods->days . " days")), 'enable' => 1]);
+                        User::query()->where('id', $user->id)->update(['expire_time' => date('Y-m-d H:i:s', strtotime("+" . $goods->days . " days")), 'enable' => 1]);
                     }
                 }
 

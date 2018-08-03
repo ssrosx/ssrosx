@@ -61,7 +61,7 @@ return [
     'error_response'                  => '出現了錯誤，請稍後再試。',
     'error'                           => '錯誤',
     'online_pay'                      => '線上支付',
-    'pay'                             => '支付',
+    'pay'                             => '去支付',
 
     // 用户资料
     'submit'                          => '提 交',
@@ -129,7 +129,7 @@ return [
 	'invoice_table_expire_at'		  => '到期時間',
     'invoice_table_status'            => '狀態',
     'invoice_table_none'              => '暫無數據',
-    'invoice_table_closed'            => '關閉',
+    'invoice_table_closed'            => '已關閉',
     'invoice_table_wait_payment'      => '待付款',
     'invoice_table_wait_confirm'      => '待確認',
     'invoice_table_wait_active'       => '使用中',

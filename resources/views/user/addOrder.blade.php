@@ -23,8 +23,6 @@
                         <tr>
                             <td style="padding: 10px;">
                                 <h2>{{$goods->name}}</h2>
-                                {{trans('home.service_traffic')}} {{$goods->traffic}}
-                                <br/>
                                 {{trans('home.service_days')}} {{$goods->days}} {{trans('home.day')}}
                             </td>
                             <td class="text-center"> ￥{{$goods->price}} </td>

@@ -127,10 +127,10 @@ class YzyController extends Controller
                     if ($goods->type == 2) {
                         // 将商品的有效期和流量自动重置日期加到账号上
                         $traffic_reset_day = in_array(date('d'), [29, 30, 31]) ? 28 : abs(date('d'));
-                        User::query()->where('id', $order->user_id)->update(['traffic_reset_day' => $traffic_reset_day, 'expire_time' => date('Y-m-d', strtotime("+" . $goods->days . " days", strtotime($order->user->expire_time))), 'enable' => 1]);
+                        User::query()->where('id', $order->user_id)->update(['traffic_reset_day' => $traffic_reset_day, 'expire_time' => date('Y-m-d H:i:s', strtotime("+" . $goods->days . " days", strtotime($order->user->expire_time))), 'enable' => 1]);
                     } else {
                         // 将商品的有效期和流量自动重置日期加到账号上
-                        User::query()->where('id', $order->user_id)->update(['expire_time' => date('Y-m-d', strtotime("+" . $goods->days . " days")), 'enable' => 1]);
+                        User::query()->where('id', $order->user_id)->update(['expire_time' => date('Y-m-d H:i:s', strtotime("+" . $goods->days . " days")), 'enable' => 1]);
                     }
 
                     // 写入用户标签

@@ -20,7 +20,7 @@
                                 <div class="form-body">
                                     <div class="alert alert-danger alert-dismissable">
                                         <button type="button" class="close" data-dismiss="alert" aria-hidden="true"></button>
-                                        <strong>注意：</strong> 添加节点后自动生成的<code>ID</code>，即为该节点后端部署SSR(R)时<code>usermysql.json</code>中的<code>node_id</code>的值
+                                        <strong>注意：</strong> 添加节点后自动生成的<code>ID</code>，即为该节点后端部署SSR(R)时<code>usermysql.json</code>中的<code>node_id</code>的值；更改服务器的SSH端口<a href="https://github.com/ssrpanel/SSRPanel/wiki/%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%A6%81%E6%AD%A2PING%E3%80%81%E6%94%B9SSH%E7%AB%AF%E5%8F%A3%E5%8F%B7" target="_blank">教程</a>；
                                     </div>
                                     <div class="row">
                                         <div class="col-md-6">

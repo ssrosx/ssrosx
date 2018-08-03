@@ -128,7 +128,7 @@ class AutoCheckNodeStatus extends Command
             $result = $this->curlRequest("https://check-host.net/check-tcp?host={$ip}:{$port}&node=cn1.node.check-host.net&node=" . $overseasNode);
             $result = json_decode($result, JSON_OBJECT_AS_ARRAY);
             if ($result['ok'] != 1) {
-                throw new \Exception("节点探测接口请求失败");
+                throw new \Exception("{$ip}:{$port}节点探测接口请求失败");
             }
 
             // 获得检测结果

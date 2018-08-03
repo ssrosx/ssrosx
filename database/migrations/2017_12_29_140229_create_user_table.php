@@ -43,7 +43,7 @@ class CreateUserTable extends Migration
             $table->integer('balance')->default('0')->comment('余额，单位分');
             $table->integer('score')->default('0')->comment('积分');
             $table->date('enable_time')->nullable()->comment('开通日期');
-            $table->date('expire_time')->default('2099-01-01')->comment('过期时间');
+            $table->date('expire_time')->default('2099-01-01 0:0:0')->comment('过期时间');
             $table->integer('ban_time')->default('0')->comment('封禁到期时间');
             $table->text('remark')->nullable()->comment('备注');
             $table->tinyInteger('level')->default('1')->comment('等级');

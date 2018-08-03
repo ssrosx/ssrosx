@@ -132,8 +132,8 @@ CREATE TABLE `user` (
   `pay_way` tinyint(4) NOT NULL DEFAULT '0' COMMENT '付费方式：0-免费、1-季付、2-月付、3-半年付、4-年付',
   `balance` int(11) NOT NULL DEFAULT '0' COMMENT '余额，单位分',
   `score` int(11) NOT NULL DEFAULT '0' COMMENT '积分',
-  `enable_time` date DEFAULT NULL COMMENT '开通日期',
-  `expire_time` date NOT NULL DEFAULT '2099-01-01' COMMENT '过期时间',
+  `enable_time` datetime DEFAULT NULL COMMENT '开通日期',
+  `expire_time` datetime NOT NULL DEFAULT '2099-01-01 0:0:0' COMMENT '过期时间',
   `ban_time` int(11) NOT NULL DEFAULT '0' COMMENT '封禁到期时间',
   `remark` text COMMENT '备注',
   `level` tinyint(4) NOT NULL DEFAULT '1' COMMENT '等级：可定义名称',
@@ -154,7 +154,7 @@ LOCK TABLES `user` WRITE;
 /*!40000 ALTER TABLE `user` DISABLE KEYS */;
 
 INSERT INTO `user` (`id`, `username`, `password`, `port`, `passwd`, `transfer_enable`, `u`, `d`, `t`, `enable`, `method`, `protocol`, `protocol_param`, `obfs`, `obfs_param`, `speed_limit_per_con`, `speed_limit_per_user`, `wechat`, `qq`, `usage`, `pay_way`, `balance`, `enable_time`, `expire_time`, `remark`, `is_admin`, `reg_ip`, `created_at`, `updated_at`)
-VALUES (1,'admin','e10adc3949ba59abbe56e057f20f883e',10000,'@123',1073741824000,0,0,0,1,'aes-192-ctr','auth_chain_a','','tls1.2_ticket_auth','',204800,204800,'','',1,3,0.00,NULL,'2099-01-01',NULL,1,'127.0.0.1',NULL,NULL);
+VALUES (1,'admin','e10adc3949ba59abbe56e057f20f883e',10000,'@123',1073741824000,0,0,0,1,'aes-192-ctr','auth_chain_a','','tls1.2_ticket_auth','',204800,204800,'','',1,3,0.00,NULL,'2099-01-01 0:0:0',NULL,1,'127.0.0.1',NULL,NULL);
 
 /*!40000 ALTER TABLE `user` ENABLE KEYS */;
 UNLOCK TABLES;
@@ -457,6 +457,7 @@ CREATE TABLE `goods` (
   `price` int(11) NOT NULL DEFAULT '0' COMMENT '商品售价，单位分',
   `desc` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '商品描述',
   `days` int(11) NOT NULL DEFAULT '30' COMMENT '有效期',
+  `sort` int(11) NOT NULL DEFAULT '0' COMMENT '排序',
   `is_del` tinyint(4) NOT NULL DEFAULT '0' COMMENT '是否已删除：0-否、1-是',
   `status` tinyint(4) NOT NULL DEFAULT '1' COMMENT '状态：0-下架、1-上架',
   `created_at` datetime DEFAULT NULL COMMENT '创建时间',
