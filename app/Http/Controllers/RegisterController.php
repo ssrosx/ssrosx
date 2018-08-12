@@ -40,7 +40,7 @@ class RegisterController extends Controller
             // 防止重复提交
             $session_register_token = Session::get('register_token');
             if (empty($register_token) || $register_token != $session_register_token) {
-                Session::flash('errorMsg', '请勿重复请求，刷新一下页面再试试');
+                Session::flash('errorMsg', 'home.request_repeat_error');
 
                 return Redirect::back()->withInput();
             } else {
@@ -48,23 +48,23 @@ class RegisterController extends Controller
             }
 
             if (empty($username)) {
-                Session::flash('errorMsg', '请输入用户名');
+                Session::flash('errorMsg', 'home.input_account');
 
                 return Redirect::back()->withInput();
             } else if (empty($password)) {
-                Session::flash('errorMsg', '请输入密码');
+                Session::flash('errorMsg', 'home.input_password');
 
                 return Redirect::back()->withInput();
             } else if (empty($repassword)) {
-                Session::flash('errorMsg', '请重新输入密码');
+                Session::flash('errorMsg', 'home.input_confirm_password');
 
                 return Redirect::back()->withInput();
             } else if (md5($password) != md5($repassword)) {
-                Session::flash('errorMsg', '两次输入密码不一致，请重新输入');
+                Session::flash('errorMsg', 'home.password_confirm_error');
 
                 return Redirect::back()->withInput($request->except(['password', 'repassword']));
             } else if (false === filter_var($username, FILTER_VALIDATE_EMAIL)) {
-                Session::flash('errorMsg', '用户名必须是合法邮箱，请重新输入');
+                Session::flash('errorMsg', 'home.account_must_email');
 
                 return Redirect::back()->withInput();
             }
@@ -72,7 +72,7 @@ class RegisterController extends Controller
             // 是否校验验证码
             if ($this->systemConfig['is_captcha']) {
                 if (!Captcha::check($captcha)) {
-                    Session::flash('errorMsg', '验证码错误，请重新输入');
+                    Session::flash('errorMsg', 'home.verfy_error_reinput');
 
                     return Redirect::back()->withInput($request->except(['password', 'repassword']));
                 }
@@ -80,7 +80,7 @@ class RegisterController extends Controller
 
             // 是否开启注册
             if (!$this->systemConfig['is_register']) {
-                Session::flash('errorMsg', '系统维护暂停注册');
+                Session::flash('errorMsg', 'home.system_maintenance');
 
                 return Redirect::back();
             }
@@ -88,7 +88,7 @@ class RegisterController extends Controller
             // 如果需要邀请注册
             if ($this->systemConfig['is_invite_register']) {
                 if (empty($code)) {
-                    Session::flash('errorMsg', '请输入邀请码');
+                    Session::flash('errorMsg', 'home.input_invitation_code');
 
                     return Redirect::back()->withInput();
                 }
@@ -96,7 +96,7 @@ class RegisterController extends Controller
                 // 校验邀请码合法性
                 $code = Invite::query()->where('code', $code)->where('status', 0)->first();
                 if (empty($code)) {
-                    Session::flash('errorMsg', '邀请码不可用，请更换邀请码后重试');
+                    Session::flash('errorMsg', 'home.invitation_code_error');
 
                     return Redirect::back()->withInput($request->except(['code']));
                 }
@@ -107,7 +107,7 @@ class RegisterController extends Controller
                 if (Cache::has($cacheKey)) {
                     $registerTimes = Cache::get($cacheKey);
                     if ($registerTimes >= $this->systemConfig['register_ip_limit']) {
-                        Session::flash('errorMsg', '系统已开启防刷机制，请勿频繁注册');
+                        Session::flash('errorMsg', 'home.donot_register_frequently');
 
                         return Redirect::back()->withInput($request->except(['code']));
                     }
@@ -117,7 +117,7 @@ class RegisterController extends Controller
             // 校验用户名是否已存在
             $exists = User::query()->where('username', $username)->first();
             if ($exists) {
-                Session::flash('errorMsg', '用户名已存在，请更换用户名');
+                Session::flash('errorMsg', 'home.account_exist_need_change');
 
                 return Redirect::back()->withInput();
             }
@@ -144,7 +144,7 @@ class RegisterController extends Controller
             // 获取可用端口
             $port = $this->systemConfig['is_rand_port'] ? $this->getRandPort() : $this->getOnlyPort();
             if ($port > $this->systemConfig['max_port']) {
-                Session::flash('errorMsg', '用户已满，请联系管理员');
+                Session::flash('errorMsg', 'home.user_full_contact_admin');
 
                 return Redirect::back()->withInput();
             }
@@ -214,7 +214,7 @@ class RegisterController extends Controller
                     $this->sendEmailLog($user->id, $title, $content, 0, $e->getMessage());
                 }
 
-                Session::flash('regSuccessMsg', '注册成功：激活邮件已发送，请查看邮箱');
+                Session::flash('regSuccessMsg', 'home.regist_success_check_email');
             } else {
                 // 如果不需要激活，则直接给推荐人加流量
                 if ($referral_uid) {
@@ -224,7 +224,7 @@ class RegisterController extends Controller
                     User::query()->where('id', $referral_uid)->update(['enable' => 1]);
                 }
 
-                Session::flash('regSuccessMsg', '注册成功');
+                Session::flash('regSuccessMsg', 'home.regist_successfully');
             }
 
             return Redirect::to('login');
@@ -233,6 +233,7 @@ class RegisterController extends Controller
 
             $view['is_captcha'] = $this->systemConfig['is_captcha'];
             $view['is_register'] = $this->systemConfig['is_register'];
+            $view['website_home_logo'] = $this->systemConfig['website_home_logo'];
             $view['is_invite_register'] = $this->systemConfig['is_invite_register'];
             $view['is_free_code'] = $this->systemConfig['is_free_code'];
             $view['website_analytics'] = $this->systemConfig['website_analytics'];

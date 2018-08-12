@@ -13,13 +13,13 @@
                 @if (Session::has('successMsg'))
                     <div class="alert alert-success alert-dismissable">
                         <button type="button" class="close" data-dismiss="alert" aria-hidden="true"></button>
-                        {{Session::get('successMsg')}}
+                        {{trans(Session::get('successMsg'))}}
                     </div>
                 @endif
                 @if (Session::has('errorMsg'))
                     <div class="alert alert-danger alert-dismissable">
                         <button type="button" class="close" data-dismiss="alert" aria-hidden="true"></button>
-                        <strong>{{trans('home.error')}}：</strong> {{Session::get('errorMsg')}}
+                        <strong>{{trans('home.error')}}：</strong> {{trans(Session::get('errorMsg'))}}
                     </div>
                 @endif
                 <!-- BEGIN PROFILE CONTENT -->

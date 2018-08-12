@@ -21,7 +21,7 @@
                         @if (Session::has('errorMsg'))
                         <div class="alert alert-danger">
                             <button class="close" data-close="alert"></button>
-                            <strong>错误：</strong> {{Session::get('errorMsg')}}
+                            <strong>{{trans('home.error')}}：</strong> {{trans(Session::get('errorMsg'))}}
                         </div>
                         @endif
                         <!-- BEGIN FORM-->

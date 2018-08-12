@@ -102,14 +102,31 @@ class Controller extends BaseController
     // 获取一个随机端口
     public function getRandPort()
     {
+        $port = 0;
         $config = $this->systemConfig();
-
-        $port = mt_rand($config['min_port'], $config['max_port']);
-        $deny_port = [1068, 1109, 1434, 3127, 3128, 3129, 3130, 3332, 4444, 5554, 6669, 8080, 8081, 8082, 8181, 8282, 9996, 17185, 24554, 35601, 60177, 60179]; // 不生成的端口
+        $minport = $config['min_port'];
+        $maxport = $config['max_port'];
 
         $exists_port = User::query()->pluck('port')->toArray();
-        if (in_array($port, $exists_port) || in_array($port, $deny_port)) {
-            $port = $this->getRandPort();
+        $len = count($exists_port);
+
+        if ($maxport - $minport + 1 >= $len) {
+            return $port;
+        }
+
+        $deny_port = [1068, 1109, 1434, 3127, 3128, 3129, 3130, 3332, 4444, 5554, 6669, 8080, 8081, 8082, 8181, 8282, 9996, 17185, 24554, 35601, 60177, 60179]; // 不生成的端口
+
+        $portlist = array();
+        for ($i = $minport; $i <= $maxport; $i++) {
+            if (!in_array($i, $exists_port) && !in_array($i, $deny_port)) {
+                array_push($portlist, $i);
+            }
+        }
+
+        $len = count($portlist);
+        if ($len > 0) {
+            $index = mt_rand(0, $len - 1);
+            $port = $portlist[$index];
         }
 
         return $port;

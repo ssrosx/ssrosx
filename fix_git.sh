@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Clear local git cache
-# Author:SSROSX
+# Author:Patatas
 
 git rm -r --cached .
 git add .

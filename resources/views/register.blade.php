@@ -38,33 +38,33 @@
 <!-- BEGIN LOGIN -->
 <div class="content">
     <nav style="padding-bottom: 20px;text-align: center;">
-        @if(app()->getLocale() == 'zh-CN')
-            <a href="{{url('lang', ['locale' => 'zh-tw'])}}">繁體中文</a>
-            <a href="{{url('lang', ['locale' => 'en'])}}">English</a>
-            <a href="{{url('lang', ['locale' => 'ja'])}}">日本語</a>
-            <a href="{{url('lang', ['locale' => 'ko'])}}">한국어</a>
-        @elseif(app()->getLocale() == 'zh-tw')
-            <a href="{{url('lang', ['locale' => 'zh-CN'])}}">简体中文</a>
-            <a href="{{url('lang', ['locale' => 'en'])}}">English</a>
-            <a href="{{url('lang', ['locale' => 'ja'])}}">日本語</a>
-            <a href="{{url('lang', ['locale' => 'ko'])}}">한국어</a>
-        @elseif(app()->getLocale() == 'en')
-            <a href="{{url('lang', ['locale' => 'zh-CN'])}}">简体中文</a>
-            <a href="{{url('lang', ['locale' => 'zh-tw'])}}">繁體中文</a>
-            <a href="{{url('lang', ['locale' => 'ja'])}}">日本語</a>
-            <a href="{{url('lang', ['locale' => 'ko'])}}">한국어</a>
-        @elseif(app()->getLocale() == 'ko')
-            <a href="{{url('lang', ['locale' => 'zh-CN'])}}">简体中文</a>
-            <a href="{{url('lang', ['locale' => 'zh-tw'])}}">繁體中文</a>
-            <a href="{{url('lang', ['locale' => 'en'])}}">English</a>
-            <a href="{{url('lang', ['locale' => 'ja'])}}">日本語</a>
-        @elseif(app()->getLocale() == 'ja')
-            <a href="{{url('lang', ['locale' => 'zh-CN'])}}">简体中文</a>
-            <a href="{{url('lang', ['locale' => 'zh-tw'])}}">繁體中文</a>
-            <a href="{{url('lang', ['locale' => 'en'])}}">English</a>
-            <a href="{{url('lang', ['locale' => 'ko'])}}">한국어</a>
-        @else
-        @endif
+        {{--@if(app()->getLocale() == 'zh-CN')--}}
+            {{--<a href="{{url('lang', ['locale' => 'zh-tw'])}}">繁體中文</a>--}}
+            {{--<a href="{{url('lang', ['locale' => 'en'])}}">English</a>--}}
+            {{--<a href="{{url('lang', ['locale' => 'ja'])}}">日本語</a>--}}
+            {{--<a href="{{url('lang', ['locale' => 'ko'])}}">한국어</a>--}}
+        {{--@elseif(app()->getLocale() == 'zh-tw')--}}
+            {{--<a href="{{url('lang', ['locale' => 'zh-CN'])}}">简体中文</a>--}}
+            {{--<a href="{{url('lang', ['locale' => 'en'])}}">English</a>--}}
+            {{--<a href="{{url('lang', ['locale' => 'ja'])}}">日本語</a>--}}
+            {{--<a href="{{url('lang', ['locale' => 'ko'])}}">한국어</a>--}}
+        {{--@elseif(app()->getLocale() == 'en')--}}
+            {{--<a href="{{url('lang', ['locale' => 'zh-CN'])}}">简体中文</a>--}}
+            {{--<a href="{{url('lang', ['locale' => 'zh-tw'])}}">繁體中文</a>--}}
+            {{--<a href="{{url('lang', ['locale' => 'ja'])}}">日本語</a>--}}
+            {{--<a href="{{url('lang', ['locale' => 'ko'])}}">한국어</a>--}}
+        {{--@elseif(app()->getLocale() == 'ko')--}}
+            {{--<a href="{{url('lang', ['locale' => 'zh-CN'])}}">简体中文</a>--}}
+            {{--<a href="{{url('lang', ['locale' => 'zh-tw'])}}">繁體中文</a>--}}
+            {{--<a href="{{url('lang', ['locale' => 'en'])}}">English</a>--}}
+            {{--<a href="{{url('lang', ['locale' => 'ja'])}}">日本語</a>--}}
+        {{--@elseif(app()->getLocale() == 'ja')--}}
+            {{--<a href="{{url('lang', ['locale' => 'zh-CN'])}}">简体中文</a>--}}
+            {{--<a href="{{url('lang', ['locale' => 'zh-tw'])}}">繁體中文</a>--}}
+            {{--<a href="{{url('lang', ['locale' => 'en'])}}">English</a>--}}
+            {{--<a href="{{url('lang', ['locale' => 'ko'])}}">한국어</a>--}}
+        {{--@else--}}
+        {{--@endif--}}
     </nav>
     <!-- BEGIN REGISTRATION FORM -->
     <form class="register-form" action="{{url('register')}}" method="post" style="display: block;">
@@ -72,7 +72,13 @@
             @if(Session::get('errorMsg'))
                 <div class="alert alert-danger">
                     <button class="close" data-close="alert"></button>
-                    <span> {{Session::get('errorMsg')}} </span>
+                    <span> {{trans(Session::get('errorMsg'))}} </span>
+                </div>
+            @endif
+            @if (Session::get('regSuccessMsg'))
+                <div class="alert alert-success">
+                    <button class="close" data-close="alert"></button>
+                    <span> {{trans(Session::get('regSuccessMsg'))}} </span>
                 </div>
             @endif
             <div class="form-group">
@@ -150,7 +156,7 @@
             type: 1
             ,title: false //不显示标题栏
             ,closeBtn: false
-            ,area: '500px;'
+            ,area: '250px;'
             ,shade: 0.8
             ,id: 'tnc' //设定一个id，防止重复弹出
             ,resize: false

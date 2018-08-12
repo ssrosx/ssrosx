@@ -16,10 +16,10 @@ class ConfigTableSeeder extends Seeder
         DB::insert("INSERT INTO `config` VALUES ('3', 'invite_num', 3);");
         DB::insert("INSERT INTO `config` VALUES ('4', 'is_register', 1);");
         DB::insert("INSERT INTO `config` VALUES ('5', 'is_invite_register', 1);");
-        DB::insert("INSERT INTO `config` VALUES ('6', 'website_name', 'SSROSX');");
+        DB::insert("INSERT INTO `config` VALUES ('6', 'website_name', 'Patatas');");
         DB::insert("INSERT INTO `config` VALUES ('7', 'is_reset_password', 1);");
         DB::insert("INSERT INTO `config` VALUES ('8', 'reset_password_times', 3);");
-        DB::insert("INSERT INTO `config` VALUES ('9', 'website_url', 'https://www.ssrosx.com');");
+        DB::insert("INSERT INTO `config` VALUES ('9', 'website_url', 'https://patatas.ssrosx.com');");
         DB::insert("INSERT INTO `config` VALUES ('10', 'is_active_register', 1);");
         DB::insert("INSERT INTO `config` VALUES ('11', 'active_times', 3);");
         DB::insert("INSERT INTO `config` VALUES ('12', 'login_add_score', 1);");

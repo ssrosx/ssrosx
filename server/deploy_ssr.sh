@@ -2,7 +2,7 @@
 # Require Root Permission
 # SSR node deploy script
 # Author: Hao-Luo (https://github.com/Hao-Luo/Others/tree/master/apps/ssr)
-# Editor: SSROSX
+# Editor: Patatas
 
 [ $(id -u) != "0" ] && { echo "Error: You must be root to run this script"; exit 1; }
 

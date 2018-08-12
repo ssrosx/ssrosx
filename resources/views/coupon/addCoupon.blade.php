@@ -14,13 +14,13 @@
                 @if (Session::has('successMsg'))
                     <div class="alert alert-success">
                         <button class="close" data-close="alert"></button>
-                        {{Session::get('successMsg')}}
+                        {{trans(Session::get('successMsg'))}}
                     </div>
                 @endif
                 @if (Session::has('errorMsg'))
                     <div class="alert alert-danger">
                         <button class="close" data-close="alert"></button>
-                        <strong>错误：</strong> {{Session::get('errorMsg')}}
+                        <strong>{{trans('home.error')}}：</strong> {{Session::get('errorMsg')}}
                     </div>
                 @endif
                 <!-- BEGIN PORTLET-->

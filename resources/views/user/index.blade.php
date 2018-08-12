@@ -26,7 +26,7 @@
         @if (Session::has('successMsg'))
             <div class="alert alert-success">
                 <button class="close" data-close="alert"></button>
-                {{Session::get('successMsg')}}
+                {{trans(Session::get('successMsg'))}}
             </div>
         @endif
         <div class="row">
@@ -96,9 +96,9 @@
                                             <span class="widget-thumb-subtitle"><a data-toggle="modal">{{$node->name}}</a></span>
                                             <span class="widget-thumb-body-stat">
                                                 @if($node->online_status)
-                                                    <a class="btn btn-sm green">正常</a>
+                                                    <a class="btn btn-sm green">{{trans('home.node_normal')}}</a>
                                                 @else
-                                                    <a class="btn btn-sm red">宕机</a>
+                                                    <a class="btn btn-sm red">{{trans('home.node_crash')}}</a>
                                                 @endif
                                             </span>
                                         </div>

@@ -86,6 +86,6 @@ return [
     |
     */
 
-    'prefix' => 'ssrosx',
+    'prefix' => 'patatas',
 
 ];

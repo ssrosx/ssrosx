@@ -28,7 +28,7 @@ class LoginController extends Controller
             $captcha = trim($request->get('captcha'));
 
             if (empty($username) || empty($password)) {
-                Session::flash('errorMsg', '请输入用户名和密码');
+                Session::flash('errorMsg', 'home.input_account_password');
 
                 return Redirect::back();
             }
@@ -36,7 +36,7 @@ class LoginController extends Controller
             // 是否校验验证码
             if ($this->systemConfig['is_captcha']) {
                 if (!Captcha::check($captcha)) {
-                    Session::flash('errorMsg', '验证码错误，请重新输入');
+                    Session::flash('errorMsg', 'home.verfy_error_reinput');
 
                     return Redirect::back()->withInput();
                 }
@@ -44,15 +44,15 @@ class LoginController extends Controller
 
             $user = User::query()->where('username', $username)->where('password', md5($password))->first();
             if (!$user) {
-                Session::flash('errorMsg', '用户名或密码错误');
+                Session::flash('errorMsg', 'home.account_password_error');
 
                 return Redirect::back()->withInput();
             } else if (!$user->is_admin && $user->status < 0) {
-                Session::flash('errorMsg', '账号已禁用');
+                Session::flash('errorMsg', 'home.account_can_not_use');
 
                 return Redirect::back();
             } else if ($user->status == 0 && $this->systemConfig['is_active_register'] && $user->is_admin == 0) {
-                Session::flash('errorMsg', '账号未激活，请先<a href="/activeUser?username=' . $user->username . '" target="_blank"><span style="color:#000">【激活账号】</span></a>');
+                Session::flash('errorMessage', '<a href="/activeUser?username=' . $user->username . '" target="_blank"><span style="color:#000">【Active】</span></a>');
 
                 return Redirect::back()->withInput();
             }

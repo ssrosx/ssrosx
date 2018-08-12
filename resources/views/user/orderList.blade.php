@@ -26,7 +26,7 @@
                                         <th> # </th>
                                         <th> {{trans('home.invoice_table_status')}} </th>
                                         <th> {{trans('home.invoice_table_name')}} </th>
-                                        <th> {{trans('home.invoice_table_price')}} </th>
+                                        {{--<th> {{trans('home.invoice_table_price')}} </th>--}}
                                         <th> {{trans('home.invoice_table_create_date')}} </th>
 										<th> {{trans('home.invoice_table_expire_at')}} </th>
                                         <th> {{trans('home.invoice_table_id')}} </th>
@@ -61,8 +61,8 @@
                                                     <a href="javascript:;" class="btn btn-sm default disabled"> {{trans('home.invoice_table_expired')}} </a>
                                                 @endif
                                             </td>
-                                            <td>{{empty($order->goods) ? '【商品已删除】' : $order->goods->name}}</td>
-                                            <td>￥{{$order->amount}}</td>
+                                            <td>{{empty($order->goods) ? '【商品已删除】' : $order->goods->name}} {{empty($order->goods) ? '' : trans('home.service_days')}} {{empty($order->goods) ? '' : $order->goods->days}}  {{empty($order->goods) ? '' : trans('home.day')}}</td>
+                                            {{--<td>￥{{$order->amount}}</td>--}}
                                             <td>{{$order->created_at}}</td>
 					                        <td>{{$order->expire_at}}</td>
                                             <td>{{$order->order_sn}}</td>

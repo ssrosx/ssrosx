@@ -122,6 +122,7 @@ class AutoJob extends Command
                         'd'               => 0,
                         'transfer_enable' => 0,
                         'enable'          => 0,
+                        'traffic_reset_day' => 0,
                         'ban_time'        => 0,
                         'port'            => 0,
                         'status'          => -1
@@ -134,6 +135,7 @@ class AutoJob extends Command
                         'd'               => 0,
                         'transfer_enable' => 0,
                         'enable'          => 0,
+                        'traffic_reset_day' => 0,
                         'ban_time'        => 0,
                         'port'            => 0
                     ]);
@@ -191,7 +193,8 @@ class AutoJob extends Command
                 User::query()->where('id', $user->id)->update([
                     'u'               => 0,
                     'd'               => 0,
-                    'transfer_enable' => 0
+                    'transfer_enable'   => 0,
+                    'traffic_reset_day' => 0
                 ]);
             }
         }

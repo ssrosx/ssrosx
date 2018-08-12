@@ -40,7 +40,7 @@
                                                 <!--@if($goods->logo) <a href="{{$goods->logo}}" class="fancybox"><img src="{{$goods->logo}}"/></a> @endif -->
                                                 <span style="font-size: 1.15em; color: #000;">{{$goods->name}} {{trans('home.service_days')}}：{{$goods->days}} {{trans('home.day')}}</span>
                                             </td>
-                                            <td style="width: 20%; text-align: center;"> ￥{{$goods->price}} </td>
+                                            <td style="width: 18%; text-align: center;"> ￥{{$goods->price}} </td>
                                             <td style="width: 20%; text-align: center;">
                                                 <a href="javascript:buy('{{$goods->id}}');" class="btn blue"> {{trans('home.service_buy_button')}} </a>
                                                 <!--<button type="button" class="btn btn-sm blue btn-outline" onclick="exchange('{{$goods->id}}')">兑换</button>-->

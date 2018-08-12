@@ -177,22 +177,22 @@ class UserController extends Controller
 
                 $user = User::query()->where('id', $user['id'])->first();
                 if ($user->password != $old_password) {
-                    Session::flash('errorMsg', '旧密码错误，请重新输入');
+                    Session::flash('errorMsg', 'home.old_password_error');
 
                     return Redirect::to('user/profile#tab_1');
                 } else if ($user->password == $new_password) {
-                    Session::flash('errorMsg', '新密码不可与旧密码一样，请重新输入');
+                    Session::flash('errorMsg', 'home.old_same_new_password_error');
 
                     return Redirect::to('user/profile#tab_1');
                 }
 
                 $ret = User::query()->where('id', $user['id'])->update(['password' => $new_password]);
                 if (!$ret) {
-                    Session::flash('errorMsg', '修改失败');
+                    Session::flash('errorMsg', 'home.change_password_failed');
 
                     return Redirect::to('user/profile#tab_1');
                 } else {
-                    Session::flash('successMsg', '修改成功');
+                    Session::flash('successMsg', 'home.change_password_success');
 
                     return Redirect::to('user/profile#tab_1');
                 }
@@ -201,18 +201,18 @@ class UserController extends Controller
             // 修改联系方式
             if ($wechat || $qq) {
                 if (empty(clean($wechat)) && empty(clean($qq))) {
-                    Session::flash('errorMsg', '修改失败');
+                    Session::flash('errorMsg', 'home.change_password_failed');
 
                     return Redirect::to('user/profile#tab_2');
                 }
 
                 $ret = User::query()->where('id', $user['id'])->update(['wechat' => $wechat, 'qq' => $qq]);
                 if (!$ret) {
-                    Session::flash('errorMsg', '修改失败');
+                    Session::flash('errorMsg', 'home.change_password_failed');
 
                     return Redirect::to('user/profile#tab_2');
                 } else {
-                    Session::flash('successMsg', '修改成功');
+                    Session::flash('successMsg', 'home.change_password_success');
 
                     return Redirect::to('user/profile#tab_2');
                 }
@@ -221,7 +221,7 @@ class UserController extends Controller
             // 修改SSR(R)设置
             if ($method || $protocol || $obfs) {
                 if (empty($passwd)) {
-                    Session::flash('errorMsg', '密码不能为空');
+                    Session::flash('errorMsg', 'home.password_empty_error');
 
                     return Redirect::to('user/profile#tab_3');
                 }
@@ -231,7 +231,7 @@ class UserController extends Controller
                 $existProtocol = SsConfig::query()->where('type', 2)->where('name', $protocol)->first();
                 $existObfs = SsConfig::query()->where('type', 3)->where('name', $obfs)->first();
                 if (!$existMethod || !$existProtocol || !$existObfs) {
-                    Session::flash('errorMsg', '非法请求');
+                    Session::flash('errorMsg', 'home.request_error');
 
                     return Redirect::to('user/profile#tab_3');
                 }
@@ -245,7 +245,7 @@ class UserController extends Controller
 
                 $ret = User::query()->where('id', $user['id'])->update($data);
                 if (!$ret) {
-                    Session::flash('errorMsg', '修改失败');
+                    Session::flash('errorMsg', 'home.change_password_failed');
 
                     return Redirect::to('user/profile#tab_3');
                 } else {
@@ -254,7 +254,7 @@ class UserController extends Controller
                     Session::remove('user');
                     Session::put('user', $user);
 
-                    Session::flash('successMsg', '修改成功');
+                    Session::flash('successMsg', 'home.change_password_success');
 
                     return Redirect::to('user/profile#tab_3');
                 }
@@ -551,7 +551,7 @@ class UserController extends Controller
 
             // 是否开启账号激活
             if (!$this->systemConfig['is_active_register']) {
-                Session::flash('errorMsg', '系统未开启账号激活功能，请联系管理员');
+                Session::flash('errorMsg', 'home.active_not_open_error');
 
                 return Redirect::back()->withInput();
             }
@@ -559,15 +559,15 @@ class UserController extends Controller
             // 查找账号
             $user = User::query()->where('username', $username)->first();
             if (!$user) {
-                Session::flash('errorMsg', '账号不存在，请重试');
+                Session::flash('errorMsg', 'home.account_not_exist');
 
                 return Redirect::back();
             } else if ($user->status < 0) {
-                Session::flash('errorMsg', '账号已禁止登陆，无需激活');
+                Session::flash('errorMsg', 'home.account_can_not_login');
 
                 return Redirect::back();
             } else if ($user->status > 0) {
-                Session::flash('errorMsg', '账号无需激活');
+                Session::flash('errorMsg', 'home.account_can_not_active');
 
                 return Redirect::back();
             }
@@ -577,7 +577,7 @@ class UserController extends Controller
             if (Cache::has('activeUser_' . md5($username))) {
                 $activeTimes = Cache::get('activeUser_' . md5($username));
                 if ($activeTimes >= $this->systemConfig['active_times']) {
-                    Session::flash('errorMsg', '同一个账号24小时内只能请求激活' . $this->systemConfig['active_times'] . '次，请勿频繁操作');
+                    Session::flash('errorMsg', 'home.active_limit');
 
                     return Redirect::back();
                 }
@@ -605,7 +605,7 @@ class UserController extends Controller
             }
 
             Cache::put('activeUser_' . md5($username), $activeTimes + 1, 1440);
-            Session::flash('successMsg', '邮件已发送，请查看邮箱');
+            Session::flash('successMsg', 'home.email_send_active_info');
 
             return Redirect::back();
         } else {
@@ -626,19 +626,19 @@ class UserController extends Controller
         if (empty($verify)) {
             return Redirect::to('login');
         } else if (empty($verify->user)) {
-            Session::flash('errorMsg', '该链接已失效');
+            Session::flash('errorMsg', 'home.link_failed');
 
             return Response::view('user/active');
         } else if ($verify->status == 1) {
-            Session::flash('errorMsg', '该链接已失效');
+            Session::flash('errorMsg', 'home.link_failed');
 
             return Response::view('user/active');
         } else if ($verify->user->status != 0) {
-            Session::flash('errorMsg', '该账号无需激活.');
+            Session::flash('errorMsg', 'home.account_needent_acivte');
 
             return Response::view('user/active');
         } else if (time() - strtotime($verify->updated_at) >= 1800) {
-            Session::flash('errorMsg', '该链接已过期');
+            Session::flash('errorMsg', 'home.link_expire');
 
             // 置为已失效
             $verify->status = 2;
@@ -650,7 +650,7 @@ class UserController extends Controller
         // 更新账号状态
         $ret = User::query()->where('id', $verify->user_id)->update(['status' => 1]);
         if (!$ret) {
-            Session::flash('errorMsg', '账号激活失败');
+            Session::flash('errorMsg', 'home.account_active_failed');
 
             return Redirect::back();
         }
@@ -667,7 +667,7 @@ class UserController extends Controller
             User::query()->where('id', $verify->user->referral_uid)->update(['enable' => 1]);
         }
 
-        Session::flash('successMsg', '账号激活成功');
+        Session::flash('successMsg', 'home.account_active_success');
 
         return Response::view('user/active');
     }
@@ -680,7 +680,7 @@ class UserController extends Controller
 
             // 是否开启重设密码
             if (!$this->systemConfig['is_reset_password']) {
-                Session::flash('errorMsg', '系统未开启重置密码功能，请联系管理员');
+                Session::flash('errorMsg', 'home.reset_not_open_error');
 
                 return Redirect::back()->withInput();
             }
@@ -688,7 +688,7 @@ class UserController extends Controller
             // 查找账号
             $user = User::query()->where('username', $username)->first();
             if (!$user) {
-                Session::flash('errorMsg', '账号不存在，请重试');
+                Session::flash('errorMsg', 'home.account_not_exist');
 
                 return Redirect::back();
             }
@@ -698,7 +698,7 @@ class UserController extends Controller
             if (Cache::has('resetPassword_' . md5($username))) {
                 $resetTimes = Cache::get('resetPassword_' . md5($username));
                 if ($resetTimes >= $this->systemConfig['reset_password_times']) {
-                    Session::flash('errorMsg', '同一个账号24小时内只能重设密码' . $this->systemConfig['reset_password_times'] . '次，请勿频繁操作');
+                    Session::flash('errorMsg', 'home.email_reset_limit');
 
                     return Redirect::back();
                 }
@@ -726,11 +726,11 @@ class UserController extends Controller
             }
 
             Cache::put('resetPassword_' . md5($username), $resetTimes + 1, 1440);
-            Session::flash('successMsg', '重置成功，请查看邮箱');
+            Session::flash('successMsg', 'home.reset_success_view_email');
 
             return Redirect::back();
         } else {
-            $view['website_logo'] = $this->systemConfig['website_logo'];
+            $view['website_home_logo'] = $this->systemConfig['website_home_logo'];
             $view['website_analytics'] = $this->systemConfig['website_analytics'];
             $view['website_customer_service'] = $this->systemConfig['website_customer_service'];
             $view['is_reset_password'] = $this->systemConfig['is_reset_password'];
@@ -749,11 +749,11 @@ class UserController extends Controller
             if (empty($token)) {
                 return Redirect::to('login');
             } else if (empty($password) || empty($repassword)) {
-                Session::flash('errorMsg', '密码不能为空');
+                Session::flash('errorMsg', 'home.password_empty_error');
 
                 return Redirect::back();
             } else if (md5($password) != md5($repassword)) {
-                Session::flash('errorMsg', '两次输入密码不一致，请重新输入');
+                Session::flash('errorMsg', 'home.password_confirm_error');
 
                 return Redirect::back();
             }
@@ -763,15 +763,15 @@ class UserController extends Controller
             if (empty($verify)) {
                 return Redirect::to('login');
             } else if ($verify->status == 1) {
-                Session::flash('errorMsg', '该链接已失效');
+                Session::flash('errorMsg', 'home.link_failed');
 
                 return Redirect::back();
             } else if ($verify->user->status < 0) {
-                Session::flash('errorMsg', '账号已被禁用');
+                Session::flash('errorMsg', 'home.account_can_not_use');
 
                 return Redirect::back();
             } else if (md5($password) == $verify->user->password) {
-                Session::flash('errorMsg', '新旧密码一样，请重新输入');
+                Session::flash('errorMsg', 'home.old_same_new_password_error');
 
                 return Redirect::back();
             }
@@ -779,7 +779,7 @@ class UserController extends Controller
             // 更新密码
             $ret = User::query()->where('id', $verify->user_id)->update(['password' => md5($password)]);
             if (!$ret) {
-                Session::flash('errorMsg', '重设密码失败');
+                Session::flash('errorMsg', 'home.reset_password_failed');
 
                 return Redirect::back();
             }
@@ -788,7 +788,7 @@ class UserController extends Controller
             $verify->status = 1;
             $verify->save();
 
-            Session::flash('successMsg', '新密码设置成功，请自行登录');
+            Session::flash('successMsg', 'home.reset_success_relogin');
 
             return Redirect::back();
         } else {
@@ -800,7 +800,7 @@ class UserController extends Controller
             if (empty($verify)) {
                 return Redirect::to('login');
             } else if (time() - strtotime($verify->updated_at) >= 1800) {
-                Session::flash('errorMsg', '该链接已过期');
+                Session::flash('errorMsg', 'home.link_expire');
 
                 // 置为已失效
                 $verify->status = 2;
@@ -811,7 +811,7 @@ class UserController extends Controller
 
                 return Response::view('user/reset', $view);
             }
-
+            $view['website_home_logo'] = $this->systemConfig['website_home_logo'];
             $view['verify'] = $verify;
 
             return Response::view('user/reset', $view);
@@ -935,7 +935,7 @@ class UserController extends Controller
                 if ($goods->type === 2) {
                     $existOrderList = Order::query()->with('goods')->whereHas('goods', function ($q) {
                         $q->where('type', 2);
-                    })->where('user_id', $user->id)->where('oid', '<>', $order->oid)->where('is_expire', 0)->get();
+                    })->where('user_id', $user->id)->where('oid', '<>', $order->oid)->where('is_expire', 0)->where('status', 2)->get();
                     foreach ($existOrderList as $vo) {
                         Order::query()->where('oid', $vo->oid)->update(['is_expire' => 1]);
                         User::query()->where('id', $user->id)->decrement('transfer_enable', $vo->goods->traffic * 1048576);

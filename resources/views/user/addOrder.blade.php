@@ -125,7 +125,7 @@
                     });
                 },
                 success: function (ret) {
-                    layer.msg(ret.message, {time:1300}, function() {
+                    layer.msg(ret.message, {time:3000}, function() {
                         if (ret.status == 'success') {
                             window.location.href = '{{url('payment')}}' + "/" + ret.data;
                         } else {

@@ -22,7 +22,7 @@ class activeUser extends Mailable
 
     public function build()
     {
-        return $this->view('emails.activeUser')->subject('激活账号')->with([
+        return $this->view('emails.activeUser')->subject('Activation Account')->with([
             'websiteName' => $this->websiteName,
             'activeUserUrl' => $this->activeUserUrl
         ]);

@@ -62,6 +62,65 @@ return [
     'error'                           => 'Error',
     'online_pay'                      => 'Online Pay',
     'pay'                             => 'Pay Now',
+    'node_normal'                     => 'Normal',
+    'node_crash'                      => 'Crash',
+
+    // Email
+    'email_title_pre'                 => 'If you have not visited',
+    'email_title_end'                 => 'or do not do this, please ignore this email.',
+    'email_msg_click'                 => 'Click here',
+    'email_msg_reset'                 => 'Reset Password',
+    'email_msg_other'                 => ', or click the link below (valid in 30 minutes).',
+    'email_reset_limit'               => 'The number of reset passwords has reached the upper limit. Do not operate frequently.',
+
+    // 错误
+    'active_limit'                    => 'The number of requests for activation has reached the upper limit. Do not operate frequently.',
+    'old_password_error'              => 'Old password is wrong, please re-enter',
+    'old_same_new_password_error'     => 'The new password cannot be the same as the old password, please re-enter',
+    'change_password_failed'          => 'Password modification failed',
+    'change_password_success'         => 'Password modification complete',
+    'password_empty_error'            => 'Password can not be empty',
+    'request_error'                   => 'Illegal request',
+    'active_not_open_error'           => 'The account activation function is not enabled in the system. Please contact the administrator.',
+    'account_not_exist'               => 'The account does not exist, please try again',
+    'account_can_not_login'           => 'Account has been banned from login, no activation required',
+    'account_can_not_active'          => 'Account does not need to be activated',
+    'email_send_active_info'          => 'The message has been sent, please check the mailbox',
+    'reset_new_password'              => 'Set a new password',
+
+    'link_failed'                     => 'The link has expired',
+    'account_needent_acivte'          => 'This account does not need to be activated',
+    'link_expire'                     => 'The link has expired',
+    'account_active_failed'           => 'Account activation failed',
+    'account_active_success'          => 'Account activation succeeded',
+
+    'reset_not_open_error'            => 'The password reset function is not enabled. Please contact the administrator.',
+    'reset_success_view_email'        => 'Reset is successful, please check the mailbox',
+    'password_confirm_error'          => 'The two passwords are inconsistent, please re-enter',
+    'account_can_not_use'             => 'Account has been disabled',
+    'reset_password_failed'           => 'Reset password failed',
+    'reset_success_relogin'           => 'The new password is set successfully. Please log in yourself.',
+
+
+
+    'input_account_password'          => 'Please enter your username and password',
+    'verfy_error_reinput'             => 'The verification code is incorrect, please re-enter',
+    'account_password_error'          => 'Wrong user name or password',
+
+    'request_repeat_error'            => 'Please do not repeat the request, refresh the page and try again.',
+    'input_account'                   => 'Please enter user name',
+    'input_password'                  => 'Please enter your password',
+    'input_confirm_password'          => 'Please re-enter your password',
+    'account_must_email'              => 'Username must be a valid email address, please re-enter',
+    'system_maintenance'              => 'System maintenance suspension registration',
+    'input_invitation_code'           => 'Please enter the invitation code',
+    'invitation_code_error'           => 'Invitation code is not available, please try to change the invitation code and try again',
+    'donot_register_frequently'       => 'Do not register frequently',
+    'account_exist_need_change'       => 'Username already exists, please change username',
+    'user_full_contact_admin'         => 'User is full, please contact the administrator',
+    'regist_success_check_email'      => 'Registration successful: activation email has been sent, please check email address',
+    'regist_successfully'             => 'Registration success',
+
 
     // 用户资料
     'submit'                          => 'Submit',

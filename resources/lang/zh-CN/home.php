@@ -62,6 +62,63 @@ return [
     'error'                           => '错误',
     'online_pay'                      => '在线支付',
     'pay'                             => '去支付',
+    'node_normal'                     => '正常',
+    'node_crash'                      => '宕机',
+
+    // Email
+    'email_title_pre'                 => '如果您并没有访问过',
+    'email_title_end'                 => '或者没有进行上述操作，请忽略这封邮件。',
+    'email_msg_click'                 => '点击这里去',
+    'email_msg_reset'                 => '重设密码',
+    'email_msg_other'                 => '，或者点击下面的链接（30分钟内有效）。',
+    'email_reset_limit'               => '重置密码次数已达上限，请勿频繁操作',
+
+    // 错误
+    'active_limit'                    => '24小时内请求激活次数已达上限，请勿频繁操作',
+    'old_password_error'              => '旧密码错误，请重新输入',
+    'old_same_new_password_error'     => '新密码不可与旧密码一样，请重新输入',
+    'change_password_failed'          => '修改失败',
+    'change_password_success'         => '修改成功',
+    'password_empty_error'            => '密码不能为空',
+    'request_error'                   => '非法请求',
+    'active_not_open_error'           => '系统未开启账号激活功能，请联系管理员',
+    'account_not_exist'               => '账号不存在，请重试',
+    'account_can_not_login'           => '账号已禁止登陆，无需激活',
+    'account_can_not_active'          => '账号无需激活',
+    'email_send_active_info'          => '邮件已发送，请查看邮箱',
+
+    'link_failed'                     => '该链接已失效',
+    'account_needent_acivte'          => '该账号无需激活',
+    'link_expire'                     => '该链接已过期',
+    'account_active_failed'           => '账号激活失败',
+    'account_active_success'          => '账号激活成功',
+
+    'reset_not_open_error'            => '系统未开启重置密码功能，请联系管理员',
+    'reset_success_view_email'        => '重置成功，请查看邮箱',
+    'password_confirm_error'          => '两次输入密码不一致，请重新输入',
+    'account_can_not_use'             => '账号已被禁用',
+    'reset_password_failed'           => '重设密码失败',
+    'reset_success_relogin'           => '新密码设置成功，请自行登录',
+    'reset_new_password'              => '设置新密码',
+
+
+    'input_account_password'          => '请输入用户名和密码',
+    'verfy_error_reinput'             => '验证码错误，请重新输入',
+    'account_password_error'          => '用户名或密码错误',
+
+    'request_repeat_error'            => '请勿重复请求，刷新一下页面再试试',
+    'input_account'                   => '请输入用户名',
+    'input_password'                  => '请输入密码',
+    'input_confirm_password'          => '请重新输入密码',
+    'account_must_email'              => '用户名必须是合法邮箱，请重新输入',
+    'system_maintenance'              => '系统维护暂停注册',
+    'input_invitation_code'           => '请输入邀请码',
+    'invitation_code_error'           => '邀请码不可用，请更换邀请码后重试',
+    'donot_register_frequently'       => '请勿频繁注册',
+    'account_exist_need_change'       => '用户名已存在，请更换用户名',
+    'user_full_contact_admin'         => '用户已满，请联系管理员',
+    'regist_success_check_email'      => '注册成功：激活邮件已发送，请查看邮箱',
+    'regist_successfully'             => '注册成功',
 
     // 用户资料
     'submit'                          => '提 交',

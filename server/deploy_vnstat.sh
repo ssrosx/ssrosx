@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Deploy vnstat-1.17
-# Author:SSROSX
+# Author:Patatas
 
 yum install -y gcc gcc+
 cd /root/

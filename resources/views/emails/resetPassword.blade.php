@@ -18,7 +18,7 @@
                                                 <th style="Margin:0;color:#333;font-family:Helvetica,Arial,sans-serif;font-size:16px;font-weight:400;line-height:19px;margin:0;padding:0;text-align:left">
                                                     <h3 style="Margin:0;Margin-bottom:10px;color:inherit;font-family:Helvetica,Arial,sans-serif;font-size:28px;font-weight:400;line-height:1.3;margin:0;margin-bottom:0;padding:0;text-align:left;word-wrap:normal">
                                                         <a href="#" style="Margin:0;color:#40253b;font-family:Helvetica,Arial,sans-serif;font-weight:400;line-height:1.3;margin:0;padding:0;text-align:left;text-decoration:none" target="_blank">
-                                                            SSROSX
+                                                            Patatas
                                                         </a>
                                                     </h3>
                                                 </th>
@@ -47,7 +47,7 @@
                                                 <th style="Margin:0;color:#333;font-family:Helvetica,Arial,sans-serif;font-size:16px;font-weight:400;line-height:19px;margin:0;padding:0;text-align:left">
                                                     <h6 style="Margin:0;Margin-bottom:10px;color:#f3f3f3;font-family:Helvetica,Arial,sans-serif;font-size:18px;font-weight:400;line-height:1.3;margin:0;margin-bottom:8px;margin-top:8px;padding:0;text-align:left;word-wrap:normal">
                                                         <a href="#" style="Margin:0;color:#f3f3f3;font-family:Helvetica,Arial,sans-serif;font-weight:400;line-height:1.3;margin:0;padding:0;text-align:left;text-decoration:none" target="_blank">
-                                                            重置密码
+                                                            {{trans('home.email_msg_reset')}}
                                                         </a>
                                                     </h6>
                                                 </th>
@@ -68,8 +68,8 @@
                                 <tr style="padding:0;text-align:left;vertical-align:top">
                                     <th style="Margin:0;color:#333;font-family:Helvetica,Arial,sans-serif;font-size:16px;font-weight:400;line-height:19px;margin:0;padding:0;text-align:left">
                                         <div class="release" style="padding-top:5px;padding-left:20px;padding-bottom:20px;">
-                                            <p>如果您并没有访问过 {{$websiteName}} 或者没有进行上述操作，请忽略这封邮件。</p>
-                                            <p>点击这里去<a href="{{$resetPasswordUrl}}" target="_blank">【重设密码】</a>，或者点击下面的链接（30分钟内有效）。</p>
+                                            <p>{{trans('home.email_title_pre')}} {{$websiteName}} {{trans('home.email_title_end')}}</p>
+                                            <p>{{trans('home.email_msg_click')}}<a href="{{$resetPasswordUrl}}" target="_blank">【{{trans('home.email_msg_reset')}}】</a>{{trans('home.email_msg_other')}}</p>
                                             <p>
                                                 <a href="{{$resetPasswordUrl}}" target="_blank">{{$resetPasswordUrl}}</a>
                                             </p>

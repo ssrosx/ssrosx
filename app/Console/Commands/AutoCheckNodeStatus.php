@@ -54,15 +54,15 @@ class AutoCheckNodeStatus extends Command
                     // 可能是宕机时再检测一次，check-host有时候会抽风
                     $tcpCheckByNeed = $this->tcpCheckByNeed($node->ip, 'us');
                     if ($tcpCheckByNeed !== false && $tcpCheckByNeed === 0) {
-                    $this->notifyMaster($title, "节点**{$node->name}【{$node->ip}】**异常：**服务器宕机**", $node->name, $node->server);
+                    $this->notifyMaster($title, "节点**{$node->name} **异常：**服务器宕机**", $node->name, $node->server);
                     }
                 } else if ($tcpCheck === 2) {
-                    $this->notifyMaster($title, "节点**{$node->name}【{$node->ip}】**异常：**海外不通**", $node->name, $node->server);
+                    $this->notifyMaster($title, "节点**{$node->name} **异常：**海外不通**", $node->name, $node->server);
                 } else if ($tcpCheck === 3) {
                     // 可能是阻断时再检测一次，因为我捐给check-host的服务器性能不太好，有时候check-host连不上，尤其是晚高峰
                     $tcpCheckByNeed = $this->tcpCheckByNeed($node->ip);
                     if ($tcpCheckByNeed !== false && $tcpCheckByNeed === 0) {
-                        $this->notifyMaster($title, "节点**{$node->name}【{$node->ip}】**异常：**TCP阻断**", $node->name, $node->server);
+                        $this->notifyMaster($title, "节点**{$node->name} **异常：**TCP阻断**", $node->name, $node->server);
                     }
                 }
             }
@@ -70,7 +70,7 @@ class AutoCheckNodeStatus extends Command
             // 10分钟内无节点负载信息且TCP检测认为不是宕机则认为是SSR(R)后端炸了
             $node_info = SsNodeInfo::query()->where('node_id', $node->id)->where('log_time', '>=', strtotime("-10 minutes"))->orderBy('id', 'desc')->first();
             if ($tcpCheck !== 1 && (empty($node_info) || empty($node_info->load))) {
-                $this->notifyMaster($title, "节点**{$node->name}【{$node->ip}】**异常：**心跳异常**", $node->name, $node->server);
+                $this->notifyMaster($title, "节点**{$node->name}**异常：**心跳异常**", $node->name, $node->server);
             }
 
             Log::info("节点【" . $node->name . "】（" . $node->ip . "）TCP阻断检测完毕");
