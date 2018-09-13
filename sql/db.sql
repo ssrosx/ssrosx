@@ -150,7 +150,7 @@ CREATE TABLE `user` (
   `updated_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   INDEX `idx_search` (`enable`, `status`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='用户';
+) ENGINE=InnoDB AUTO_INCREMENT=10000 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='用户';
 
 
 LOCK TABLES `user` WRITE;
