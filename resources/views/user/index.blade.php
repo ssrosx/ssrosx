@@ -1,7 +1,12 @@
 @extends('user.layouts')
 
 @section('css')
+    <link href="/assets/global/plugins/fancybox/source/jquery.fancybox.css" rel="stylesheet" type="text/css" />
     <style type="text/css">
+        .fancybox > img {
+            width: 75px;
+            height: 75px;
+        }
         .ticker {
             background-color: #fff;
             margin-bottom: 20px;
@@ -182,7 +187,7 @@
                     <div class="modal-content">
                         <div class="modal-header">
                             <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
-                            <h4 class="modal-title">Scheme Links - {{$node->name}}</h4>
+                            <h4 class="modal-title">{{$node->name}}</h4>
                         </div>
                         <div class="modal-body">
                             <textarea class="form-control" rows="5" readonly="readonly">{{$node->ssr_scheme}}</textarea>
@@ -228,6 +233,8 @@
     <!-- END CONTENT BODY -->
 @endsection
 @section('script')
+    <script src="/assets/global/plugins/clipboardjs/clipboard.min.js" type="text/javascript"></script>
+    <script src="/assets/pages/scripts/components-clipboard.min.js" type="text/javascript"></script>
     <script src="/assets/global/plugins/jquery-qrcode/jquery.qrcode.min.js" type="text/javascript"></script>
     <script src="/assets/global/plugins/jquery-ui/jquery-ui.min.js" type="text/javascript"></script>
     <script src="/js/layer/layer.js" type="text/javascript"></script>
@@ -246,7 +253,7 @@
             }
 
             $.ajax({
-                url:'{{url('user/charge')}}',
+                url:'{{url('charge')}}',
                 type:"POST",
                 data:{_token:_token, coupon_sn:charge_coupon},
                 beforeSend:function(){
@@ -272,7 +279,7 @@
         function exchange() {
             $.ajax({
                 type: "POST",
-                url: "{{url('user/exchange')}}",
+                url: "{{url('exchange')}}",
                 async: false,
                 data: {_token:'{{csrf_token()}}'},
                 dataType: 'json',
@@ -317,7 +324,7 @@
 
         // 节点订阅
         function subscribe() {
-            window.location.href = '{{url('/user/subscribe')}}';
+            window.location.href = '{{url('subscribe')}}';
         }
 
         // 显示加密、混淆、协议

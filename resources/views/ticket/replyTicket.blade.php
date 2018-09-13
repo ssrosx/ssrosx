@@ -20,7 +20,7 @@
                         <div class="actions">
                             @if($ticket->status != 2)
                                 <div class="btn-group btn-group-devided" data-toggle="buttons">
-                                    <a class="btn red btn-outline sbold" data-toggle="modal" href="#closeTicket"> 关闭 </a>
+                                    <a class="btn red btn-outline sbold" data-toggle="modal" href="#closeTicket"> {{trans('home.close')}} </a>
                                 </div>
                             @endif
                         </div>
@@ -42,7 +42,7 @@
                                         </div>
                                         <div class="timeline-body-head-actions"></div>
                                     </div>
-                                    <div class="timeline-body-content">
+                                    <div class="timeline-body-content" style="word-wrap: break-word;">
                                         <span class="font-grey-cascade"> {!! $ticket->content !!} </span>
                                     </div>
                                 </div>
@@ -72,7 +72,7 @@
                                                 </div>
                                                 <div class="timeline-body-head-actions"></div>
                                             </div>
-                                            <div class="timeline-body-content">
+                                            <div class="timeline-body-content" style="word-wrap: break-word;">
                                                 <span class="font-grey-cascade"> {!! $reply->content !!} </span>
                                             </div>
                                         </div>
@@ -98,12 +98,12 @@
                         <div class="modal-content">
                             <div class="modal-header">
                                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
-                                <h4 class="modal-title">关闭工单</h4>
+                                <h4 class="modal-title">{{trans('home.close_ticket')}}</h4>
                             </div>
-                            <div class="modal-body"> 您确定要关闭该工单吗？ </div>
+                            <div class="modal-body"> {{trans('home.ticket_close_msg')}} </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn dark btn-outline" data-dismiss="modal">取消</button>
-                                <button type="button" class="btn red" onclick="closeTicket()">确定</button>
+                                <button type="button" class="btn dark btn-outline" data-dismiss="modal">{{trans('home.close')}}</button>
+                                <button type="button" class="btn red" onclick="closeTicket()">{{trans('home.ticket_confirm')}}</button>
                             </div>
                         </div>
                         <!-- /.modal-content -->

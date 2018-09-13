@@ -17,7 +17,7 @@ use Log;
 use DB;
 
 /**
- * 有赞云支付
+ * 有赞云支付消息推送接收
  * Class YzyController
  *
  * @package App\Http\Controllers
@@ -27,7 +27,7 @@ class YzyController extends Controller
     // 接收GET请求
     public function index(Request $request)
     {
-        \Log::info("YZY-GET:" . var_export($request->all()) . '[' . $request->getClientIp() . ']');
+        \Log::info("YZY-GET:" . var_export($request->all()) . '[' . getClientIp() . ']');
     }
 
     // 接收POST请求
@@ -38,7 +38,7 @@ class YzyController extends Controller
         $json = file_get_contents('php://input');
         $data = json_decode($json, true);
         if (!$data) {
-            Log::info('YZY-POST:回调数据无法解析，可能是非法请求[' . $request->getClientIp() . ']');
+            Log::info('YZY-POST:回调数据无法解析，可能是非法请求[' . getClientIp() . ']');
             exit();
         }
 
@@ -47,7 +47,8 @@ class YzyController extends Controller
         $sign_string = $this->systemConfig['youzan_client_id'] . "" . $msg . "" . $this->systemConfig['youzan_client_secret'];
         $sign = md5($sign_string);
         if ($sign != $data['sign']) {
-            Log::info('YZY-POST:回调数据签名错误，可能是非法请求[' . $request->getClientIp() . ']');
+            Log::info('本地签名：' . $sign_string . ' | 远程签名：' . $data['sign']);
+            Log::info('YZY-POST:回调数据签名错误，可能是非法请求[' . getClientIp() . ']');
             exit();
         } else {
             // 返回请求成功标识给有赞
@@ -126,12 +127,17 @@ class YzyController extends Controller
 
                     // 套餐就改流量重置日，流量包不改
                     if ($goods->type == 2) {
-                        // 将商品的有效期和流量自动重置日期加到账号上
-                        $traffic_reset_day = in_array(date('d'), [29, 30, 31]) ? 28 : abs(date('d'));
-                        User::query()->where('id', $order->user_id)->update(['traffic_reset_day' => $traffic_reset_day, 'expire_time' => date('Y-m-d H:i:s', strtotime("+" . $goods->days . " days", strtotime($order->user->expire_time))), 'enable' => 1]);
+                        if ($order->user->expire_time < date('Y-m-d H:i:s')) {
+                            $expireTime = date('Y-m-d H:i:s', strtotime("+" . $goods->days . " days"));
+                        } else {
+                            $expireTime = date('Y-m-d H:i:s', strtotime("+" . $goods->days . " days", strtotime($order->user->expire_time)));
+                        }
+                        User::query()->where('id', $order->user_id)->update(['traffic_reset_day' => 1, 'expire_time' => $expireTime, 'enable' => 1]);
                     } else {
-                        // 将商品的有效期和流量自动重置日期加到账号上
-                        User::query()->where('id', $order->user_id)->update(['expire_time' => date('Y-m-d H:i:s', strtotime("+" . $goods->days . " days")), 'enable' => 1]);
+                        $lastCanUseDays = floor(round(strtotime($order->user->expire_time) - strtotime(date('Y-m-d H:i:s'))) / 3600 / 24);
+                        if ($lastCanUseDays < $goods->days) {
+                            User::query()->where('id', $order->user_id)->update(['expire_time' => date('Y-m-d H:i:s', strtotime("+" . $goods->days . " days")), 'enable' => 1]);
+                        }
                     }
 
                     // 写入用户标签
@@ -147,9 +153,7 @@ class YzyController extends Controller
                         $goodsLabels = GoodsLabel::query()->where('goods_id', $order->goods_id)->pluck('label_id')->toArray();
 
                         // 标签去重
-                        $newUserLabels = array_merge($userLabels, $goodsLabels, $defaultLabels);
-                        $newUserLabels = array_unique($newUserLabels);
-                        $newUserLabels = array_values($newUserLabels);
+                        $newUserLabels = array_values(array_unique(array_merge($userLabels, $goodsLabels, $defaultLabels)));
 
                         // 删除用户所有标签
                         UserLabel::query()->where('user_id', $order->user_id)->delete();

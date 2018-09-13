@@ -2,7 +2,7 @@
 
 return [
     'panel'                           => '제어판',
-    'subscribe_address'               => 'RSS구독주소',
+    'subscribe_address'               => '구독 서비스',
     'copy_subscribe_address'          => '주소복사',
     'exchange_subscribe'              => '주소변경',
     'subscribe_warning'               => '경고: 구독 주소 는 개인적 으로 사용 되 지 말고 이 주소 를 전파 하지 마시오',
@@ -14,6 +14,7 @@ return [
     'home'                            => '메인',
     'services'                        => '서버구축',
     'traffic_log'                     => '트래픽',
+    'help'                            => '도와주다',
     'invite_code'                     => '초청코드',
     'invoices'                        => '오더관리',
     'tickets'                         => '고객센트',
@@ -106,7 +107,7 @@ return [
     'invite_code_make'                => '초청코드생성',
     'invite_code_button'              => '생성',
     'invite_code_tips1'               => '생성가능',
-    'invite_code_tips2'               => '개 총청코드',
+    'invite_code_tips2'               => '개 총청코드, 7 일내에 유효하다.',
     'invite_code_my_codes'            => '나의 초청코드',
     'invite_code_table_name'          => '초청코드',
     'invite_code_table_date'          => '유효기간',
@@ -122,6 +123,7 @@ return [
     'invoice_title'                   => '거래내역',
     'invoice_table_id'                => '번호',
     'invoice_table_name'              => '서버스',
+    'invoice_table_pay_way'           => '지불 방식',
     'invoice_table_price'             => '금액',
     'invoice_table_create_date'       => '구입일자',
 	'invoice_table_expire_at'		  => '만료 시간',
@@ -132,6 +134,7 @@ return [
     'invoice_table_wait_confirm'      => '확인중',
     'invoice_table_wait_active'       => '사용중',
     'invoice_table_expired'           => '기간만료',
+    'invoice_table_goods_deleted'     => '[삭제됨]',
 
     // 工
     'ticket_title'                    => '문의 기록',

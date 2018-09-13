@@ -42,7 +42,7 @@
                                     @foreach($ticketList as $key => $ticket)
                                         <tr class="odd gradeX">
                                             <td> {{$key + 1}} </td>
-                                            <td> <a href="{{url('user/replyTicket?id=') . $ticket->id}}" target="_blank">{{$ticket->title}}</a> </td>
+                                            <td> <a href="{{url('replyTicket?id=') . $ticket->id}}" target="_blank">{{$ticket->title}}</a> </td>
                                             <td>
                                                 @if ($ticket->status == 0)
                                                     <span class="label label-info"> {{trans('home.ticket_table_status_wait')}} </span>
@@ -96,28 +96,23 @@
     <script src="/js/layer/layer.js" type="text/javascript"></script>
 
     <script type="text/javascript">
-        // 回复工单
-        function reply(id) {
-            window.location.href =  + id;
-        }
-
         // 发起工单
         function addTicket() {
             var title = $("#title").val();
             var content = $("#content").val();
 
             if (title == '' || title == undefined) {
-                bootbox.alert('工单标题不能为空');
+                bootbox.alert('{{trans('home.ticket_title_not_empty')}}');
                 return false;
             }
 
             if (content == '' || content == undefined) {
-                bootbox.alert('工单内容不能为空');
+                bootbox.alert('{{trans('home.ticket_msg_not_empty')}}');
                 return false;
             }
 
-            layer.confirm('确定提交工单？', {icon: 3, title:'警告'}, function(index) {
-                $.post("{{url('user/addTicket')}}", {_token:'{{csrf_token()}}', title:title, content:content}, function(ret) {
+            layer.confirm('{{trans('home.ticket_submit_msg')}}', {icon: 3, title:'{{trans('home.ticket_warning')}}'}, function(index) {
+                $.post("{{url('addTicket')}}", {_token:'{{csrf_token()}}', title:title, content:content}, function(ret) {
                     layer.msg(ret.message, {time:1000}, function() {
                         if (ret.status == 'success') {
                             window.location.reload();

@@ -26,9 +26,8 @@
                                         <th> # </th>
                                         <th> {{trans('home.invoice_table_status')}} </th>
                                         <th> {{trans('home.invoice_table_name')}} </th>
-                                        {{--<th> {{trans('home.invoice_table_price')}} </th>--}}
                                         <th> {{trans('home.invoice_table_create_date')}} </th>
-										<th> {{trans('home.invoice_table_expire_at')}} </th>
+					<th> {{trans('home.invoice_table_expire_at')}} </th>
                                         <th> {{trans('home.invoice_table_id')}} </th>
                                     </tr>
                                 </thead>

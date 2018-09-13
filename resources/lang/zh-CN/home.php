@@ -2,7 +2,7 @@
 
 return [
     'panel'                           => '控制面板',
-    'subscribe_address'               => '我的订阅地址',
+    'subscribe_address'               => '订阅服务',
     'copy_subscribe_address'          => '复制',
     'exchange_subscribe'              => '更换',
     'subscribe_warning'               => '警告：该订阅地址仅限个人使用，请勿传播该地址，否则会导致您的账号流量使用情况异常触发自动封号机制。',
@@ -11,9 +11,10 @@ return [
     'subscribe_baned'                 => '您的订阅功能被禁用，请联系管理员恢复',
 
     // 菜单
-    'home'                            => '我的节点',
+    'home'                            => '个人中心',
     'services'                        => '购买服务',
     'traffic_log'                     => '流量记录',
+    'help'                            => '帮助中心',
     'invite_code'                     => '邀请码',
     'invoices'                        => '我的账单',
     'tickets'                         => '服务单',
@@ -165,7 +166,7 @@ return [
     'invite_code_make'                => '生成邀请码',
     'invite_code_button'              => '生成',
     'invite_code_tips1'               => '可生成',
-    'invite_code_tips2'               => '个邀请码',
+    'invite_code_tips2'               => '枚邀请码，7日内有效',
     'invite_code_my_codes'            => '我的邀请码',
     'invite_code_table_name'          => '邀请码',
     'invite_code_table_date'          => '有效期',
@@ -181,6 +182,7 @@ return [
     'invoice_title'                   => '消费记录',
     'invoice_table_id'                => '编号',
     'invoice_table_name'              => '服务',
+    'invoice_table_pay_way'           => '支付方式',
     'invoice_table_price'             => '金额',
     'invoice_table_create_date'       => '购买日期',
 	'invoice_table_expire_at'		  => '到期时间',
@@ -191,6 +193,7 @@ return [
     'invoice_table_wait_confirm'      => '待确认',
     'invoice_table_wait_active'       => '使用中',
     'invoice_table_expired'           => '已过期',
+    'invoice_table_goods_deleted'     => '[服務已刪除]',
 
     // 工单
     'ticket_title'                    => '我的服务单',
@@ -207,6 +210,17 @@ return [
     'ticket_reply_me'                 => '我',
     'ticket_reply_master'             => '管理员',
     'ticket_reply_button'             => '回复',
+    'ticket_submit_msg'               => '确定提交工单？',
+    'ticket_warning'                  => '警告',
+    'ticket_title_not_empty'          => '工单标题不能为空',
+    'ticket_msg_not_empty'            => '工单内容不能为空',
+    'close_ticket'                    => '关闭工单',
+    'ticket_close_msg'                => '您确定要关闭该工单吗？',
+    'ticket_confirm'                  => '确定',
+    'close_ticket_success'            => '关闭成功',
+    'close_ticket_failed'             => '关闭失败',
+    'ticket_submit_success'           => '提交成功',
+    'ticket_action_failed'            => '操作失败',
 
     // 推广返利
     'referral_title'                  => '我的推广',
@@ -227,6 +241,50 @@ return [
     'console'                         => '管理中心',
     'profile'                         => '个人设置',
     'logout'                          => '退出登入',
+
     'promote_link'                    => '通过您的推广链接注册并激活，你们双方都将获得 :traffic 流量奖励；当他们消费时，您将获得他们消费金额的 :referral_percent% 作为奖励。',
     'promote_invite_code'             => '通过您的邀请码注册并激活，你们双方都将获得 :traffic 流量奖励；当他们消费时，您将获得他们消费金额的 :referral_percent% 作为奖励。',
+
+    'privacy_policies_title'          => 'Privacy Policies',
+    'privacy_policies_msg1'           => 'Patatas believes in privacy and online freedom and that it should be very clear how we manage and protect your personal information. If you have any questions or concerns, please contact us.',
+
+    'privacy_policies_msg2'           => 'The Patatas network is a no-log network. That means, except for the limited exceptions below, we do not collect any information transmitted through our network. More specifically, we do not collect any information regarding the websites you visit assigned to you when you access the Patatas Private Network, and with respect to our service, we do not collect any data stored on or transmitted from your device, including any data that collect any data stored on or transmitted from your device, including any data that applications on your device may transmit through our network. There are a few exceptions where we may need to collect or monitor traffic through our network.',
+
+    'privacy_policies_msg1_lite'           => 'PatatasLite believes in privacy and online freedom and that it should be very clear how we manage and protect your personal information. If you have any questions or concerns, please contact us.',
+
+    'privacy_policies_msg2_lite'           => 'The PatatasLite network is a no-log network. That means, except for the limited exceptions below, we do not collect any information transmitted through our network. More specifically, we do not collect any information regarding the websites you visit assigned to you when you access the PatatasLite Private Network, and with respect to our service, we do not collect any data stored on or transmitted from your device, including any data that collect any data stored on or transmitted from your device, including any data that applications on your device may transmit through our network. There are a few exceptions where we may need to collect or monitor traffic through our network.',
+
+
+    'privacy_policies_msg11'           => 'What information do we collect?',
+    'privacy_policies_msg12'           => 'We will record your aggregate bandwidth usage for billing and network operations and support.',
+    'privacy_policies_msg13'           => 'It may become necessary to temporarily maintain usage data to assist in debugging a problem with the service.',
+    'privacy_policies_msg14'           => 'This usage data may include such information as the date and time of your login and the IP addresses you visited.',
+    'privacy_policies_msg15'           => 'This personal information is not retained once the troubleshooting is resolved.',
+    'privacy_policies_msg16'           => 'We may collect and disclose personal information, including your usage data, to governmental authorities or agencies, including law enforcement agencies, at their request or pursuant to a court order, subpoena or other legal process, if there is a good faith belief that such collection or disclosure is required by law.',
+    'privacy_policies_msg17'           => 'We perform automated rules-based traffic management for the purposes of maintaining and improving our service. Applying these rules may require real-time analysis of Internet and data traffic including destination websites or IP addresses, originating IP addresses.',
+    'privacy_policies_msg18'           => 'However, no log is maintained regarding this information as it is a real-time process.',
+    'privacy_policies_msg19'           => 'Since we manage a global network, your Internet traffic may be routed through one or more different countries.',
+
+
+    'privacy_policies_msg21'           => 'Account Information',
+    'privacy_policies_msg22'           => 'In order to enroll you in our service and maintain your account we need to collect your email address.',
+    'privacy_policies_msg23'           => 'We may also use your email address for billing and customer support. From time to time we may use your email address to request your feedback on our service, advise you of promotional offers regarding our current and new services and provide you with updates on our new products and product features.',
+    'privacy_policies_msg24'           => 'We may also collect information such as your name, address, phone number and payment information in connection with your purchase of our products and services. This information is used to fulfill your purchase and to bill you as necessary based on your service plan.',
+
+    'privacy_policies_msg31'           => 'How do we protect your information?',
+    'privacy_policies_msg32'           => 'We implement a variety of security measures to maintain the safety of your personal information when you place an order or enter, submit, or access your personal information. ',
+    'privacy_policies_msg33'           => 'We offer the use of a secure server. All supplied sensitive/credit information is transmitted via Secure Socket Layer (SSL) technology and then encrypted into our Payment gateway providers database is only to be accessible by those authorized with special access rights to such systems, and are required to keep the information confidential. ',
+    'privacy_policies_msg34'           => 'After a transaction, your private information (credit cards, social security numbers, financials, etc.) will not be stored on our servers.',
+
+    'privacy_policies_msg41'           => 'Do we use cookies?',
+    'privacy_policies_msg42'           => 'Yes. Cookies are small files that a site or its service provider transfers to your computers hard drive through your Web browser (if you allow) that enables the sites or service providers systems to recognize your browser and capture and remember certain information.',
+    'privacy_policies_msg43'           => 'We use cookies to help us remember and process the items in your shopping cart and compile aggregate data about site traffic and site interaction so that we can offer better site experiences and tools in the future.',
+
+    'privacy_policies_msg51'           => 'Do we disclose any information to outside parties?',
+    'privacy_policies_msg52'           => 'We do not sell, trade, or otherwise transfer to outside parties your personally identifiable information. This does not include trusted third parties who assist us in operating our website, conducting our business, or servicing you, so long as those parties agree to keep this information confidential. We may also release your information when we believe release is appropriate to comply with the law, enforce our site policies, or protect ours or others rights, property, or safety. However, non- personally identifiable visitor information may be provided to other parties for marketing, advertising, or other uses.',
+
+    'privacy_policies_msg61'           => 'Customer Support',
+    'privacy_policies_msg62'           => 'We collect your email address and other contact information when you request customer support. We also collect information regarding your support request. This information is used to address your inquiry or service problem and to improve our service.',
+    'privacy_policies_msg63'           => 'January 1, 2018',
+
 ];

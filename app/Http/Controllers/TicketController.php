@@ -37,6 +37,7 @@ class TicketController extends Controller
         if ($request->method() == 'POST') {
             $content = clean($request->get('content'));
             $content = str_replace("eval", "", str_replace("atob", "", $content));
+            $content = substr($content, 0, 300);
 
             $obj = new TicketReply();
             $obj->ticket_id = $id;
@@ -115,7 +116,7 @@ class TicketController extends Controller
             $this->sendEmailLog($ticket->user_id, $title, $content, 0, $e->getMessage());
         }
 
-        return Response::json(['status' => 'success', 'data' => '', 'message' => '关闭成功']);
+        return Response::json(['status' => 'success', 'data' => '', 'message' => 'Close success']);
     }
 
 }

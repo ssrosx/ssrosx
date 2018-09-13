@@ -26,7 +26,7 @@ class RegisterController extends Controller
     // 注册页
     public function index(Request $request)
     {
-        $cacheKey = 'register_times_' . md5($request->getClientIp()); // 注册限制缓存key
+        $cacheKey = 'register_times_' . md5(getClientIp()); // 注册限制缓存key
 
         if ($request->method() == 'POST') {
             $username = trim($request->get('username'));
@@ -65,6 +65,15 @@ class RegisterController extends Controller
                 return Redirect::back()->withInput($request->except(['password', 'repassword']));
             } else if (false === filter_var($username, FILTER_VALIDATE_EMAIL)) {
                 Session::flash('errorMsg', 'home.account_must_email');
+
+                return Redirect::back()->withInput();
+            }
+            
+            // 校验域名邮箱是否在敏感词中
+            $sensitiveWords = $this->sensitiveWords();
+            $usernameSuffix = explode('@', $username); // 提取邮箱后缀
+            if (in_array(strtolower($usernameSuffix[1]), $sensitiveWords)) {
+                Session::flash('errorMsg', '邮箱含有敏感词，请重新输入');
 
                 return Redirect::back()->withInput();
             }
@@ -163,7 +172,7 @@ class RegisterController extends Controller
             $user->obfs = $this->getDefaultObfs();
             $user->enable_time = date('Y-m-d H:i:s');
             $user->expire_time = date('Y-m-d H:i:s', strtotime("+" . $this->systemConfig['default_days'] . " days"));
-            $user->reg_ip = $request->getClientIp();
+            $user->reg_ip = getClientIp();
             $user->referral_uid = $referral_uid;
             $user->save();
 
