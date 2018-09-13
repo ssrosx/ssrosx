@@ -19,8 +19,7 @@
         "paypal/rest-api-sdk-php": "*",
         "phpoffice/phpspreadsheet": "^1.4",
         "rap2hpoutre/laravel-log-viewer": "^0.19.1",
-        "youzan/open-sdk": "^1.0",
-        "predis/predis": "^1.0"
+        "youzan/open-sdk": "^1.0"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",
