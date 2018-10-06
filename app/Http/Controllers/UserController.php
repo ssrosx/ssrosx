@@ -69,6 +69,8 @@ class UserController extends Controller
         $view['website_customer_service'] = self::$systemConfig['website_customer_service'];
         $view['is_push_bear'] = self::$systemConfig['is_push_bear'];
         $view['push_bear_qrcode'] = self::$systemConfig['push_bear_qrcode'];
+        $view['articleList'] = Article::query()->where('type', 2)->where('is_del', 0)->orderBy('sort', 'desc')->orderBy('id', 'desc')->limit(10)->paginate(1);
+        $view['goodsList'] = Goods::query()->where('type', 3)->where('is_del', 0)->orderBy('price', 'asc')->paginate(20);
 
         // 推广返利是否可见
         if (!Session::has('referral_status')) {
@@ -363,7 +365,7 @@ class UserController extends Controller
     // 商品列表
     public function goodsList(Request $request)
     {
-        $view['goodsList'] = Goods::query()->where('status', 1)->where('is_del', 0)->orderBy('type', 'desc')->orderBy('sort', 'desc')->paginate(10)->appends($request->except('page'));
+        $view['goodsList'] = Goods::query()->where('status', 1)->where('is_del', 0)->where('type', '<=', '2')->orderBy('type', 'desc')->orderBy('sort', 'desc')->paginate(10)->appends($request->except('page'));
         $view['website_logo'] = self::$systemConfig['website_logo'];
         $view['website_analytics'] = self::$systemConfig['website_analytics'];
         $view['website_customer_service'] = self::$systemConfig['website_customer_service'];
@@ -380,7 +382,7 @@ class UserController extends Controller
         $view['website_analytics'] = self::$systemConfig['website_analytics'];
         $view['website_customer_service'] = self::$systemConfig['website_customer_service'];
 
-        $view['ticketList'] = Ticket::query()->where('user_id', $user['id'])->paginate(10)->appends($request->except('page'));
+        $view['ticketList'] = Ticket::query()->where('user_id', $user['id'])->orderBy('id', 'desc')->paginate(10)->appends($request->except('page'));
 
         return Response::view('user.ticketList', $view);
     }
@@ -1137,8 +1139,8 @@ class UserController extends Controller
         $view['totalAmount'] = ReferralLog::query()->where('ref_user_id', $user['id'])->sum('ref_amount') / 100;
         $view['canAmount'] = ReferralLog::query()->where('ref_user_id', $user['id'])->where('status', 0)->sum('ref_amount') / 100;
         $view['link'] = self::$systemConfig['website_url'] . '/register?aff=' . $user['id'];
-        $view['referralLogList'] = ReferralLog::query()->where('ref_user_id', $user['id'])->with('user')->paginate(10);
-        $view['referralApplyList'] = ReferralApply::query()->where('user_id', $user['id'])->with('user')->paginate(10);
+        $view['referralLogList'] = ReferralLog::query()->where('ref_user_id', $user['id'])->with('user')->orderBy('id', 'desc')->paginate(10);
+        $view['referralApplyList'] = ReferralApply::query()->where('user_id', $user['id'])->with('user')->orderBy('id', 'desc')->paginate(10);
         $view['referralUserList'] = User::query()->select(['username', 'created_at'])->where('referral_uid', $user['id'])->orderBy('id', 'desc')->paginate(10);
 
         return Response::view('user.referral', $view);

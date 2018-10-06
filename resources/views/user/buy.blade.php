@@ -12,6 +12,23 @@
             <div class="row invoice-body">
                 <div class="col-xs-12 table-responsive">
                     <table class="table table-hover">
+                        @if($goods->type == 3)
+                            <thead>
+                                <tr>
+                                    <th class="invoice-title"> {{trans('home.service_name')}} </th>
+                                    <th class="invoice-title text-center"> {{trans('home.service_price')}} </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td style="padding: 10px;">
+                                        <h2>{{$goods->name}}</h2>
+                                        添加帐户余额{{$goods->price}}元
+                                        </td>
+                                    <td class="text-center"> ￥{{$goods->price}} </td>
+                                </tr>
+                            </tbody>
+                        @else
                         <thead>
                         <tr>
                             <th class="invoice-title"> {{trans('home.service_name')}} </th>
@@ -23,15 +40,19 @@
                         <tr>
                             <td style="padding: 10px;">
                                 <h2>{{$goods->name}}</h2>
+                                        {{trans('home.service_traffic')}} {{$goods->traffic_label}}
+                                        <br/>
                                 {{trans('home.service_days')}} {{$goods->days}} {{trans('home.day')}}
                             </td>
                             <td class="text-center"> ￥{{$goods->price}} </td>
                             <td class="text-center"> x 1 </td>
                         </tr>
                         </tbody>
+                      	@endif
                     </table>
                 </div>
             </div>
+            @if($goods->type <= 2)
             <div class="row invoice-subtotal">
                 <div class="col-xs-3">
                     <h2 class="invoice-title"> {{trans('home.service_subtotal_price')}} </h2>
@@ -41,12 +62,27 @@
                     <h2 class="invoice-title"> {{trans('home.service_total_price')}} </h2>
                     <p class="invoice-desc grand-total"> ￥{{$goods->price}} </p>
                 </div>
+                    <div class="col-xs-6">
+                        <h2 class="invoice-title"> {{trans('home.coupon')}} </h2>
+                        <p class="invoice-desc">
+                            <div class="input-group">
+                                <input class="form-control" type="text" name="coupon_sn" id="coupon_sn" placeholder="{{trans('home.coupon')}}" />
+                                <span class="input-group-btn">
+                                    <button class="btn btn-default" type="button" onclick="redeemCoupon()"><i class="fa fa-refresh"></i> {{trans('home.redeem_coupon')}} </button>
+                                </span>
             </div>
+                        </p>
+                    </div>
+                </div>
+            @endif
             <div class="row">
                 <div class="col-xs-12" style="text-align: right;">
                     @if($is_youzan)
                         <a class="btn btn-lg red hidden-print" onclick="onlinePay()"> {{trans('home.online_pay')}} </a>
                     @endif
+                  	@if($goods->type <= 2)
+                        <a class="btn btn-lg blue hidden-print uppercase" onclick="pay()"> {{trans('home.service_pay_button')}} </a>
+                  	@endif
                 </div>
             </div>
         </div>
@@ -125,17 +161,49 @@
                     });
                 },
                 success: function (ret) {
-                    layer.msg(ret.message, {time:3000}, function() {
+                    layer.msg(ret.message, {time:1300}, function() {
                         if (ret.status == 'success') {
                             window.location.href = '{{url('payment')}}' + "/" + ret.data;
                         } else {
-                            layer.close(index);
+                            window.location.href = '{{url('invoices')}}';
                         }
                     });
                 }
                 //complete: function () {
                     //
                 //}
+            });
+        }
+
+        // 余额支付
+        function pay() {
+            var goods_id = '{{$goods->id}}';
+            var coupon_sn = $('#coupon_sn').val();
+
+            index = layer.load(1, {
+                shade: [0.7,'#CCC']
+            });
+
+            $.ajax({
+                type: "POST",
+                url: "/buy/" + goods_id,
+                async: false,
+                data: {_token:'{{csrf_token()}}', coupon_sn:coupon_sn},
+                dataType: 'json',
+                beforeSend: function () {
+                    index = layer.load(1, {
+                        shade: [0.7,'#CCC']
+                    });
+                },
+                success: function (ret) {
+                    layer.msg(ret.message, {time:1300}, function() {
+                        if (ret.status == 'success') {
+                            window.location.href = '{{url('invoices')}}';
+                        } else {
+                            layer.close(index);
+                        }
+                    });
+                }
             });
         }
     </script>

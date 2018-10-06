@@ -18,7 +18,7 @@
                                                 <th style="Margin:0;color:#333;font-family:Helvetica,Arial,sans-serif;font-size:16px;font-weight:400;line-height:19px;margin:0;padding:0;text-align:left">
                                                     <h3 style="Margin:0;Margin-bottom:10px;color:inherit;font-family:Helvetica,Arial,sans-serif;font-size:28px;font-weight:400;line-height:1.3;margin:0;margin-bottom:0;padding:0;text-align:left;word-wrap:normal">
                                                         <a href="#" style="Margin:0;color:#40253b;font-family:Helvetica,Arial,sans-serif;font-weight:400;line-height:1.3;margin:0;padding:0;text-align:left;text-decoration:none" target="_blank">
-                                                            Patatas
+                                                            SSRPanel
                                                         </a>
                                                     </h3>
                                                 </th>
@@ -47,7 +47,7 @@
                                                 <th style="Margin:0;color:#333;font-family:Helvetica,Arial,sans-serif;font-size:16px;font-weight:400;line-height:19px;margin:0;padding:0;text-align:left">
                                                     <h6 style="Margin:0;Margin-bottom:10px;color:#f3f3f3;font-family:Helvetica,Arial,sans-serif;font-size:18px;font-weight:400;line-height:1.3;margin:0;margin-bottom:8px;margin-top:8px;padding:0;text-align:left;word-wrap:normal">
                                                         <a href="#" style="Margin:0;color:#f3f3f3;font-family:Helvetica,Arial,sans-serif;font-weight:400;line-height:1.3;margin:0;padding:0;text-align:left;text-decoration:none" target="_blank">
-                                                            流量警告
+                                                            您的账号信息
                                                         </a>
                                                     </h6>
                                                 </th>
@@ -68,8 +68,47 @@
                                 <tr style="padding:0;text-align:left;vertical-align:top">
                                     <th style="Margin:0;color:#333;font-family:Helvetica,Arial,sans-serif;font-size:16px;font-weight:400;line-height:19px;margin:0;padding:0;text-align:left">
                                         <div class="release" style="padding-top:5px;padding-left:20px;padding-bottom:20px;">
-                                            <p>这是一封来自 {{$websiteName}} 的流量警告提醒。</p>
-                                            <p>您的流量已使用【{{$usedPercent}}%】了，为了确保您可以继续正常享受我们的服务，请及时续费或者购买流量包。</p>
+                                            <table>
+                                                <th>
+                                                    <td colspan="2">您的账号信息如下</td>
+                                                </th>
+                                                <tr>
+                                                    <td>订单编号</td>
+                                                    <td>{{$content['order_sn']}}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>服务</td>
+                                                    <td>{{$content['goods_name']}}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>流量</td>
+                                                    <td>{{$content['goods_traffic']}}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>节点列表</td>
+                                                    <td>{{$content['server_list']}}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>端口</td>
+                                                    <td>{{$content['port']}}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>密码</td>
+                                                    <td>{{$content['passwd']}}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>加密方式</td>
+                                                    <td>{{$content['method']}}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>创建时间</td>
+                                                    <td>{{$content['created_at']}}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>过期时间</td>
+                                                    <td>{{$content['expire_at']}}</td>
+                                                </tr>
+                                            </table>
                                         </div>
                                     </th>
                                     <th class="expander" style="Margin:0;color:#333;font-family:Helvetica,Arial,sans-serif;font-size:16px;font-weight:400;line-height:19px;margin:0;padding:0!important;text-align:left;visibility:hidden;width:0"></th>

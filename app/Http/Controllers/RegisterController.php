@@ -99,25 +99,28 @@ class RegisterController extends Controller
                 if (!Captcha::check($captcha)) {
                     Session::flash('errorMsg', 'home.verfy_error_reinput');
 
-                    return Redirect::back()->withInput($request->except(['password', 'repassword']));
+                    return Redirect::back()->withInput();
                 }
             }
 
             // 如果需要邀请注册
             if (self::$systemConfig['is_invite_register']) {
-                if (empty($code)) {
+                // 必须使用邀请码
+                if (self::$systemConfig['is_invite_register'] == 2 && empty($code)) {
                     Session::flash('errorMsg', 'home.input_invitation_code');
 
                     return Redirect::back()->withInput();
                 }
 
                 // 校验邀请码合法性
-                $code = Invite::query()->where('code', $code)->where('status', 0)->first();
-                if (empty($code)) {
-                    Session::flash('errorMsg', 'home.invitation_code_error');
+                if (!empty($code)) {
+                    $codeEnable = Invite::query()->where('code', $code)->where('status', 0)->first();
+                    if (empty($codeEnable)) {
+                        Session::flash('errorMsg', 'home.invitation_code_error');
 
                     return Redirect::back()->withInput($request->except(['code']));
                 }
+            }
             }
 
             // 24小时内同IP注册限制

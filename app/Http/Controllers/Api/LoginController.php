@@ -40,7 +40,7 @@ class LoginController extends Controller
                 return Response::json(['status' => 'fail', 'data' => [], 'message' => '请求失败超限，禁止访问1小时']);
             }
         } else {
-            Cache::put($cacheKey, 1, 10);
+            Cache::put($cacheKey, 1, 60);
         }
 
         if (!$username || !$password) {

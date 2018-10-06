@@ -5,6 +5,8 @@ Route::get('s/{code}', 'SubscribeController@index'); // 节点订阅地址
 Route::group(['middleware' => ['forbidden', 'affiliate']], function () {
     Route::get('lang/{locale}', 'UserController@switchLang'); // 语言切换
     Route::any('login', 'LoginController@index'); // 登录
+    Route::any('loginCN', 'LoginController@indexCN'); // 语言登录
+    Route::any('loginEN', 'LoginController@indexEN'); // 语言登录
     Route::get('logout', 'LoginController@logout'); // 退出
     Route::any('register', 'RegisterController@index'); // 注册
     Route::any('resetPassword', 'UserController@resetPassword'); // 重设密码
@@ -12,6 +14,8 @@ Route::group(['middleware' => ['forbidden', 'affiliate']], function () {
     Route::any('activeUser', 'UserController@activeUser'); // 激活账号
     Route::get('active/{token}', 'UserController@active'); // 激活账号
     Route::get('free', 'UserController@free'); // 免费邀请码
+    Route::any('privacy', 'UserController@privacy'); // privacy
+    Route::any('privacyLite', 'UserController@privacyLite'); // privacy
 });
 
 Route::group(['middleware' => ['forbidden', 'user', 'admin']], function () {
