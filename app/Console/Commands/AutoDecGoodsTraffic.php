@@ -59,33 +59,24 @@ class AutoDecGoodsTraffic extends Command
                     // 到期自动处理
                     if ($order->expire_at) {
                         $traffic = $order->traffic * 1048576;
-                        if ($traffic == 0)
-                        {
+                        if ($traffic == 0) {
                             $traffic = $order->goods->traffic * 1048576;
                         }
 
-                        if ($traffic == 0)
-                        {
+                        if ($traffic == 0) {
                             continue;
                         }
 
                         if ($order->user->transfer_enable - $traffic <= 0) {
                             User::query()->where('id', $order->user_id)->update(['transfer_enable' => 0, 'u' => 0, 'd' => 0]);
-                        }
-                        else if ($order->user->d - $traffic >= 0)
-                        {
+                        } else if ($order->user->d - $traffic >= 0) {
                             User::query()->where('id', $order->user_id)->decrement('transfer_enable', $traffic);
                             User::query()->where('id', $order->user_id)->decrement('d', $traffic);
-                        }
-                        else
-                        {
-                            if ($order->user->u + $order->user->d - $traffic <= 0)
-                            {
+                        } else {
+                            if ($order->user->u + $order->user->d - $traffic <= 0) {
                                 User::query()->where('id', $order->user_id)->decrement('transfer_enable', $traffic);
                                 User::query()->where('id', $order->user_id)->update(['u' => 0, 'd' => 0]);
-                            }
-                            else
-                            {
+                            } else {
                                 User::query()->where('id', $order->user_id)->decrement('transfer_enable', $traffic);
                                 User::query()->where('id', $order->user_id)->decrement('u', $traffic - $order->user->d);
                                 User::query()->where('id', $order->user_id)->update(['d' => 0]);
@@ -108,7 +99,7 @@ class AutoDecGoodsTraffic extends Command
                             $userLabel->save();
                         }
                     }
-
+                }
                 DB::commit();
             } catch (\Exception $e) {
                 \Log::error($this->description . '：' . $e);
