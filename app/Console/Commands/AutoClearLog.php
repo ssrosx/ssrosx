@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
+use App\Components\Helpers;
 use Illuminate\Console\Command;
-use App\Http\Models\Config;
 use App\Http\Models\SsNodeInfo;
 use App\Http\Models\SsNodeOnlineLog;
 use App\Http\Models\SsNodeTrafficHourly;
@@ -16,19 +16,32 @@ class AutoClearLog extends Command
 {
     protected $signature = 'autoClearLog';
     protected $description = '自动清除日志';
+    protected static $systemConfig;
 
     public function __construct()
     {
         parent::__construct();
+        self::$systemConfig = Helpers::systemConfig();
     }
 
     public function handle()
     {
         $jobStartTime = microtime(true);
 
-        $config = $this->systemConfig();
+        // 清除日志
+        if (self::$systemConfig['is_clear_log']) {
+            $this->clearLog();
+        }
 
-        if ($config['is_clear_log']) {
+        $jobEndTime = microtime(true);
+        $jobUsedTime = round(($jobEndTime - $jobStartTime), 4);
+
+        Log::info('执行定时任务【' . $this->description . '】，耗时' . $jobUsedTime . '秒');
+    }
+
+    // 清除日志
+    private function clearLog()
+    {
             // 自动清除30分钟以前的节点负载信息日志
             SsNodeInfo::query()->where('log_time', '<=', strtotime(date('Y-m-d H:i:s', strtotime("-30 minutes"))))->delete();
 
@@ -48,21 +61,4 @@ class AutoClearLog extends Command
             UserBanLog::query()->where('created_at', '<=', strtotime(date('Y-m-d H:i:s', strtotime("-30 days"))))->delete();
         }
 
-        $jobEndTime = microtime(true);
-        $jobUsedTime = round(($jobEndTime - $jobStartTime) , 4);
-
-        Log::info('执行定时任务【' . $this->description . '】，耗时' . $jobUsedTime . '秒');
-    }
-
-    // 系统配置
-    private function systemConfig()
-    {
-        $config = Config::query()->get();
-        $data = [];
-        foreach ($config as $vo) {
-            $data[$vo->name] = $vo->value;
-        }
-
-        return $data;
-    }
 }

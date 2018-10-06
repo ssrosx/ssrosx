@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Components\Helpers;
 use App\Http\Models\Goods;
 use App\Http\Models\GoodsLabel;
 use App\Http\Models\Label;
@@ -19,17 +20,19 @@ use DB;
  */
 class ShopController extends Controller
 {
+    protected static $systemConfig;
+
+    function __construct()
+    {
+        self::$systemConfig = Helpers::systemConfig();
+    }
+
     // 商品列表
     public function goodsList(Request $request)
     {
-        $goodsList = Goods::query()->where('is_del', 0)->orderBy('id', 'desc')->paginate(10);
-        foreach ($goodsList as $goods) {
-            $goods->traffic = flowAutoShow($goods->traffic * 1048576);
-        }
+        $view['goodsList'] = Goods::query()->where('is_del', 0)->orderBy('id', 'desc')->paginate(10);
 
-        $view['goodsList'] = $goodsList;
-
-        return Response::view('shop/goodsList', $view);
+        return Response::view('shop.goodsList', $view);
     }
 
     // 添加商品
@@ -43,7 +46,9 @@ class ShopController extends Controller
             $score = intval($request->get('score', 0));
             $type = intval($request->get('type', 1));
             $days = intval($request->get('days', 30));
+            $color = trim($request->get('color', 0));
             $sort = intval($request->get('sort', 0));
+            $is_hot = intval($request->get('is_hot', 0));
             $labels = $request->get('labels');
             $status = $request->get('status');
 
@@ -113,7 +118,9 @@ class ShopController extends Controller
                 $goods->score = $score;
                 $goods->type = $type;
                 $goods->days = $days;
+                $goods->color = $color;
                 $goods->sort = $sort;
+                $goods->is_hot = $is_hot;
                 $goods->is_del = 0;
                 $goods->status = $status;
                 $goods->save();
@@ -145,7 +152,7 @@ class ShopController extends Controller
         } else {
             $view['label_list'] = Label::query()->orderBy('sort', 'desc')->orderBy('id', 'asc')->get();
 
-            return Response::view('shop/addGoods', $view);
+            return Response::view('shop.addGoods', $view);
         }
     }
 
@@ -159,7 +166,9 @@ class ShopController extends Controller
             $desc = $request->get('desc');
             $price = $request->get('price', 0);
             $labels = $request->get('labels');
+            $color = trim($request->get('color', 0));
             $sort = intval($request->get('sort', 0));
+            $is_hot = intval($request->get('is_hot', 0));
             $status = $request->get('status');
 
             $goods = Goods::query()->where('id', $id)->first();
@@ -208,6 +217,8 @@ class ShopController extends Controller
                     'logo'   => $logo,
                     'price'  => $price * 100,
                     'sort'   => $sort,
+                    'color'  => $color,
+                    'is_hot' => $is_hot,
                     'status' => $status
                 ];
 
@@ -249,7 +260,7 @@ class ShopController extends Controller
             $view['goods'] = $goods;
             $view['label_list'] = Label::query()->orderBy('sort', 'desc')->orderBy('id', 'asc')->get();
 
-            return Response::view('shop/editGoods', $view);
+            return Response::view('shop.editGoods', $view);
         }
     }
 

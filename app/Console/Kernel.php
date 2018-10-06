@@ -46,7 +46,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('autoStatisticsUserDailyTraffic')->dailyAt('23:50');
         $schedule->command('autoStatisticsUserHourlyTraffic')->hourly();
         $schedule->command('userTrafficAbnormalAutoWarning')->hourly();
-        $schedule->command('userExpireAutoWarning')->dailyAt('10:20');
+        $schedule->command('userExpireAutoWarning')->dailyAt('20:00');
         $schedule->command('userTrafficAutoWarning')->dailyAt('10:30');
     }
 

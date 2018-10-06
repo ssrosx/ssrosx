@@ -73,15 +73,6 @@
                         {{trans('home.account_bandwidth_unused')}}：{{$info['unusedTransfer']}} @if($info['traffic_reset_day']) &ensp;{{trans('home.account_reset_notice', ['reset_day' => $info['traffic_reset_day']])}}  @endif
                     </li>
                 </ul>
-
-                <div class="list-group">
-                    @if($notice)
-                        <a href="{{url('user/article?id=') . $notice->id}}" class="list-group-item"> {{$notice->title}} </a>
-                    @endif
-                    @foreach($articleList as $k => $article)
-                        <a href="{{url('user/article?id=') . $article->id}}" class="list-group-item"> [{{date('m/d', strtotime($article->created_at))}}] {{str_limit($article->title, 50)}}</a>
-                    @endforeach
-                </div>
             </div>
             <div class="col-md-8">
                 <div class="row widget-row">
@@ -130,7 +121,7 @@
                                     <label for="charge_type" class="col-md-4 control-label">{{trans('home.payment_method')}}</label>
                                     <div class="col-md-6">
                                         <select class="form-control" name="charge_type" id="charge_type">
-                                            <option value="1" selected>{{trans('home.coupon')}}</option>
+                                            <option value="1" selected>{{trans('home.coupon_code')}}</option>
                                         </select>
                                     </div>
                                 </div>

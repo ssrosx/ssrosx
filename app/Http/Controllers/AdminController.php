@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Components\Helpers;
 use App\Http\Models\Article;
 use App\Http\Models\Config;
 use App\Http\Models\Country;
@@ -28,6 +29,7 @@ use App\Http\Models\UserSubscribe;
 use App\Http\Models\UserTrafficDaily;
 use App\Http\Models\UserTrafficHourly;
 use App\Http\Models\UserTrafficLog;
+use App\Http\Models\UserTrafficModifyLog;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Illuminate\Http\Request;
@@ -39,17 +41,24 @@ use DB;
 
 class AdminController extends Controller
 {
+    protected static $systemConfig;
+
+    function __construct()
+    {
+        self::$systemConfig = Helpers::systemConfig();
+    }
+
     public function index(Request $request)
     {
-        $past = strtotime(date('Y-m-d', strtotime("-" . $this->systemConfig['expire_days'] . " days")));
+        $past = strtotime(date('Y-m-d', strtotime("-" . self::$systemConfig['expire_days'] . " days")));
 
-        $view['expireDays'] = $this->systemConfig['expire_days'];
+        $view['expireDays'] = self::$systemConfig['expire_days'];
         $view['totalUserCount'] = User::query()->count(); // 总用户数
         $view['enableUserCount'] = User::query()->where('enable', 1)->count(); // 有效用户数
         $view['activeUserCount'] = User::query()->where('t', '>=', $past)->count(); // 活跃用户数
         $view['unActiveUserCount'] = User::query()->where('t', '<=', $past)->where('enable', 1)->where('t', '>', 0)->count(); // 不活跃用户数
         $view['onlineUserCount'] = User::query()->where('t', '>=', time() - 600)->count(); // 10分钟内在线用户数
-        $view['expireWarningUserCount'] = User::query()->where('expire_time', '<=', date('Y-m-d H:i:s', strtotime("+" . $this->systemConfig['expire_days'] . " days")))->whereIn('status', [0, 1])->where('enable', 1)->count(); // 临近过期用户数
+        $view['expireWarningUserCount'] = User::query()->where('expire_time', '>=', date('Y-m-d H:i:s', strtotime("now")))->where('expire_time', '<=', date('Y-m-d H:i:s', strtotime("+" . self::$systemConfig['expire_days'] . " days")))->count(); // 临近过期用户数
         $view['largeTrafficUserCount'] = User::query()->whereRaw('(u + d) >= 107374182400')->whereIn('status', [0, 1])->count(); // 流量超过100G的用户
 
         // 1小时内流量异常用户
@@ -57,7 +66,7 @@ class AdminController extends Controller
         $userTotalTrafficList = UserTrafficHourly::query()->where('node_id', 0)->where('total', '>', 104857600)->where('created_at', '>=', date('Y-m-d H:i:s', time() - 3900))->groupBy('user_id')->selectRaw("user_id, sum(total) as totalTraffic")->get(); // 只统计100M以上的记录，加快速度
         if (!$userTotalTrafficList->isEmpty()) {
             foreach ($userTotalTrafficList as $vo) {
-                if ($vo->totalTraffic > ($this->systemConfig['traffic_ban_value'] * 1024 * 1024 * 1024)) {
+                if ($vo->totalTraffic > (self::$systemConfig['traffic_ban_value'] * 1024 * 1024 * 1024)) {
                     $tempUsers[] = $vo->user_id;
                 }
             }
@@ -77,7 +86,7 @@ class AdminController extends Controller
         $view['totalWaitRefAmount'] = ReferralLog::query()->whereIn('status', [0, 1])->sum('ref_amount') / 100;
         $view['totalRefAmount'] = ReferralApply::query()->where('status', 2)->sum('amount') / 100;
 
-        return Response::view('admin/index', $view);
+        return Response::view('admin.index', $view);
     }
 
     // 用户列表
@@ -132,7 +141,7 @@ class AdminController extends Controller
 
         // 临近过期提醒
         if ($expireWarning) {
-            $query->whereIn('status', [0, 1])->where('expire_time', '<=', date('Y-m-d H:i:s', strtotime("+" . $this->systemConfig['expire_days'] . " days")));
+            $query->where('expire_time', '>=', date('Y-m-d H:i:s', strtotime("now")))->where('expire_time', '<=', date('Y-m-d H:i:s', strtotime("+" . self::$systemConfig['expire_days'] . " days")));
         }
 
         // 当前在线
@@ -142,7 +151,7 @@ class AdminController extends Controller
 
         // 不活跃用户
         if ($unActive) {
-            $query->where('t', '>', 0)->where('t', '<=', strtotime(date('Y-m-d', strtotime("-" . $this->systemConfig['expire_days'] . " days"))))->where('enable', 1);
+            $query->where('t', '>', 0)->where('t', '<=', strtotime(date('Y-m-d', strtotime("-" . self::$systemConfig['expire_days'] . " days"))))->where('enable', 1);
         }
 
         // 1小时内流量异常用户
@@ -151,7 +160,7 @@ class AdminController extends Controller
             $userTotalTrafficList = UserTrafficHourly::query()->where('node_id', 0)->where('total', '>', 104857600)->where('created_at', '>=', date('Y-m-d H:i:s', time() - 3900))->groupBy('user_id')->selectRaw("user_id, sum(total) as totalTraffic")->get(); // 只统计100M以上的记录，加快速度
             if (!$userTotalTrafficList->isEmpty()) {
                 foreach ($userTotalTrafficList as $vo) {
-                    if ($vo->totalTraffic > ($this->systemConfig['traffic_ban_value'] * 1024 * 1024 * 1024)) {
+                    if ($vo->totalTraffic > (self::$systemConfig['traffic_ban_value'] * 1024 * 1024 * 1024)) {
                         $tempUsers[] = $vo->user_id;
                     }
                 }
@@ -163,17 +172,25 @@ class AdminController extends Controller
         foreach ($userList as &$user) {
             $user->transfer_enable = flowAutoShow($user->transfer_enable);
             $user->used_flow = flowAutoShow($user->u + $user->d);
-            $user->expireWarning = $user->expire_time <= date('Y-m-d H:i:s', strtotime("+ 30 days")) ? 1 : 0; // 临近过期提醒
+            if ($user->expire_time < date('Y-m-d', strtotime("now"))) {
+                $user->expireWarning = -1; // 已过期
+            } elseif ($user->expire_time == date('Y-m-d', strtotime("now"))) {
+                $user->expireWarning = 0; // 今天过期
+            } elseif ($user->expire_time > date('Y-m-d', strtotime("now")) && $user->expire_time <= date('Y-m-d', strtotime("+30 days"))) {
+                $user->expireWarning = 1; // 最近一个月过期
+            } else {
+                $user->expireWarning = 2; // 大于一个月过期
+            }
 
             // 流量异常警告
             $time = date('Y-m-d H:i:s', time() - 3900);
             $totalTraffic = UserTrafficHourly::query()->where('user_id', $user->id)->where('node_id', 0)->where('created_at', '>=', $time)->sum('total');
-            $user->trafficWarning = $totalTraffic > ($this->systemConfig['traffic_ban_value'] * 1024 * 1024 * 1024) ? 1 : 0;
+            $user->trafficWarning = $totalTraffic > (self::$systemConfig['traffic_ban_value'] * 1024 * 1024 * 1024) ? 1 : 0;
         }
 
         $view['userList'] = $userList;
 
-        return Response::view('admin/userList', $view);
+        return Response::view('admin.userList', $view);
     }
 
     // 添加账号
@@ -211,7 +228,7 @@ class AdminController extends Controller
             $user->level = $request->get('level', 1);
             $user->is_admin = 0;
             $user->reg_ip = getClientIp();
-            $user->referral_uid = 1;
+            $user->referral_uid = 0;
             $user->traffic_reset_day = 0;
             $user->status = 1;
             $user->save();
@@ -234,15 +251,15 @@ class AdminController extends Controller
             }
         } else {
             // 生成一个可用端口
-            $view['last_port'] = $this->systemConfig['is_rand_port'] ? $this->getRandPort() : $this->getOnlyPort();
-            $view['is_rand_port'] = $this->systemConfig['is_rand_port'];
-            $view['method_list'] = $this->methodList();
-            $view['protocol_list'] = $this->protocolList();
-            $view['obfs_list'] = $this->obfsList();
-            $view['level_list'] = $this->levelList();
+            $view['last_port'] = self::$systemConfig['is_rand_port'] ? Helpers::getRandPort() : Helpers::getOnlyPort();
+            $view['is_rand_port'] = self::$systemConfig['is_rand_port'];
+            $view['method_list'] = Helpers::methodList();
+            $view['protocol_list'] = Helpers::protocolList();
+            $view['obfs_list'] = Helpers::obfsList();
+            $view['level_list'] = Helpers::levelList();
             $view['label_list'] = Label::query()->orderBy('sort', 'desc')->orderBy('id', 'asc')->get();
 
-            return Response::view('admin/addUser', $view);
+            return Response::view('admin.addUser', $view);
         }
     }
 
@@ -253,7 +270,7 @@ class AdminController extends Controller
         try {
             for ($i = 0; $i < 5; $i++) {
                 // 生成一个可用端口
-                $port = $this->systemConfig['is_rand_port'] ? $this->getRandPort() : $this->getOnlyPort();
+                $port = self::$systemConfig['is_rand_port'] ? Helpers::getRandPort() : Helpers::getOnlyPort();
 
                 $user = new User();
                 $user->username = '批量生成-' . makeRandStr();
@@ -261,22 +278,22 @@ class AdminController extends Controller
                 $user->port = $port;
                 $user->passwd = makeRandStr();
                 $user->enable = 1;
-                $user->method = $this->getDefaultMethod();
-                $user->protocol = $this->getDefaultProtocol();
-                $user->obfs = $this->getDefaultObfs();
+                $user->method = Helpers::getDefaultMethod();
+                $user->protocol = Helpers::getDefaultProtocol();
+                $user->obfs = Helpers::getDefaultObfs();
                 $user->usage = 1;
                 $user->transfer_enable = toGB(1000);
                 $user->enable_time = date('Y-m-d H:i:s');
                 $user->expire_time = date('Y-m-d H:i:s', strtotime("+365 days"));
                 $user->reg_ip = getClientIp();
-                $user->referral_uid = 1;
+                $user->referral_uid = 0;
                 $user->traffic_reset_day = 0;
                 $user->status = 1;
                 $user->save();
 
                 // 初始化默认标签
-                if (count($this->systemConfig['initial_labels_for_user']) > 0) {
-                    $labels = explode(',', $this->systemConfig['initial_labels_for_user']);
+                if (count(self::$systemConfig['initial_labels_for_user']) > 0) {
+                    $labels = explode(',', self::$systemConfig['initial_labels_for_user']);
                     foreach ($labels as $label) {
                         $userLabel = new UserLabel();
                         $userLabel->user_id = $user->id;
@@ -416,13 +433,13 @@ class AdminController extends Controller
             }
 
             $view['user'] = $user;
-            $view['method_list'] = $this->methodList();
-            $view['protocol_list'] = $this->protocolList();
-            $view['obfs_list'] = $this->obfsList();
-            $view['level_list'] = $this->levelList();
+            $view['method_list'] = Helpers::methodList();
+            $view['protocol_list'] = Helpers::protocolList();
+            $view['obfs_list'] = Helpers::obfsList();
+            $view['level_list'] = Helpers::levelList();
             $view['label_list'] = Label::query()->orderBy('sort', 'desc')->orderBy('id', 'asc')->get();
 
-            return Response::view('admin/editUser', $view);
+            return Response::view('admin.editUser', $view);
         }
     }
 
@@ -472,7 +489,7 @@ class AdminController extends Controller
 
         $view['nodeList'] = $nodeList;
 
-        return Response::view('admin/nodeList', $view);
+        return Response::view('admin.nodeList', $view);
     }
 
     // 添加节点
@@ -524,6 +541,7 @@ class AdminController extends Controller
                 $ssNode->monitor_url = $request->get('monitor_url', '');
                 $ssNode->is_subscribe = intval($request->get('is_subscribe', 1));
                 $ssNode->ssh_port = intval($request->get('ssh_port', 22));
+                $ssNode->is_tcp_check = intval($request->get('is_tcp_check', 1));
                 $ssNode->compatible = intval($request->get('compatible', 0));
                 $ssNode->single = intval($request->get('single', 0));
                 $ssNode->single_force = $request->get('single') ? $request->get('single_force') : 0;
@@ -565,15 +583,15 @@ class AdminController extends Controller
                 return Response::json(['status' => 'fail', 'data' => '', 'message' => '添加失败：' . $e->getMessage()]);
             }
         } else {
-            $view['method_list'] = $this->methodList();
-            $view['protocol_list'] = $this->protocolList();
-            $view['obfs_list'] = $this->obfsList();
-            $view['level_list'] = $this->levelList();
+            $view['method_list'] = Helpers::methodList();
+            $view['protocol_list'] = Helpers::protocolList();
+            $view['obfs_list'] = Helpers::obfsList();
+            $view['level_list'] = Helpers::levelList();
             $view['group_list'] = SsGroup::query()->get();
             $view['country_list'] = Country::query()->orderBy('country_code', 'asc')->get();
             $view['label_list'] = Label::query()->orderBy('sort', 'desc')->orderBy('id', 'asc')->get();
 
-            return Response::view('admin/addNode', $view);
+            return Response::view('admin.addNode', $view);
         }
     }
 
@@ -626,7 +644,8 @@ class AdminController extends Controller
                     'monitor_url'     => $request->get('monitor_url'),
                     'is_subscribe'    => intval($request->get('is_subscribe', 1)),
                     'ssh_port'        => intval($request->get('ssh_port', 22)),
-                    'compatible'      => intval($request->get('compatible')),
+                    'is_tcp_check'    => intval($request->get('is_tcp_check', 1)),
+                    'compatible'      => intval($request->get('compatible', 1)),
                     'single'          => intval($request->get('single', 0)),
                     'single_force'    => $request->get('single') ? $request->get('single_force') : 0,
                     'single_port'     => $request->get('single') ? $request->get('single_port') : '',
@@ -689,15 +708,15 @@ class AdminController extends Controller
             }
 
             $view['node'] = $node;
-            $view['method_list'] = $this->methodList();
-            $view['protocol_list'] = $this->protocolList();
-            $view['obfs_list'] = $this->obfsList();
-            $view['level_list'] = $this->levelList();
+            $view['method_list'] = Helpers::methodList();
+            $view['protocol_list'] = Helpers::protocolList();
+            $view['obfs_list'] = Helpers::obfsList();
+            $view['level_list'] = Helpers::levelList();
             $view['group_list'] = SsGroup::query()->get();
             $view['country_list'] = Country::query()->orderBy('country_code', 'asc')->get();
             $view['label_list'] = Label::query()->orderBy('sort', 'desc')->orderBy('id', 'asc')->get();
 
-            return Response::view('admin/editNode', $view);
+            return Response::view('admin.editNode', $view);
         }
     }
 
@@ -795,7 +814,7 @@ class AdminController extends Controller
         $view['nodeServer'] = $node->server;
         $view['monthDays'] = "'" . implode("','", $monthDays) . "'";
 
-        return Response::view('admin/nodeMonitor', $view);
+        return Response::view('admin.nodeMonitor', $view);
     }
 
     // 文章列表
@@ -803,7 +822,7 @@ class AdminController extends Controller
     {
         $view['list'] = Article::query()->where('is_del', 0)->orderBy('sort', 'desc')->paginate(15)->appends($request->except('page'));
 
-        return Response::view('admin/articleList', $view);
+        return Response::view('admin.articleList', $view);
     }
 
     // 添加文章
@@ -821,7 +840,7 @@ class AdminController extends Controller
 
             return Response::json(['status' => 'success', 'data' => '', 'message' => '添加成功']);
         } else {
-            return Response::view('admin/addArticle');
+            return Response::view('admin.addArticle');
         }
     }
 
@@ -854,7 +873,7 @@ class AdminController extends Controller
         } else {
             $view['article'] = Article::query()->where('id', $id)->first();
 
-            return Response::view('admin/editArticle', $view);
+            return Response::view('admin.editArticle', $view);
         }
     }
 
@@ -876,14 +895,14 @@ class AdminController extends Controller
     {
         $view['groupList'] = SsGroup::query()->paginate(15)->appends($request->except('page'));
 
-        $levelList = $this->levelList();
+        $levelList = Helpers::levelList();
         $levelMap = [];
         foreach ($levelList as $vo) {
             $levelMap[$vo['level']] = $vo['level_name'];
         }
         $view['levelMap'] = $levelMap;
 
-        return Response::view('admin/groupList', $view);
+        return Response::view('admin.groupList', $view);
     }
 
     // 添加节点分组
@@ -897,9 +916,9 @@ class AdminController extends Controller
 
             return Response::json(['status' => 'success', 'data' => '', 'message' => '添加成功']);
         } else {
-            $view['levelList'] = $this->levelList();
+            $view['levelList'] = Helpers::levelList();
 
-            return Response::view('admin/addGroup', $view);
+            return Response::view('admin.addGroup', $view);
         }
     }
 
@@ -925,9 +944,9 @@ class AdminController extends Controller
             }
         } else {
             $view['group'] = SsGroup::query()->where('id', $id)->first();
-            $view['levelList'] = $this->levelList();
+            $view['levelList'] = Helpers::levelList();
 
-            return Response::view('admin/editGroup', $view);
+            return Response::view('admin.editGroup', $view);
         }
     }
 
@@ -987,7 +1006,7 @@ class AdminController extends Controller
 
         $view['trafficLogList'] = $trafficLogList;
 
-        return Response::view('admin/trafficLog', $view);
+        return Response::view('admin.trafficLog', $view);
     }
 
     // 订阅请求日志
@@ -1010,7 +1029,7 @@ class AdminController extends Controller
 
         $view['subscribeList'] = $query->orderBy('id', 'desc')->paginate(20)->appends($request->except('page'));
 
-        return Response::view('admin/subscribeLog', $view);
+        return Response::view('admin.subscribeLog', $view);
     }
 
     // 设置用户的订阅的状态
@@ -1063,7 +1082,7 @@ class AdminController extends Controller
 
             return Response::json(['status' => 'success', 'data' => $txt, 'message' => '反解析成功']);
         } else {
-            return Response::view('admin/decompile');
+            return Response::view('admin.decompile');
         }
     }
 
@@ -1116,11 +1135,11 @@ class AdminController extends Controller
             return Response::json(['status' => 'success', 'data' => $json, 'message' => '转换成功']);
         } else {
             // 加密方式、协议、混淆
-            $view['method_list'] = $this->methodList();
-            $view['protocol_list'] = $this->protocolList();
-            $view['obfs_list'] = $this->obfsList();
+            $view['method_list'] = Helpers::methodList();
+            $view['protocol_list'] = Helpers::protocolList();
+            $view['obfs_list'] = Helpers::obfsList();
 
-            return Response::view('admin/convert', $view);
+            return Response::view('admin.convert', $view);
         }
     }
 
@@ -1231,7 +1250,7 @@ class AdminController extends Controller
 
             return Redirect::back();
         } else {
-            return Response::view('admin/import');
+            return Response::view('admin.import');
         }
     }
 
@@ -1299,14 +1318,14 @@ class AdminController extends Controller
         $view['nodeList'] = $nodeList;
         $view['user'] = $user;
 
-        return Response::view('admin/export', $view);
+        return Response::view('admin.export', $view);
     }
 
     // 导出原版SS用户配置信息
     public function exportSSJson(Request $request)
     {
         $userList = User::query()->where('port', '>', 0)->get();
-        $defaultMethod = $this->getDefaultMethod();
+        $defaultMethod = Helpers::getDefaultMethod();
 
         $json = '';
         if (!$userList->isEmpty()) {
@@ -1376,7 +1395,7 @@ EOF;
                 return Redirect::back();
             }
         } else {
-            return Response::view('admin/profile');
+            return Response::view('admin.profile');
         }
     }
 
@@ -1448,13 +1467,13 @@ EOF;
         $view['username'] = $user->username;
         $view['monthDays'] = "'" . implode("','", $monthDays) . "'";
 
-        return Response::view('admin/userMonitor', $view);
+        return Response::view('admin.userMonitor', $view);
     }
 
     // 生成SS端口
     public function makePort(Request $request)
     {
-        $new_port = $this->systemConfig['is_rand_port'] ? $this->getRandPort() : $this->getOnlyPort();
+        $new_port = self::$systemConfig['is_rand_port'] ? Helpers::getRandPort() : Helpers::getOnlyPort();
         echo $new_port;
         exit;
     }
@@ -1496,10 +1515,10 @@ EOF;
             $view['method_list'] = SsConfig::query()->where('type', 1)->get();
             $view['protocol_list'] = SsConfig::query()->where('type', 2)->get();
             $view['obfs_list'] = SsConfig::query()->where('type', 3)->get();
-            $view['level_list'] = $this->levelList();
+            $view['level_list'] = Helpers::levelList();
             $view['country_list'] = Country::query()->get();
 
-            return Response::view('admin/config', $view);
+            return Response::view('admin.config', $view);
         }
     }
 
@@ -1609,7 +1628,7 @@ EOF;
         if (!file_exists($file)) {
             Session::flash('analysisErrorMsg', $file . ' 不存在，请先创建文件');
 
-            return Response::view('admin/analysis');
+            return Response::view('admin.analysis');
         }
 
         $logs = $this->tail($file, 10000);
@@ -1636,7 +1655,7 @@ EOF;
             $view['urlList'] = array_unique($url);
         }
 
-        return Response::view('admin/analysis', $view);
+        return Response::view('admin.analysis', $view);
     }
 
     // 添加等级
@@ -1848,10 +1867,10 @@ EOF;
     // 系统设置
     public function system(Request $request)
     {
-        $view = $this->systemConfig();
+        $view = Helpers::systemConfig();
         $view['label_list'] = Label::query()->orderBy('sort', 'desc')->orderBy('id', 'asc')->get();
 
-        return Response::view('admin/system', $view);
+        return Response::view('admin.system', $view);
     }
 
     // 设置某个配置项
@@ -1865,7 +1884,7 @@ EOF;
         }
 
         // 屏蔽异常配置
-        if (!array_key_exists($name, $this->systemConfig)) {
+        if (!array_key_exists($name, self::$systemConfig)) {
             return Response::json(['status' => 'fail', 'data' => '', 'message' => '设置失败：配置不存在']);
         }
 
@@ -1884,7 +1903,7 @@ EOF;
 
         // 演示环境禁止修改特定配置项
         if (env('APP_DEMO')) {
-            if (in_array($name, ['website_url', 'push_bear_send_key', 'push_bear_qrcode', 'youzan_client_id', 'youzan_client_secret', 'kdt_id'])) {
+            if (in_array($name, ['website_url', 'push_bear_send_key', 'push_bear_qrcode', 'youzan_client_id', 'youzan_client_secret', 'kdt_id', 'is_forbid_china'])) {
                 return Response::json(['status' => 'fail', 'data' => '', 'message' => '演示环境禁止修改该配置']);
             }
         }
@@ -1911,17 +1930,15 @@ EOF;
     {
         $view['inviteList'] = Invite::query()->with(['generator', 'user'])->orderBy('status', 'asc')->orderBy('id', 'desc')->paginate(15)->appends($request->except('page'));
 
-        return Response::view('admin/inviteList', $view);
+        return Response::view('admin.inviteList', $view);
     }
 
     // 生成邀请码
     public function makeInvite(Request $request)
     {
-        $user = Session::get('user');
-
         for ($i = 0; $i < 5; $i++) {
             $obj = new Invite();
-            $obj->uid = $user['id'];
+            $obj->uid = 0;
             $obj->fuid = 0;
             $obj->code = strtoupper(substr(md5(microtime() . makeRandStr()), 8, 12));
             $obj->status = 0;
@@ -1978,7 +1995,7 @@ EOF;
 
         $view['applyList'] = $query->orderBy('id', 'desc')->paginate(15)->appends($request->except('page'));
 
-        return Response::view('admin/applyList', $view);
+        return Response::view('admin.applyList', $view);
     }
 
     // 提现申请详情
@@ -1996,7 +2013,7 @@ EOF;
         $view['info'] = $apply;
         $view['list'] = $list;
 
-        return Response::view('admin/applyDetail', $view);
+        return Response::view('admin.applyDetail', $view);
     }
 
     // 订单列表
@@ -2038,7 +2055,7 @@ EOF;
 
         $view['orderList'] = $query->paginate(15);
 
-        return Response::view('admin/orderList', $view);
+        return Response::view('admin.orderList', $view);
     }
 
     // 设置提现申请状态
@@ -2106,7 +2123,7 @@ EOF;
                 return Response::json(['status' => 'fail', 'data' => '', 'message' => '充值失败：' . $e->getMessage()]);
             }
         } else {
-            return Response::view('admin/handleUserBalance');
+            return Response::view('admin.handleUserBalance');
         }
     }
 
@@ -2125,7 +2142,7 @@ EOF;
 
         $view['list'] = $query->paginate(15);
 
-        return Response::view('admin/userBalanceLogList', $view);
+        return Response::view('admin.userBalanceLogList', $view);
     }
 
     // 用户封禁记录
@@ -2143,7 +2160,50 @@ EOF;
 
         $view['list'] = $query->paginate(15);
 
-        return Response::view('admin/userBanLogList', $view);
+        return Response::view('admin.userBanLogList', $view);
+    }
+
+    // 用户流量变动记录
+    public function userTrafficLogList(Request $request)
+    {
+        $username = trim($request->get('username'));
+
+        $query = UserTrafficModifyLog::query()->with(['user', 'order'])->orderBy('id', 'desc');
+
+        if ($username) {
+            $query->whereHas('user', function ($q) use ($username) {
+                $q->where('username', 'like', '%' . $username . '%');
+            });
+        }
+
+        $view['list'] = $query->paginate(15);
+
+        return Response::view('admin.userTrafficLogList', $view);
+    }
+
+    // 用户返利流水记录
+    public function userRebateList(Request $request)
+    {
+        $username = trim($request->get('username'));
+        $ref_username = trim($request->get('ref_username'));
+
+        $query = ReferralLog::query()->with(['user', 'order'])->orderBy('id', 'desc')->orderBy('status', 'asc');
+
+        if ($username) {
+            $query->whereHas('user', function ($q) use ($username) {
+                $q->where('username', 'like', '%' . $username . '%');
+            });
+        }
+
+        if ($ref_username) {
+            $query->whereHas('ref_user', function ($q) use ($ref_username) {
+                $q->where('username', 'like', '%' . $ref_username . '%');
+            });
+        }
+
+        $view['list'] = $query->paginate(15);
+
+        return Response::view('admin.userRebateList', $view);
     }
 
     // 转换成某个用户的身份
@@ -2174,7 +2234,7 @@ EOF;
 
         $view['labelList'] = $labelList;
 
-        return Response::view('admin/labelList', $view);
+        return Response::view('admin.labelList', $view);
     }
 
     // 添加标签
@@ -2191,7 +2251,7 @@ EOF;
 
             return Response::json(['status' => 'success', 'data' => '', 'message' => '添加成功']);
         } else {
-            return Response::view('admin/addLabel');
+            return Response::view('admin.addLabel');
         }
     }
 
@@ -2210,7 +2270,7 @@ EOF;
             $id = $request->get('id');
             $view['label'] = Label::query()->where('id', $id)->first();
 
-            return Response::view('admin/editLabel', $view);
+            return Response::view('admin.editLabel', $view);
         }
     }
 

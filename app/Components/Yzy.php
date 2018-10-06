@@ -8,11 +8,13 @@ use Log;
 
 class Yzy
 {
-    protected $accessToken;
+    protected static $systemConfig;
+    protected static $accessToken;
 
     function __construct()
     {
-        $this->accessToken = $this->getAccessToken();
+        self::$systemConfig = Helpers::systemConfig();
+        self::$accessToken = $this->getAccessToken();
     }
 
     // 获取accessToken
@@ -20,19 +22,14 @@ class Yzy
     {
         if (Cache::has('YZY_TOKEN')) {
             $token = Cache::get('YZY_TOKEN');
-            if (isset($token['error'])) { // 错误兼容
-                Cache::forget('YZY_TOKEN');
-            } else {
+            if (!isset($token['error'])) {
                 return Cache::get('YZY_TOKEN')['access_token'];
             }
+
+            Cache::forget('YZY_TOKEN');
         }
 
-        $config = $this->systemConfig();
-
-        $keys['kdt_id'] = $config['kdt_id'];
-
-        $token = (new \Youzan\Open\Token($config['youzan_client_id'], $config['youzan_client_secret']))->getToken('self', $keys);
-
+        $token = (new \Youzan\Open\Token(self::$systemConfig['youzan_client_id'], self::$systemConfig['youzan_client_secret']))->getToken('self', ['kdt_id' => self::$systemConfig['kdt_id']]);
         if (isset($token['error'])) {
             Log::info('获取有赞云支付access_token失败：' . $token['error_description']);
 
@@ -47,7 +44,7 @@ class Yzy
     // 生成收款二维码
     public function createQrCode($goodsName, $price, $orderSn)
     {
-        $client = new \Youzan\Open\Client($this->accessToken);
+        $client = new \Youzan\Open\Client(self::$accessToken);
 
         $params = [
             'qr_name'   => $goodsName, // 商品名
@@ -62,20 +59,16 @@ class Yzy
     // 通过tid获取交易信息
     public function getTradeByTid($tid)
     {
-        $client = new \Youzan\Open\Client($this->accessToken);
+        $client = new \Youzan\Open\Client(self::$accessToken);
 
-        return $client->post('youzan.trade.get', '3.0.0', ['tid' => $tid]);
+        return $client->post('youzan.trade.get', '4.0.0', ['tid' => $tid]);
     }
 
-    // 系统配置
-    private function systemConfig()
+    // 通过二维码ID获取已支付的交易信息
+    public function getTradeByQrId($qr_id)
     {
-        $config = Config::query()->get();
-        $data = [];
-        foreach ($config as $vo) {
-            $data[$vo->name] = $vo->value;
-        }
+        $client = new \Youzan\Open\Client(self::$accessToken);
 
-        return $data;
+        return $client->post('youzan.trades.qr.get', '3.0.0', ['qr_id' => $qr_id, 'status' => 'TRADE_RECEIVED']);
     }
 }

@@ -7,6 +7,7 @@ return [
     'exchange_subscribe'              => 'Exchange Address',
     'subscribe_warning'               => 'Warning: This subscription address is for personal use only. Do not propagate the address.',
     'reset_password_title'            => 'Reset Password',
+    'username_placeholder'            => 'Please Enter E-mail',
     'system_down'                     => 'The system is being maintained',
     'subscribe_baned'                 => 'Your subscription function has been banned. Please contact the administrator.',
 
@@ -147,7 +148,7 @@ return [
     'service_total_price'             => 'Total Price',
     'service_pay_button'              => 'Pay',
     'services_none'                   => 'None Services',
-    'service_traffic'                 => 'Transfer',
+    'service_traffic'                 => 'Traffic',
     'service_days'                    => 'Term of Validity',
     'service_buy_button'              => 'Order Now',
     'day'                             => 'days',
@@ -225,7 +226,7 @@ return [
     'ticket_action_failed'            => 'Operation failed',
 
     // 推广返利
-    'referral_title'                  => 'My Referrals',
+    'referral_title'                  => 'Commissions',
     'referral_button'                 => 'Copy Link',
     'referral_my_link'                => 'My Referral Link',
     'referral_table_user'             => 'Who',
@@ -246,7 +247,9 @@ return [
 
     'promote_link'                    => 'With your promotion link registration and activation, both of you will receive :traffic traffic awards; when they are consumed, you will receive :referral_percent% of their consumption amount as a reward.',
     'promote_invite_code'             => 'With your invite code registration and activation, both of you will receive :traffic traffic awards; when they are consumed, you will receive :referral_percent% of their consumption amount as a reward.',
-
+    'invite_user_title'               => 'Invitation record',
+    'invite_user_username'            => 'Username',
+    'invite_user_created_at'          => 'Registration time',
     'privacy_policies_title'          => 'Privacy Policies',
     'privacy_policies_msg1'           => 'Patatas believes in privacy and online freedom and that it should be very clear how we manage and protect your personal information. If you have any questions or concerns, please contact us.',
 

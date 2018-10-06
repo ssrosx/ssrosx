@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Components\Helpers;
 use App\Http\Models\Invite;
 use App\Http\Models\User;
 use App\Http\Models\UserLabel;
@@ -23,7 +24,15 @@ use Mail;
  */
 class RegisterController extends Controller
 {
+    protected static $systemConfig;
+
+    function __construct()
+    {
+        self::$systemConfig = Helpers::systemConfig();
+    }
+
     // 注册页
+    // TODO：改成点击发送验证码按钮，而不是到邮箱里去打开激活链接
     public function index(Request $request)
     {
         $cacheKey = 'register_times_' . md5(getClientIp()); // 注册限制缓存key
@@ -45,6 +54,13 @@ class RegisterController extends Controller
                 return Redirect::back()->withInput();
             } else {
                 Session::forget('register_token');
+            }
+
+            // 是否开启注册
+            if (!self::$systemConfig['is_register']) {
+                Session::flash('errorMsg', '系统维护，暂停注册');
+
+                return Redirect::back();
             }
 
             if (empty($username)) {
@@ -79,7 +95,7 @@ class RegisterController extends Controller
             }
 
             // 是否校验验证码
-            if ($this->systemConfig['is_captcha']) {
+            if (self::$systemConfig['is_captcha']) {
                 if (!Captcha::check($captcha)) {
                     Session::flash('errorMsg', 'home.verfy_error_reinput');
 
@@ -87,15 +103,8 @@ class RegisterController extends Controller
                 }
             }
 
-            // 是否开启注册
-            if (!$this->systemConfig['is_register']) {
-                Session::flash('errorMsg', 'home.system_maintenance');
-
-                return Redirect::back();
-            }
-
             // 如果需要邀请注册
-            if ($this->systemConfig['is_invite_register']) {
+            if (self::$systemConfig['is_invite_register']) {
                 if (empty($code)) {
                     Session::flash('errorMsg', 'home.input_invitation_code');
 
@@ -112,10 +121,10 @@ class RegisterController extends Controller
             }
 
             // 24小时内同IP注册限制
-            if ($this->systemConfig['register_ip_limit']) {
+            if (self::$systemConfig['register_ip_limit']) {
                 if (Cache::has($cacheKey)) {
                     $registerTimes = Cache::get($cacheKey);
-                    if ($registerTimes >= $this->systemConfig['register_ip_limit']) {
+                    if ($registerTimes >= self::$systemConfig['register_ip_limit']) {
                         Session::flash('errorMsg', 'home.donot_register_frequently');
 
                         return Redirect::back()->withInput($request->except(['code']));
@@ -124,41 +133,26 @@ class RegisterController extends Controller
             }
 
             // 校验用户名是否已存在
-            $exists = User::query()->where('username', $username)->first();
+            $exists = User::query()->where('username', $username)->exists();
             if ($exists) {
                 Session::flash('errorMsg', 'home.account_exist_need_change');
 
                 return Redirect::back()->withInput();
             }
 
-            // 校验aff对应账号是否存在
-            $aff = $aff ? $aff : $request->cookie('register_aff');
-            if ($aff) {
-                $affUser = User::query()->where('id', $aff)->first();
-                $referral_uid = $affUser ? $aff : 0;
-            } else {
-                // 如果使用邀请码，则将邀请码也列入aff
-                if ($code) {
-                    $inviteCode = Invite::query()->where('code', $code)->where('status', 0)->first();
-                    if ($inviteCode) {
-                        $referral_uid = $inviteCode->uid;
-                    } else {
-                        $referral_uid = 0;
-                    }
-                } else {
-                    $referral_uid = 0;
-                }
-            }
-
             // 获取可用端口
-            $port = $this->systemConfig['is_rand_port'] ? $this->getRandPort() : $this->getOnlyPort();
-            if ($port > $this->systemConfig['max_port']) {
+            $port = self::$systemConfig['is_rand_port'] ? Helpers::getRandPort() : Helpers::getOnlyPort();
+            if ($port >  self::$systemConfig['max_port']) {
                 Session::flash('errorMsg', 'home.user_full_contact_admin');
 
                 return Redirect::back()->withInput();
             }
 
-            $transfer_enable = $referral_uid ? ($this->systemConfig['default_traffic'] + $this->systemConfig['referral_traffic']) * 1048576 : $this->systemConfig['default_traffic'] * 1048576;
+            // 获取aff
+            $affArr = $this->getAff($code, $aff);
+            $referral_uid = $affArr['referral_uid'];
+
+            $transfer_enable = $referral_uid ? (self::$systemConfig['default_traffic'] + self::$systemConfig['referral_traffic']) * 1048576 : self::$systemConfig['default_traffic'] * 1048576;
 
             // 创建新用户
             $user = new User();
@@ -167,11 +161,11 @@ class RegisterController extends Controller
             $user->port = $port;
             $user->passwd = makeRandStr();
             $user->transfer_enable = $transfer_enable;
-            $user->method = $this->getDefaultMethod();
-            $user->protocol = $this->getDefaultProtocol();
-            $user->obfs = $this->getDefaultObfs();
+            $user->method = Helpers::getDefaultMethod();
+            $user->protocol = Helpers::getDefaultProtocol();
+            $user->obfs = Helpers::getDefaultObfs();
             $user->enable_time = date('Y-m-d H:i:s');
-            $user->expire_time = date('Y-m-d H:i:s', strtotime("+" . $this->systemConfig['default_days'] . " days"));
+            $user->expire_time = date('Y-m-d H:i:s', strtotime("+" . self::$systemConfig['default_days'] . " days"));
             $user->reg_ip = getClientIp();
             $user->referral_uid = $referral_uid;
             $user->save();
@@ -185,8 +179,8 @@ class RegisterController extends Controller
                 }
 
                 // 初始化默认标签
-                if (strlen($this->systemConfig['initial_labels_for_user'])) {
-                    $labels = explode(',', $this->systemConfig['initial_labels_for_user']);
+                if (strlen(self::$systemConfig['initial_labels_for_user'])) {
+                    $labels = explode(',', self::$systemConfig['initial_labels_for_user']);
                     foreach ($labels as $label) {
                         $userLabel = new UserLabel();
                         $userLabel->user_id = $user->id;
@@ -196,28 +190,20 @@ class RegisterController extends Controller
                 }
 
                 // 更新邀请码
-                if ($this->systemConfig['is_invite_register']) {
-                    Invite::query()->where('id', $code->id)->update(['fuid' => $user->id, 'status' => 1]);
+                if (self::$systemConfig['is_invite_register'] && $affArr['code_id']) {
+                    Invite::query()->where('id', $affArr['code_id'])->update(['fuid' => $user->id, 'status' => 1]);
                 }
             }
 
             // 发送邮件
-            if ($this->systemConfig['is_active_register']) {
+            if (self::$systemConfig['is_active_register']) {
                 // 生成激活账号的地址
-                $token = md5($this->systemConfig['website_name'] . $username . microtime());
-                $verify = new Verify();
-                $verify->user_id = $user->id;
-                $verify->username = $username;
-                $verify->token = $token;
-                $verify->status = 0;
-                $verify->save();
-
-                $activeUserUrl = $this->systemConfig['website_url'] . '/active/' . $token;
-                $title = '注册激活';
-                $content = '请求地址：' . $activeUserUrl;
+                $token = md5(self::$systemConfig['website_name'] . $username . microtime());
+                $activeUserUrl = self::$systemConfig['website_url'] . '/active/' . $token;
+                $this->addVerify($user->id, $username, $token);
 
                 try {
-                    Mail::to($username)->send(new activeUser($this->systemConfig['website_name'], $activeUserUrl));
+                    Mail::to($username)->send(new activeUser(self::$systemConfig['website_name'], $activeUserUrl));
                     $this->sendEmailLog($user->id, $title, $content);
                 } catch (\Exception $e) {
                     $this->sendEmailLog($user->id, $title, $content, 0, $e->getMessage());
@@ -227,7 +213,7 @@ class RegisterController extends Controller
             } else {
                 // 如果不需要激活，则直接给推荐人加流量
                 if ($referral_uid) {
-                    $transfer_enable = $this->systemConfig['referral_traffic'] * 1048576;
+                    $transfer_enable = self::$systemConfig['referral_traffic'] * 1048576;
 
                     User::query()->where('id', $referral_uid)->increment('transfer_enable', $transfer_enable);
                     User::query()->where('id', $referral_uid)->update(['enable' => 1]);
@@ -240,17 +226,71 @@ class RegisterController extends Controller
         } else {
             Session::put('register_token', makeRandStr(16));
 
-            $view['is_captcha'] = $this->systemConfig['is_captcha'];
-            $view['is_register'] = $this->systemConfig['is_register'];
-            $view['website_home_logo'] = $this->systemConfig['website_home_logo'];
-            $view['is_invite_register'] = $this->systemConfig['is_invite_register'];
-            $view['is_free_code'] = $this->systemConfig['is_free_code'];
-            $view['website_analytics'] = $this->systemConfig['website_analytics'];
-            $view['website_customer_service'] = $this->systemConfig['website_customer_service'];
+            $view['is_captcha'] = self::$systemConfig['is_captcha'];
+            $view['is_register'] = self::$systemConfig['is_register'];
+            $view['website_home_logo'] = self::$systemConfig['website_home_logo'];
+            $view['is_invite_register'] = self::$systemConfig['is_invite_register'];
+            $view['is_free_code'] = self::$systemConfig['is_free_code'];
+            $view['website_analytics'] = self::$systemConfig['website_analytics'];
+            $view['website_customer_service'] = self::$systemConfig['website_customer_service'];
 
             return Response::view('register', $view);
         }
     }
 
+    /**
+     * 获取AFF
+     *
+     * @param string $code 邀请码
+     * @param string $aff  URL中的aff参数
+     *
+     * @return array
+     */
+    private function getAff($code = '', $aff = '')
+    {
+        // 邀请人ID
+        $referral_uid = 0;
 
+        // 有邀请码先用邀请码，用谁的邀请码就给谁返利
+        if ($code) {
+            $inviteCode = Invite::query()->where('code', $code)->where('uid', '>', 0)->where('status', 0)->first();
+            if ($inviteCode) {
+                $referral_uid = $inviteCode->uid;
+
+                return [
+                    'referral_uid' => $referral_uid,
+                    'code_id'      => $inviteCode->id
+                ];
+            }
+        }
+
+        // 没有用邀请码或者邀请码是管理员生成的，则检查cookie或者url链接
+        if (!$referral_uid) {
+            // 检查一下cookie里有没有aff
+            $cookieAff = \Request::cookie('register_aff') ? \Request::cookie('register_aff') : 0;
+            if ($cookieAff) {
+                $affUser = User::query()->where('id', $cookieAff)->exists();
+                $referral_uid = $affUser ? $cookieAff : 0;
+            } elseif ($aff) { // 如果cookie里没有aff，就再检查一下请求的url里有没有aff，因为有些人的浏览器会禁用了cookie，比如chrome开了隐私模式
+                $affUser = User::query()->where('id', $aff)->exists();
+                $referral_uid = $affUser ? $aff : 0;
+            }
+        }
+
+        return [
+            'referral_uid' => $referral_uid,
+            'code_id'      => 0
+        ];
+    }
+
+    // 写入生成激活账号验证记录
+    private function addVerify($userId, $username, $token)
+    {
+        $verify = new Verify();
+        $verify->user_id = $userId;
+        $verify->username = $username;
+        $verify->token = $token;
+        $verify->status = 0;
+        $verify->save();
+    }
 }

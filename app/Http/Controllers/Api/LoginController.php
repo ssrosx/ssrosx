@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Components\Helpers;
 use App\Http\Controllers\Controller;
 use App\Http\Models\User;
 use App\Http\Models\UserSubscribe;
@@ -19,6 +20,13 @@ use DB;
  */
 class LoginController extends Controller
 {
+    protected static $systemConfig;
+
+    function __construct()
+    {
+        self::$systemConfig = Helpers::systemConfig();
+    }
+
     // 登录返回订阅信息
     public function login(Request $request)
     {
@@ -32,7 +40,7 @@ class LoginController extends Controller
                 return Response::json(['status' => 'fail', 'data' => [], 'message' => '请求失败超限，禁止访问1小时']);
             }
         } else {
-            Cache::put($cacheKey, 1, 60);
+            Cache::put($cacheKey, 1, 10);
         }
 
         if (!$username || !$password) {
@@ -75,7 +83,7 @@ class LoginController extends Controller
         $data['user'] = $user;
 
         // 订阅链接
-            $data['link'] = $this->systemConfig['subscribe_domain'] ? $this->systemConfig['subscribe_domain'] . '/s/' . $code : $this->systemConfig['website_url'] . '/s/' . $code;
+            $data['link'] = self::$systemConfig['subscribe_domain'] ? self::$systemConfig['subscribe_domain'] . '/s/' . $code : self::$systemConfig['website_url'] . '/s/' . $code;
 
             DB::commit();
 

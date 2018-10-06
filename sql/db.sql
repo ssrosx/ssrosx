@@ -43,6 +43,7 @@ CREATE TABLE `ss_node` (
   `monitor_url` VARCHAR(255) NULL DEFAULT NULL COMMENT '监控地址',
   `is_subscribe` TINYINT(4) NULL DEFAULT '1' COMMENT '是否允许用户订阅该节点：0-否、1-是',
   `ssh_port` SMALLINT(6) UNSIGNED NOT NULL DEFAULT '22' COMMENT 'SSH端口',
+  `is_tcp_check` TINYINT(4) NOT NULL DEFAULT '1' COMMENT '是否开启检测: 0-不开启、1-开启',
   `icmp` TINYINT(4) NOT NULL DEFAULT '1' COMMENT 'ICMP检测：-2-内外都不通、-1-内不通外通、0-外不通内通、1-内外都通',
   `tcp` TINYINT(4) NOT NULL DEFAULT '1' COMMENT 'TCP检测：-2-内外都不通、-1-内不通外通、0-外不通内通、1-内外都通',
   `udp` TINYINT(4) NOT NULL DEFAULT '1' COMMENT 'ICMP检测：-2-内外都不通、-1-内不通外通、0-外不通内通、1-内外都通',
@@ -353,6 +354,8 @@ INSERT INTO `config` VALUES ('70', 'max_rand_traffic', 20);
 INSERT INTO `config` VALUES ('71', 'ads_daily_count', 10);
 INSERT INTO `config` VALUES ('72', 'is_tcp_check', 0);
 INSERT INTO `config` VALUES ('73', 'tcp_check_warning_times', 3);
+INSERT INTO `config` VALUES ('74', 'is_forbid_china', 0);
+INSERT INTO `config` VALUES ('75', 'is_forbid_oversea', 0);
 
 -- ----------------------------
 -- Table structure for `article`
@@ -462,7 +465,9 @@ CREATE TABLE `goods` (
   `price` int(11) NOT NULL DEFAULT '0' COMMENT '商品售价，单位分',
   `desc` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '商品描述',
   `days` int(11) NOT NULL DEFAULT '30' COMMENT '有效期',
+  `color` VARCHAR(50) NOT NULL DEFAULT 'green' COMMENT '商品颜色',
   `sort` int(11) NOT NULL DEFAULT '0' COMMENT '排序',
+  `is_hot` TINYINT(4) NOT NULL DEFAULT '0' COMMENT '是否热销：0-否、1-是',
   `is_del` tinyint(4) NOT NULL DEFAULT '0' COMMENT '是否已删除：0-否、1-是',
   `status` tinyint(4) NOT NULL DEFAULT '1' COMMENT '状态：0-下架、1-上架',
   `created_at` datetime DEFAULT NULL COMMENT '创建时间',
@@ -517,6 +522,7 @@ CREATE TABLE `order` (
   `user_id` int(11) NOT NULL DEFAULT '0' COMMENT '操作人',
   `goods_id` int(11) NOT NULL DEFAULT '0' COMMENT '商品ID',
   `coupon_id` int(11) NOT NULL DEFAULT '0' COMMENT '优惠券ID',
+  `email` varchar(255) DEFAULT NULL COMMENT '邮箱',
   `origin_amount` int(11) NOT NULL DEFAULT '0' COMMENT '订单原始总价，单位分',
   `amount` int(11) NOT NULL DEFAULT '0' COMMENT '订单总价，单位分',
   `expire_at` datetime DEFAULT NULL COMMENT '过期时间',
@@ -607,6 +613,22 @@ CREATE TABLE `user_balance_log` (
   `created_at` datetime DEFAULT NULL COMMENT '创建时间',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='用户余额变动日志';
+
+
+-- ----------------------------
+-- Table structure for `user_traffic_modify_log`
+-- ----------------------------
+CREATE TABLE `user_traffic_modify_log` (
+	`id` INT(11) NOT NULL AUTO_INCREMENT,
+	`user_id` INT(11) NOT NULL DEFAULT '0' COMMENT '用户ID',
+	`order_id` INT(11) NOT NULL DEFAULT '0' COMMENT '发生的订单ID',
+	`before` INT(11) NOT NULL DEFAULT '0',
+	`after` INT(11) NOT NULL DEFAULT '0',
+	`desc` VARCHAR(255) NOT NULL DEFAULT '' COMMENT '描述',
+	`created_at` DATETIME NOT NULL,
+	`updated_at` DATETIME NOT NULL,
+	PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='用户流量变动日志';
 
 
 -- ----------------------------
@@ -1071,17 +1093,16 @@ CREATE TABLE `user_login_log` (
 	`id` INT(11) NOT NULL AUTO_INCREMENT,
 	`user_id` INT(11) NOT NULL DEFAULT '0',
 	`ip` CHAR(20) NOT NULL,
-	`country` CHAR(80) NOT NULL,
-	`province` CHAR(80) NOT NULL,
-	`city` CHAR(80) NOT NULL,
-	`county` CHAR(80) NOT NULL,
-	`isp` CHAR(50) NOT NULL,
-	`area` CHAR(200) NOT NULL,
+	`country` CHAR(20) NOT NULL,
+	`province` CHAR(20) NOT NULL,
+	`city` CHAR(20) NOT NULL,
+	`county` CHAR(20) NOT NULL,
+	`isp` CHAR(20) NOT NULL,
+	`area` CHAR(20) NOT NULL,
 	`created_at` DATETIME NOT NULL,
 	`updated_at` DATETIME NOT NULL,
 	PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='用户登录日志';
-
+) ENGINE=InnoDB COLLATE='utf8mb4_general_ci' COMMENT='用户登录日志';
 
 
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;

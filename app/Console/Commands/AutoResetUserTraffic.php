@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
+use App\Components\Helpers;
 use Illuminate\Console\Command;
-use App\Http\Models\Config;
 use App\Http\Models\Order;
 use App\Http\Models\User;
 use Log;
@@ -12,19 +12,32 @@ class AutoResetUserTraffic extends Command
 {
     protected $signature = 'autoResetUserTraffic';
     protected $description = '自动重置用户可用流量';
+    protected static $systemConfig;
 
     public function __construct()
     {
         parent::__construct();
+        self::$systemConfig = Helpers::systemConfig();
     }
 
     public function handle()
     {
         $jobStartTime = microtime(true);
 
-        $config = $this->systemConfig();
+        // 重置用户流量
+        if (self::$systemConfig['reset_traffic']) {
+            $this->resetUserTraffic();
+        }
 
-        if ($config['reset_traffic']) {
+        $jobEndTime = microtime(true);
+        $jobUsedTime = round(($jobEndTime - $jobStartTime), 4);
+
+        Log::info('执行定时任务【' . $this->description . '】，耗时' . $jobUsedTime . '秒');
+    }
+
+    // 重置用户流量
+    private function resetUserTraffic()
+    {
             $userList = User::query()->where('status', '>=', 0)->where('enable', 1)->get();
             if (!$userList->isEmpty()) {
                 foreach ($userList as $user) {
@@ -62,22 +75,4 @@ class AutoResetUserTraffic extends Command
                 }
             }
         }
-
-        $jobEndTime = microtime(true);
-        $jobUsedTime = round(($jobEndTime - $jobStartTime) , 4);
-
-        Log::info('执行定时任务【' . $this->description . '】，耗时' . $jobUsedTime . '秒');
-    }
-
-    // 系统配置
-    private function systemConfig()
-    {
-        $config = Config::query()->get();
-        $data = [];
-        foreach ($config as $vo) {
-            $data[$vo->name] = $vo->value;
-        }
-
-        return $data;
-    }
 }
