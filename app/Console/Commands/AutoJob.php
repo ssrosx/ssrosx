@@ -123,7 +123,7 @@ class AutoJob extends Command
         $userList = User::query()->where('status', '>=', 0)->where('enable', 1)->where('expire_time', '<=', date('Y-m-d H:i:s'))->get();
         if (!$userList->isEmpty()) {
             foreach ($userList as $user) {
-                if (self::$config['is_ban_status']) {
+                if (self::$systemConfig['is_ban_status']) {
                     User::query()->where('id', $user->id)->update([
                         'u'               => 0,
                         'd'               => 0,
@@ -249,7 +249,7 @@ class AutoJob extends Command
         }
 
         // 被封禁的账号自动释放端口
-        if (self::$config['auto_release_port']) {
+        if (self::$systemConfig['auto_release_port']) {
             $userList = User::query()->where('enable', 0)->get();
             if (!$userList->isEmpty()) {
                 foreach ($userList as $user) {
