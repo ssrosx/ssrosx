@@ -123,8 +123,8 @@
                         <span class="title">{{trans('home.services')}}</span>
                     </a>
                 </li>
-                <li class="nav-item {{in_array(Request::path(), ['orderList']) ? 'active open' : ''}}">
-                    <a href="{{url('orderList')}}" class="nav-link nav-toggle">
+                <li class="nav-item {{in_array(Request::path(), ['invoices']) || Request::segment(1) == 'invoice' ? 'active open' : ''}}">
+                    <a href="{{url('invoices')}}" class="nav-link nav-toggle">
                         <i class="icon-wallet"></i>
                         <span class="title">{{trans('home.invoices')}}</span>
                     </a>
@@ -149,6 +149,12 @@
                     </a>
                 </li>
                 @endif
+                <li class="nav-item {{in_array(Request::path(), ['help', 'article']) ? 'active open' : ''}}">
+                    <a href="{{url('help')}}" class="nav-link nav-toggle">
+                        <i class="icon-doc"></i>
+                        <span class="title">{{trans('home.help')}}</span>
+                    </a>
+                </li>
             </ul>
             <!-- END SIDEBAR MENU -->
         </div>

@@ -160,7 +160,7 @@
             type: 1
             ,title: false //不显示标题栏
             ,closeBtn: false
-            ,area: '250px;'
+            ,area: '300px;'
             ,shade: 0.8
             ,id: 'tnc' //设定一个id，防止重复弹出
             ,resize: false

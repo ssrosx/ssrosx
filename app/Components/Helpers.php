@@ -55,10 +55,10 @@ class Helpers
     }
 
     // 获取一个随机端口
-    public function getRandPort()
+    public static function getRandPort()
     {
         $port = 0;
-        $config = $this->systemConfig();
+        $config = self::systemConfig();
         $minport = $config['min_port'];
         $maxport = $config['max_port'];
 
@@ -69,11 +69,9 @@ class Helpers
             return $port;
         }
 
-        $deny_port = [1068, 1109, 1434, 3127, 3128, 3129, 3130, 3332, 4444, 5554, 6669, 8080, 8081, 8082, 8181, 8282, 9996, 17185, 24554, 35601, 60177, 60179]; // 不生成的端口
-
         $portlist = array();
         for ($i = $minport; $i <= $maxport; $i++) {
-            if (!in_array($i, $exists_port) && !in_array($i, $deny_port)) {
+            if (!in_array($i, $exists_port) && !in_array($i, self::$denyPorts)) {
                 array_push($portlist, $i);
             }
         }
