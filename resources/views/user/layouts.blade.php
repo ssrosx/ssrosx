@@ -135,12 +135,6 @@
                         <span class="title">{{trans('home.tickets')}}</span>
                     </a>
                 </li>
-                <li class="nav-item {{in_array(Request::path(), ['logout']) ? 'active open' : ''}}">
-                    <a href="{{url('logout')}}" class="nav-link nav-toggle">
-                        <i class="icon-key"></i>
-                        <span class="title">{{trans('home.logout')}}</span>
-                    </a>
-                </li>
                 @if(Session::get('referral_status'))
                 <li class="nav-item {{in_array(Request::path(), ['referral']) ? 'active open' : ''}}">
                     <a href="{{url('referral')}}" class="nav-link nav-toggle">
@@ -153,6 +147,12 @@
                     <a href="{{url('help')}}" class="nav-link nav-toggle">
                         <i class="icon-doc"></i>
                         <span class="title">{{trans('home.help')}}</span>
+                    </a>
+                </li>
+                <li class="nav-item {{in_array(Request::path(), ['logout']) ? 'active open' : ''}}">
+                    <a href="{{url('logout')}}" class="nav-link nav-toggle">
+                        <i class="icon-key"></i>
+                        <span class="title">{{trans('home.logout')}}</span>
                     </a>
                 </li>
             </ul>
