@@ -1,0 +1,2 @@
+-- 商品加排序
+ALTER TABLE `goods` ADD COLUMN `bundle` VARCHAR(50) NOT NULL DEFAULT '' COMMENT 'BUNDLE' AFTER `desc`;

@@ -464,6 +464,7 @@ CREATE TABLE `goods` (
   `type` tinyint(4) NOT NULL DEFAULT '1' COMMENT '商品类型：1-流量包、2-套餐、3-广告流量',
   `price` int(11) NOT NULL DEFAULT '0' COMMENT '商品售价，单位分',
   `desc` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '商品描述',
+  `bundle` VARCHAR(50) NOT NULL DEFAULT '' COMMENT 'BUNDLE',
   `days` int(11) NOT NULL DEFAULT '30' COMMENT '有效期',
   `color` VARCHAR(50) NOT NULL DEFAULT 'green' COMMENT '商品颜色',
   `sort` int(11) NOT NULL DEFAULT '0' COMMENT '排序',
