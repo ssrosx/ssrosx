@@ -122,9 +122,24 @@
                                     <div class="col-md-6">
                                         <select class="form-control" name="charge_type" id="charge_type">
                                             <option value="1" selected>{{trans('home.coupon_code')}}</option>
+                                            @if(!$goodsList->isEmpty())
+                                                <option value="2">{{trans('home.online_pay')}}</option>
+                                            @endif
                                         </select>
                                     </div>
                                 </div>
+                                @if(!$goodsList->isEmpty())
+                                    <div class="form-group" id="charge_balance" style="display: none;">
+                                        <label for="online_pay" class="col-md-4 control-label">充值金额</label>
+                                        <div class="col-md-6">
+                                            <select class="form-control" name="online_pay" id="online_pay">
+                                                @foreach($goodsList as $key => $goods)
+                                                    <option value="{{$goods->id}}">充值{{$goods->price}}元</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                @endif
                                 <div class="form-group">
                                     <label for="charge_coupon" class="col-md-4 control-label"> {{trans('home.coupon_code')}} </label>
                                     <div class="col-md-6">
@@ -231,11 +246,26 @@
     <script src="/js/layer/layer.js" type="text/javascript"></script>
 
     <script type="text/javascript">
+        // 切换充值方式
+        $("#charge_type").change(function(){
+            if ($(this).val() == 2) {
+                $("#charge_balance").show();
+            } else {
+                $("#charge_balance").hide();
+            }
+        });
+
         // 充值
         function charge() {
-            var _token = '{{csrf_token()}}';
             var charge_type = $("#charge_type").val();
             var charge_coupon = $("#charge_coupon").val();
+            var online_pay = $("#online_pay").val();
+
+            if (charge_type == '2') {
+                $("#charge_msg").show().html("正在跳转支付界面");
+                window.location.href = '/buy/' + online_pay;
+                return false;
+            }
 
             if (charge_type == '1' && (charge_coupon == '' || charge_coupon == undefined)) {
                 $("#charge_msg").show().html("{{trans('home.coupon_not_empty')}}");
@@ -246,7 +276,7 @@
             $.ajax({
                 url:'{{url('charge')}}',
                 type:"POST",
-                data:{_token:_token, coupon_sn:charge_coupon},
+                data:{_token:'{{csrf_token()}}', coupon_sn:charge_coupon},
                 beforeSend:function(){
                     $("#charge_msg").show().html("{{trans('home.recharging')}}");
                 },

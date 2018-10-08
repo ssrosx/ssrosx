@@ -56,7 +56,17 @@
                                         <tr class="odd gradeX">
                                             <td> {{$goods->id}} </td>
                                             <td> {{$goods->name}} </td>
-                                            <td> {{$goods->type == 1 ? '流量包' : '套餐'}} </td>
+                                            <td>
+                                                @if($goods->type == 1)
+                                                    流量包
+                                                @elseif($goods->type == 2)
+                                                    套餐
+                                                @elseif($goods->type == 3)
+                                                    广告流量
+                                                @else
+                                                    充值
+                                                @endif
+                                            </td>
                                             <!-- <td> @if($goods->logo) <a href="{{$goods->logo}}" class="fancybox"><img src="{{$goods->logo}}"/></a> @endif </td> -->
                                             <td> {{$goods->traffic_label}} </td>
                                             <td> {{$goods->price}}元 </td>

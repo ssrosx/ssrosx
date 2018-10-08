@@ -56,6 +56,10 @@
                                                 <input type="radio" name="type" value="3"> 广告流量
                                                 <span></span>
                                             </label>
+                                            <label class="mt-radio">
+                                                <input type="radio" name="type" value="4"> 充值
+                                                <span></span>
+                                            </label>
                                         </div>
                                         <span class="help-block"> 套餐与账号有效期有关，流量包只扣可用流量，不影响有效期。广告流量为了使用对应数据库才放在这边，只能创建一个广告流量，广告流量范围在：设置-系统设置-广告设置里面设置</span>
                                     </div>

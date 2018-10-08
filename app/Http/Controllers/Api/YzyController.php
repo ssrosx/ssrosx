@@ -9,6 +9,8 @@ use App\Http\Models\GoodsLabel;
 use App\Http\Models\Order;
 use App\Http\Models\Payment;
 use App\Http\Models\PaymentCallback;
+use App\Http\Models\SsNode;
+use App\Http\Models\SsNodeLabel;
 use App\Http\Models\User;
 use App\Http\Models\UserLabel;
 use App\Mail\sendUserInfo;
@@ -166,8 +168,11 @@ class YzyController extends Controller
                     $order->status = 2;
                     $order->save();
 
+            $goods = Goods::query()->where('id', $order->goods_id)->first();
+
+            // 商品为流量或者套餐
+            if ($goods->type <= 2) {
                     // 如果买的是套餐，则先将之前购买的所有套餐置都无效，并扣掉之前所有套餐的流量
-                    $goods = Goods::query()->where('id', $order->goods_id)->first();
                     if ($goods->type == 2) {
                         $existOrderList = Order::query()
                             ->with(['goods'])
@@ -238,8 +243,14 @@ class YzyController extends Controller
 
             // 取消重复返利
             User::query()->where('id', $order->user_id)->update(['referral_uid' => 0]);
+            } elseif ($goods->type == 3) { // 商品为在线充值
+                User::query()->where('id', $order->user_id)->increment('balance', $goods->price * 100);
 
-            // 如果order的email值不为空
+                // 余额变动记录日志
+                $this->addUserBalanceLog($order->user_id, $order->oid, $order->user->balance, $order->user->balance + $goods->price, +$goods->price, '用户在线充值');
+            }
+
+            // 自动提号机：如果order的email值不为空
             if ($order->email) {
                 $title = '【' . self::$systemConfig['website_name'] . '】您的账号信息';
                 $content = [
@@ -256,6 +267,12 @@ class YzyController extends Controller
                     'created_at'    => $order->created_at->toDateTimeString(),
                     'expire_at'     => $order->expire_at
                 ];
+
+                // 获取可用节点列表
+                $labels = UserLabel::query()->where('user_id', $order->user_id)->get()->pluck('label_id');
+                $nodeIds = SsNodeLabel::query()->whereIn('label_id', $labels)->get()->pluck('node_id');
+                $nodeList = SsNode::query()->whereIn('id', $nodeIds)->orderBy('sort', 'desc')->orderBy('id', 'desc')->get();
+                $content['serverList'] = $nodeList;
 
                 try {
                     Mail::to($order->email)->send(new sendUserInfo(self::$systemConfig['website_name'], $content));

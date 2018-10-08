@@ -109,7 +109,7 @@
         function do_submit() {
             var _token = '{{csrf_token()}}';
             var title = $('#title').val();
-            var type = $('#type').val();
+            var type = $("input:radio[name='type']:checked").val();
             var author = $('#author').val();
             var sort = $('#sort').val();
             var content = UE.getEditor('editor').getContent();
