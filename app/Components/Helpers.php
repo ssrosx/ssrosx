@@ -65,7 +65,7 @@ class Helpers
         $exists_port = User::query()->pluck('port')->toArray();
         $len = count($exists_port);
 
-        if ($maxport - $minport + 1 >= $len) {
+        if ($maxport - $minport + 1 < $len) {
             return $port;
         }
 

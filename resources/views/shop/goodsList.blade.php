@@ -63,7 +63,7 @@
                                                     套餐
                                                 @elseif($goods->type == 3)
                                                     广告流量
-                                                @else
+                                                @elseif($goods->type == 4)
                                                     充值
                                                 @endif
                                             </td>
