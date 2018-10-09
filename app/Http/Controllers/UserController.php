@@ -571,6 +571,12 @@ class UserController extends Controller
         return Response::view('user.free', $view);
     }
 
+    public function privacy(Request $request)
+    {
+        $view['website_logo'] = self::$systemConfig['website_logo'];
+        return Response::view('user.privacy', $view);
+    }
+
     // 生成邀请码
     public function makeInvite(Request $request)
     {

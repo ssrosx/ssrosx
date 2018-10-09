@@ -140,7 +140,8 @@ if (!function_exists('getClientIP')) {
 
         return $ip;
     }
-}// 获取IPv6信息
+}
+// 获取IPv6信息
 if (!function_exists('getIPv6')) {
     /*
      * {
