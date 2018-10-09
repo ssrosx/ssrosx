@@ -157,6 +157,7 @@ return [
     'service_type_1'                  => 'Flow Packet',
     'service_type_2'                  => 'Flow Plans',
     'service_type_3'                  => 'Balance',
+    'service_print'                   => 'Print',
 
     // 流量日志
     'traffic_log_tips'                => 'Tips: The update of the flow chart will be delayed.',
@@ -177,7 +178,7 @@ return [
     'invite_code_table_user'          => 'Usage User',
     'invite_code_table_status'        => 'Status',
     'invite_code_table_none_codes'    => 'None Data',
-    'invite_code_table_status_un'     => 'Active',
+    'invite_code_table_status_un'     => 'Unused',
     'invite_code_table_status_yes'    => 'Already Used',
     'invite_code_table_status_expire' => 'Overdue',
     'invite_code_summary'             => 'Total of :total invite codes',
@@ -255,10 +256,6 @@ return [
     'privacy_policies_msg1'           => 'Patatas believes in privacy and online freedom and that it should be very clear how we manage and protect your personal information. If you have any questions or concerns, please contact us.',
 
     'privacy_policies_msg2'           => 'The Patatas network is a no-log network. That means, except for the limited exceptions below, we do not collect any information transmitted through our network. More specifically, we do not collect any information regarding the websites you visit assigned to you when you access the Patatas Private Network, and with respect to our service, we do not collect any data stored on or transmitted from your device, including any data that collect any data stored on or transmitted from your device, including any data that applications on your device may transmit through our network. There are a few exceptions where we may need to collect or monitor traffic through our network.',
-
-    'privacy_policies_msg1_lite'           => 'PatatasLite believes in privacy and online freedom and that it should be very clear how we manage and protect your personal information. If you have any questions or concerns, please contact us.',
-
-    'privacy_policies_msg2_lite'           => 'The PatatasLite network is a no-log network. That means, except for the limited exceptions below, we do not collect any information transmitted through our network. More specifically, we do not collect any information regarding the websites you visit assigned to you when you access the PatatasLite Private Network, and with respect to our service, we do not collect any data stored on or transmitted from your device, including any data that collect any data stored on or transmitted from your device, including any data that applications on your device may transmit through our network. There are a few exceptions where we may need to collect or monitor traffic through our network.',
 
     'privacy_policies_msg11'           => 'What information do we collect?',
     'privacy_policies_msg12'           => 'We will record your aggregate bandwidth usage for billing and network operations and support.',

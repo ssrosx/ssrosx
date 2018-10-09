@@ -78,6 +78,8 @@ class YzyController extends Controller
         $msg = json_decode(urldecode($msg), true);
 
         switch ($data['type']) {
+            case 'TRADE':
+                break;
             case 'trade_TradePaid':
                 $this->tradePaid($msg);
                 break;
@@ -243,7 +245,7 @@ class YzyController extends Controller
 
             // 取消重复返利
             User::query()->where('id', $order->user_id)->update(['referral_uid' => 0]);
-            } elseif ($goods->type == 3) { // 商品为在线充值
+            } elseif ($goods->type == 4) { // 商品为在线充值
                 User::query()->where('id', $order->user_id)->increment('balance', $goods->price * 100);
 
                 // 余额变动记录日志

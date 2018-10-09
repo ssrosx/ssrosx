@@ -12,7 +12,7 @@
             <div class="row invoice-body">
                 <div class="col-xs-12 table-responsive">
                     <table class="table table-hover">
-                        @if($goods->type == 3)
+                        @if($goods->type == 4)
                             <thead>
                                 <tr>
                                     <th class="invoice-title"> {{trans('home.service_name')}} </th>
@@ -40,9 +40,11 @@
                         <tr>
                             <td style="padding: 10px;">
                                 <h2>{{$goods->name}}</h2>
+                                    @if($goods->type != 4)
                                         {{trans('home.service_traffic')}} {{$goods->traffic_label}}
                                         <br/>
                                 {{trans('home.service_days')}} {{$goods->days}} {{trans('home.day')}}
+                                    @endif
                             </td>
                             <td class="text-center"> ￥{{$goods->price}} </td>
                             <td class="text-center"> x 1 </td>
@@ -62,17 +64,17 @@
                     <h2 class="invoice-title"> {{trans('home.service_total_price')}} </h2>
                     <p class="invoice-desc grand-total"> ￥{{$goods->price}} </p>
                 </div>
-                    <div class="col-xs-6">
-                        <h2 class="invoice-title"> {{trans('home.coupon')}} </h2>
-                        <p class="invoice-desc">
-                            <div class="input-group">
-                                <input class="form-control" type="text" name="coupon_sn" id="coupon_sn" placeholder="{{trans('home.coupon')}}" />
-                                <span class="input-group-btn">
-                                    <button class="btn btn-default" type="button" onclick="redeemCoupon()"><i class="fa fa-refresh"></i> {{trans('home.redeem_coupon')}} </button>
-                                </span>
-            </div>
-                        </p>
-                    </div>
+                    {{--<div class="col-xs-6">--}}
+                        {{--<h2 class="invoice-title"> {{trans('home.coupon')}} </h2>--}}
+                        {{--<p class="invoice-desc">--}}
+                        {{--<div class="input-group">--}}
+                            {{--<input class="form-control" type="text" name="coupon_sn" id="coupon_sn" placeholder="{{trans('home.coupon')}}" />--}}
+                            {{--<span class="input-group-btn">--}}
+                                    {{--<button class="btn btn-default" type="button" onclick="redeemCoupon()"><i class="fa fa-refresh"></i> {{trans('home.redeem_coupon')}} </button>--}}
+                                {{--</span>--}}
+                        {{--</div>--}}
+                        {{--</p>--}}
+                    {{--</div>--}}
                 </div>
             @endif
             <div class="row">
@@ -94,51 +96,51 @@
     <script src="/js/layer/layer.js" type="text/javascript"></script>
 
     <script type="text/javascript">
-        // 校验优惠券是否可用
-        function redeemCoupon() {
-            var coupon_sn = $('#coupon_sn').val();
-            var goods_price = '{{$goods->price}}';
+        {{--// 校验优惠券是否可用--}}
+        {{--function redeemCoupon() {--}}
+            {{--var coupon_sn = $('#coupon_sn').val();--}}
+            {{--var goods_price = '{{$goods->price}}';--}}
 
-            $.ajax({
-                type: "POST",
-                url: "{{url('redeemCoupon')}}",
-                async: false,
-                data: {_token:'{{csrf_token()}}', coupon_sn:coupon_sn},
-                dataType: 'json',
-                beforeSend: function () {
-                    index = layer.load(1, {
-                        shade: [0.7,'#CCC']
-                    });
-                },
-                success: function (ret) {
-                    console.log(ret);
-                    layer.close(index);
-                    $("#coupon_sn").parent().removeClass("has-error");
-                    $("#coupon_sn").parent().removeClass("has-success");
-                    $(".input-group-addon").remove();
-                    if (ret.status == 'success') {
-                        $("#coupon_sn").parent().addClass('has-success');
-                        $("#coupon_sn").parent().prepend('<span class="input-group-addon"><i class="fa fa-check fa-fw"></i></span>');
+            {{--$.ajax({--}}
+                {{--type: "POST",--}}
+                {{--url: "{{url('redeemCoupon')}}",--}}
+                {{--async: false,--}}
+                {{--data: {_token:'{{csrf_token()}}', coupon_sn:coupon_sn},--}}
+                {{--dataType: 'json',--}}
+                {{--beforeSend: function () {--}}
+                    {{--index = layer.load(1, {--}}
+                        {{--shade: [0.7,'#CCC']--}}
+                    {{--});--}}
+                {{--},--}}
+                {{--success: function (ret) {--}}
+                    {{--console.log(ret);--}}
+                    {{--layer.close(index);--}}
+                    {{--$("#coupon_sn").parent().removeClass("has-error");--}}
+                    {{--$("#coupon_sn").parent().removeClass("has-success");--}}
+                    {{--$(".input-group-addon").remove();--}}
+                    {{--if (ret.status == 'success') {--}}
+                        {{--$("#coupon_sn").parent().addClass('has-success');--}}
+                        {{--$("#coupon_sn").parent().prepend('<span class="input-group-addon"><i class="fa fa-check fa-fw"></i></span>');--}}
 
-                        // 根据类型计算折扣后的总金额
-                        var total_price = 0;
-                        if (ret.data.type == '2') {
-                            total_price = goods_price * ret.data.discount / 10;
-                        } else {
-                            total_price = goods_price - ret.data.amount;
-                            total_price = total_price > 0 ? total_price : 0;
-                        }
+                        {{--// 根据类型计算折扣后的总金额--}}
+                        {{--var total_price = 0;--}}
+                        {{--if (ret.data.type == '2') {--}}
+                            {{--total_price = goods_price * ret.data.discount / 10;--}}
+                        {{--} else {--}}
+                            {{--total_price = goods_price - ret.data.amount;--}}
+                            {{--total_price = total_price > 0 ? total_price : 0;--}}
+                        {{--}--}}
 
-                        $(".grand-total").text("￥" + total_price);
-                    } else {
-                        $(".grand-total").text("￥" + goods_price);
-                        $("#coupon_sn").parent().addClass('has-error');
-                        $("#coupon_sn").parent().remove('.input-group-addon');
-                        $("#coupon_sn").parent().prepend('<span class="input-group-addon"><i class="fa fa-remove fa-fw"></i></span>');
-                    }
-                }
-            });
-        }
+                        {{--$(".grand-total").text("￥" + total_price);--}}
+                    {{--} else {--}}
+                        {{--$(".grand-total").text("￥" + goods_price);--}}
+                        {{--$("#coupon_sn").parent().addClass('has-error');--}}
+                        {{--$("#coupon_sn").parent().remove('.input-group-addon');--}}
+                        {{--$("#coupon_sn").parent().prepend('<span class="input-group-addon"><i class="fa fa-remove fa-fw"></i></span>');--}}
+                    {{--}--}}
+                {{--}--}}
+            {{--});--}}
+        {{--}--}}
 
         // 在线支付
         function onlinePay() {

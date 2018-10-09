@@ -143,12 +143,6 @@
                     </a>
                 </li>
                 @endif
-                <li class="nav-item {{in_array(Request::path(), ['help', 'article']) ? 'active open' : ''}}">
-                    <a href="{{url('help')}}" class="nav-link nav-toggle">
-                        <i class="icon-doc"></i>
-                        <span class="title">{{trans('home.help')}}</span>
-                    </a>
-                </li>
                 <li class="nav-item {{in_array(Request::path(), ['logout']) ? 'active open' : ''}}">
                     <a href="{{url('logout')}}" class="nav-link nav-toggle">
                         <i class="icon-key"></i>

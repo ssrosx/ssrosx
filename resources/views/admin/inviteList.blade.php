@@ -74,11 +74,11 @@
                                                     </td>
                                                     <td>
                                                         @if($invite->status == '0')
-                                                            <span class="label label-sm label-success"> 未使用 </span>
+                                                            <span class="label label-sm label-success"> {{trans('home.invite_code_table_status_un')}} </span>
                                                         @elseif($invite->status == '1')
-                                                            <span class="label label-sm label-danger"> 已使用 </span>
+                                                            <span class="label label-sm label-danger"> {{trans('home.invite_code_table_status_yes')}} </span>
                                                         @else
-                                                            <span class="label label-sm label-default"> 已过期 </span>
+                                                            <span class="label label-sm label-default"> {{trans('home.invite_code_table_status_expire')}} </span>
                                                         @endif
                                                     </td>
                                                     <td> {{empty($invite->user) ? '' : $invite->user->username}} </td>

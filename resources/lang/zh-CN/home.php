@@ -155,6 +155,7 @@ return [
     'service_type_1'                  => '流量包',
     'service_type_2'                  => '套餐',
     'service_type_3'                  => '余额',
+    'service_print'                   => '打印',
 
     // 流量日志
     'traffic_log_tips'                => '提示：流量统计更新会有延迟。按天统计于次日更新，按小时统计于次小时更新。',
@@ -253,12 +254,6 @@ return [
     'privacy_policies_msg1'           => 'Patatas believes in privacy and online freedom and that it should be very clear how we manage and protect your personal information. If you have any questions or concerns, please contact us.',
 
     'privacy_policies_msg2'           => 'The Patatas network is a no-log network. That means, except for the limited exceptions below, we do not collect any information transmitted through our network. More specifically, we do not collect any information regarding the websites you visit assigned to you when you access the Patatas Private Network, and with respect to our service, we do not collect any data stored on or transmitted from your device, including any data that collect any data stored on or transmitted from your device, including any data that applications on your device may transmit through our network. There are a few exceptions where we may need to collect or monitor traffic through our network.',
-
-    'privacy_policies_msg1_lite'           => 'PatatasLite believes in privacy and online freedom and that it should be very clear how we manage and protect your personal information. If you have any questions or concerns, please contact us.',
-
-    'privacy_policies_msg2_lite'           => 'The PatatasLite network is a no-log network. That means, except for the limited exceptions below, we do not collect any information transmitted through our network. More specifically, we do not collect any information regarding the websites you visit assigned to you when you access the PatatasLite Private Network, and with respect to our service, we do not collect any data stored on or transmitted from your device, including any data that collect any data stored on or transmitted from your device, including any data that applications on your device may transmit through our network. There are a few exceptions where we may need to collect or monitor traffic through our network.',
-
-
     'privacy_policies_msg11'           => 'What information do we collect?',
     'privacy_policies_msg12'           => 'We will record your aggregate bandwidth usage for billing and network operations and support.',
     'privacy_policies_msg13'           => 'It may become necessary to temporarily maintain usage data to assist in debugging a problem with the service.',

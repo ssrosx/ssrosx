@@ -102,7 +102,6 @@
     </form>
     <!-- END FORGOT PASSWORD FORM -->
 </div>
-
 <!-- END LOGIN -->
 <!--[if lt IE 9]>
 <script src="/assets/global/plugins/respond.min.js"></script>

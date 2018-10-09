@@ -79,11 +79,11 @@
                                             <td>
                                                 @if ($coupon->usage == 1)
                                                     @if($coupon->status == '1')
-                                                        <span class="label label-default"> 已使用 </span>
+                                                        <span class="label label-default"> {{trans('home.invite_code_table_status_yes')}} </span>
                                                     @elseif ($coupon->status == '2')
                                                         <span class="label label-default"> 已失效 </span>
                                                     @else
-                                                        <span class="label label-success"> 未使用 </span>
+                                                        <span class="label label-success"> {{trans('home.invite_code_table_status_un')}} </span>
                                                     @endif
                                                 @endif
                                             </td>

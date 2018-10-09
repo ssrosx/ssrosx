@@ -79,15 +79,15 @@ class AutoCheckNodeStatus extends Command
                         if ($times < self::$systemConfig['tcp_check_warning_times']) {
                             Cache::increment('tcp_check_warning_times_' . $node->id);
 
-                            $this->notifyMaster($title, "节点**{$node->name}【{$node->ip}】**：**" . $text . "**", $node->name, $node->server);
+                            $this->notifyMaster($title, "节点**{$node->name}**：**" . $text . "**", $node->name, $node->server);
                         } elseif ($times >= self::$systemConfig['tcp_check_warning_times']) {
                             Cache::forget('tcp_check_warning_times_' . $node->id);
                             SsNode::query()->where('id', $node->id)->update(['status' => 0]);
 
-                            $this->notifyMaster($title, "节点**{$node->name}【{$node->ip}】**：**" . $text . "**，节点自动进入维护状态", $node->name, $node->server);
+                            $this->notifyMaster($title, "节点**{$node->name}**：**" . $text . "**，节点自动进入维护状态", $node->name, $node->server);
     }
                     } else {
-                        $this->notifyMaster($title, "节点**{$node->name}【{$node->ip}】**：**" . $text . "**", $node->name, $node->server);
+                        $this->notifyMaster($title, "节点**{$node->name}**：**" . $text . "**", $node->name, $node->server);
         }
     }
 
@@ -97,7 +97,7 @@ class AutoCheckNodeStatus extends Command
             // 10分钟内无节点负载信息且TCP检测认为不是宕机则认为是SSR(R)后端炸了
             $nodeTTL = SsNodeInfo::query()->where('node_id', $node->id)->where('log_time', '>=', strtotime("-10 minutes"))->orderBy('id', 'desc')->first();
             if ($tcpCheck !== 1 && !$nodeTTL) {
-                $this->notifyMaster($title, "节点**{$node->name}【{$node->ip}】**异常：**心跳异常**", $node->name, $node->server);
+                $this->notifyMaster($title, "节点**{$node->name}**异常：**心跳异常**", $node->name, $node->server);
             }
 
             // 天若有情天亦老，我为长者续一秒

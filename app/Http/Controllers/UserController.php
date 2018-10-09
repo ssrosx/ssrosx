@@ -69,7 +69,7 @@ class UserController extends Controller
         $view['website_customer_service'] = self::$systemConfig['website_customer_service'];
         $view['is_push_bear'] = self::$systemConfig['is_push_bear'];
         $view['push_bear_qrcode'] = self::$systemConfig['push_bear_qrcode'];
-        $view['goodsList'] = Goods::query()->where('type', 3)->where('is_del', 0)->orderBy('sort', 'desc')->orderBy('price', 'asc')->limit(10)->get(); // 余额充值商品，只取10个
+        $view['goodsList'] = Goods::query()->where('type', 4)->where('status', 1)->where('is_del', 0)->orderBy('sort', 'desc')->orderBy('price', 'asc')->limit(10)->get(); // 余额充值商品，只取10个
 
         // 推广返利是否可见
         if (!Session::has('referral_status')) {
@@ -1071,7 +1071,6 @@ class UserController extends Controller
                 return Redirect::to('services');
             }
 
-            $goods->traffic = flowAutoShow($goods->traffic * 1048576);
             $view['goods'] = $goods;
             $view['is_youzan'] = self::$systemConfig['is_youzan'];
             $view['website_logo'] = self::$systemConfig['website_logo'];
@@ -1295,28 +1294,5 @@ class UserController extends Controller
         Session::put("locale", $locale);
 
         return Redirect::back();
-    }
-
-    // 上传文件
-    public function uploadImg(Request $request)
-    {
-        var_dump($_FILES);
-        var_dump($request->all());
-        die;
-        if ($request->hasFile('img')) {
-            $file = $request->file('logo');
-            $fileType = $file->getClientOriginalExtension();
-
-            // 验证文件合法性
-            if (!in_array($fileType, ['jpg', 'png', 'jpeg', 'bmp'])) {
-                Session::flash('errorMsg', 'LOGO不合法');
-
-                return Redirect::back()->withInput();
-            }
-
-            $logoName = date('YmdHis') . mt_rand(1000, 2000) . '.' . $fileType;
-            $move = $file->move(base_path() . '/public/upload/image/goods/', $logoName);
-            $logo = $move ? '/upload/image/goods/' . $logoName : '';
-        }
     }
 }

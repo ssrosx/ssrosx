@@ -36,22 +36,16 @@
         @endif
         <div class="row">
             <div class="col-md-4">
-                @if($is_push_bear && $push_bear_qrcode)
                 <ul class="list-group">
+                    @if($info['enable'])
                     <li class="list-group-item">
-                        <div style="text-align: center">
-                            <span> 微信扫码订阅，获取本站最新资讯 </span>
-                            <br><br>
-                            <div id="subscribe_qrcode" style="text-align: center;"></div>
-                        </div>
+                            {{trans('home.account_status')}}：{{trans('home.enabled')}}
+                        </li>
+                    @else
+                        <li class="list-group-item list-group-item-danger">
+                            {{trans('home.account_status')}}：{{trans('home.disabled')}}
                     </li>
-                </ul>
                 @endif
-
-                <ul class="list-group">
-                    <li class="list-group-item">
-                        {{trans('home.account_status')}}：{{$info['enable'] ? trans('home.enabled') : trans('home.disabled') }}
-                    </li>
                     @if($login_add_score)
                         <li class="list-group-item">
                             {{trans('home.account_score')}}：{{$info['score']}}
@@ -61,8 +55,20 @@
                         </li>
                     @endif
                     <li class="list-group-item">
-                        {{trans('home.account_expire')}}：{{date('Y-m-d H:i:s') > $info['expire_time'] ? trans('home.expired') : $info['expire_time']}}
+                        {{trans('home.account_balance')}}：{{$info['balance']}}
+                        <span class="badge badge-danger">
+                            <a href="javascript:;" data-toggle="modal" data-target="#charge_modal" style="color:#FFF;">{{trans('home.recharge')}}</a>
+                        </span>
                     </li>
+                    @if(date('Y-m-d') > $info['expire_time'])
+                        <li class="list-group-item list-group-item-danger">
+                            {{trans('home.account_expire')}}：{{trans('home.expired')}}
+                        </li>
+                    @else
+                        <li class="list-group-item">
+                            {{trans('home.account_expire')}}：{{$info['expire_time']}}
+                    </li>
+                    @endif
                     <li class="list-group-item">
                         {{trans('home.account_last_usage')}}：{{empty($info['t']) ? trans('home.never_used') : date('Y-m-d H:i:s', $info['t'])}}
                     </li>
@@ -78,10 +84,10 @@
                 <div class="row widget-row">
                     @if(!$nodeList->isEmpty())
                         @foreach($nodeList as $node)
-                            <div class="col-md-4">
+                            <div class="col-md-6">
                                 <div class="widget-thumb widget-bg-color-white text-uppercase margin-bottom-20 ">
                                     <div class="widget-thumb-wrap">
-                                        <div style="float:left;display: inline-block;padding-right:15px;">
+                                        <div style="float:left;display: inline-block;padding-right:10px;">
                                             @if($node->country_code)
                                                 <img src="{{asset('assets/images/country/' . $node->country_code . '.png')}}"/>
                                             @else
@@ -140,7 +146,7 @@
                                         </div>
                                     </div>
                                 @endif
-                                <div class="form-group">
+                                <div class="form-group" id="charge_coupon_code">
                                     <label for="charge_coupon" class="col-md-4 control-label"> {{trans('home.coupon_code')}} </label>
                                     <div class="col-md-6">
                                         <input type="text" class="form-control" name="charge_coupon" id="charge_coupon" placeholder="{{trans('home.please_input_coupon')}}">
@@ -250,8 +256,10 @@
         $("#charge_type").change(function(){
             if ($(this).val() == 2) {
                 $("#charge_balance").show();
+                $("#charge_coupon_code").hide();
             } else {
                 $("#charge_balance").hide();
+                $("#charge_coupon_code").show();
             }
         });
 
@@ -357,5 +365,20 @@
         @if($is_push_bear && $push_bear_qrcode)
             $('#subscribe_qrcode').qrcode({render:"canvas", text:"{{$push_bear_qrcode}}", width:170, height:170});
         @endif
+
+        // 更换订阅地址
+        function exchangeSubscribe() {
+            layer.confirm('更换订阅地址将导致：<br>1.旧地址立即失效；<br>2.连接密码被更改；', {icon: 7, title:'警告'}, function(index) {
+                $.post("{{url('exchangeSubscribe')}}", {_token:'{{csrf_token()}}'}, function (ret) {
+                    layer.msg(ret.message, {time:1000}, function () {
+                        if (ret.status == 'success') {
+                            window.location.reload();
+                        }
+                    });
+                });
+
+                layer.close(index);
+            });
+        }
     </script>
 @endsection

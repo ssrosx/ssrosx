@@ -4,9 +4,14 @@ namespace App\Console\Commands;
 
 use App\Components\Helpers;
 use App\Components\Yzy;
+use App\Http\Models\EmailLog;
 use App\Http\Models\Goods;
 use App\Http\Models\GoodsLabel;
 use App\Http\Models\ReferralLog;
+use App\Http\Models\SsNode;
+use App\Http\Models\SsNodeLabel;
+use App\Http\Models\UserBalanceLog;
+use App\Mail\sendUserInfo;
 use Illuminate\Console\Command;
 use App\Http\Models\Coupon;
 use App\Http\Models\CouponLog;
@@ -21,6 +26,7 @@ use App\Http\Models\UserSubscribeLog;
 use App\Http\Models\UserTrafficHourly;
 use Log;
 use DB;
+use Mail;
 
 class AutoJob extends Command
 {
@@ -236,8 +242,8 @@ class AutoJob extends Command
     // 端口回收与分配
     private function dispatchPort()
     {
-        // 自动分配端口
         if (self::$systemConfig['auto_release_port']) {
+            ## 自动分配端口
             $userList = User::query()->where('enable', 1)->where('port', 0)->whereRaw("u + d < transfer_enable")->get();
             if (!$userList->isEmpty()) {
                 foreach ($userList as $user) {
@@ -246,11 +252,19 @@ class AutoJob extends Command
                     User::query()->where('id', $user->id)->update(['port' => $port]);
                 }
             }
-        }
-
-        // 被封禁的账号自动释放端口
-        if (self::$systemConfig['auto_release_port']) {
-            $userList = User::query()->where('enable', 0)->get();
+            
+            ## 被封禁的账号自动释放端口
+            $userList = User::query()->where('status', -1)->where('enable', 0)->get();
+            if (!$userList->isEmpty()) {
+                foreach ($userList as $user) {
+                    if ($user->port) {
+                        User::query()->where('id', $user->id)->update(['port' => 0]);
+                    }
+                }
+            }
+            
+            // 过期账户自动释放端口
+            $userList = User::query()->where('enable', 0)->where('port', '!=', 0)->get();
             if (!$userList->isEmpty()) {
                 foreach ($userList as $user) {
                     if ($user->port) {
@@ -328,8 +342,11 @@ class AutoJob extends Command
                         $order->status = 2;
                         $order->save();
 
-                        // 如果买的是套餐，则先将之前购买的所有套餐置都无效，并扣掉之前所有套餐的流量
                         $goods = Goods::query()->where('id', $order->goods_id)->first();
+
+                        // 商品为流量或者套餐
+                        if ($goods->type <= 2) {
+                        // 如果买的是套餐，则先将之前购买的所有套餐置都无效，并扣掉之前所有套餐的流量
                         if ($goods->type == 2) {
                             $existOrderList = Order::query()
                                 ->with(['goods'])
@@ -404,6 +421,45 @@ class AutoJob extends Command
 
                         // 取消重复返利
                         User::query()->where('id', $order->user_id)->update(['referral_uid' => 0]);
+
+                        } elseif ($goods->type == 4) { // 商品为在线充值
+                            User::query()->where('id', $order->user_id)->increment('balance', $goods->price * 100);
+
+                            // 余额变动记录日志
+                            $this->addUserBalanceLog($order->user_id, $order->oid, $order->user->balance, $order->user->balance + $goods->price, $goods->price, '用户在线充值');
+                        }
+
+                        // 自动提号机：如果order的email值不为空
+                        if ($order->email) {
+                            $title = '【' . self::$systemConfig['website_name'] . '】您的账号信息';
+                            $content = [
+                                'order_sn'      => $order->order_sn,
+                                'goods_name'    => $order->goods->name,
+                                'goods_traffic' => flowAutoShow($order->goods->traffic),
+                                'port'          => $order->user->port,
+                                'passwd'        => $order->user->passwd,
+                                'method'        => $order->user->method,
+                                //'protocol'       => $order->user->protocol,
+                                //'protocol_param' => $order->user->protocol_param,
+                                //'obfs'           => $order->user->obfs,
+                                //'obfs_param'     => $order->user->obfs_param,
+                                'created_at'    => $order->created_at->toDateTimeString(),
+                                'expire_at'     => $order->expire_at
+                            ];
+
+                            // 获取可用节点列表
+                            $labels = UserLabel::query()->where('user_id', $order->user_id)->get()->pluck('label_id');
+                            $nodeIds = SsNodeLabel::query()->whereIn('label_id', $labels)->get()->pluck('node_id');
+                            $nodeList = SsNode::query()->whereIn('id', $nodeIds)->orderBy('sort', 'desc')->orderBy('id', 'desc')->get();
+                            $content['serverList'] = $nodeList;
+
+                            try {
+                                Mail::to($order->email)->send(new sendUserInfo(self::$systemConfig['website_name'], $content));
+                                $this->sendEmailLog($order->user_id, $title, json_encode($content));
+                            } catch (\Exception $e) {
+                                $this->sendEmailLog($order->user_id, $title, json_encode($content), 0, $e->getMessage());
+                            }
+                        }
 
                         DB::commit();
                     } catch (\Exception $e) {
@@ -504,5 +560,52 @@ class AutoJob extends Command
         $log->status = 0;
 
         return $log->save();
+    }
+
+    /**
+     * 记录余额操作日志
+     *
+     * @param int    $userId 用户ID
+     * @param string $oid    订单ID
+     * @param int    $before 记录前余额
+     * @param int    $after  记录后余额
+     * @param int    $amount 发生金额
+     * @param string $desc   描述
+     *
+     * @return int
+     */
+    public function addUserBalanceLog($userId, $oid, $before, $after, $amount, $desc = '')
+    {
+        $log = new UserBalanceLog();
+        $log->user_id = $userId;
+        $log->order_id = $oid;
+        $log->before = $before;
+        $log->after = $after;
+        $log->amount = $amount;
+        $log->desc = $desc;
+        $log->created_at = date('Y-m-d H:i:s');
+
+        return $log->save();
+    }
+
+    /**
+     * 添加邮件发送日志
+     *
+     * @param int    $userId  接收者用户ID
+     * @param string $title   标题
+     * @param string $content 内容
+     * @param int    $status  投递状态
+     * @param string $error   投递失败时记录的异常信息
+     */
+    private function sendEmailLog($userId, $title, $content, $status = 1, $error = '')
+    {
+        $emailLogObj = new EmailLog();
+        $emailLogObj->user_id = $userId;
+        $emailLogObj->title = $title;
+        $emailLogObj->content = $content;
+        $emailLogObj->status = $status;
+        $emailLogObj->error = $error;
+        $emailLogObj->created_at = date('Y-m-d H:i:s');
+        $emailLogObj->save();
     }
 }

@@ -32,6 +32,25 @@ class LoginController extends Controller
     // 登录页
     public function index(Request $request)
     {
+        return $this->indexPublic($request, false);
+    }
+
+    // 中文登录页
+    public function indexCN(Request $request)
+    {
+        Session::put("locale", 'zh-CN');
+        return $this->indexPublic($request, true);
+    }
+
+    // 英文登录页
+    public function indexEN(Request $request)
+    {
+        Session::put("locale", 'en');
+        return $this->indexPublic($request, true);
+    }
+
+    private function indexPublic(Request $request, $lang)
+    {
         if ($request->method() == 'POST') {
             $username = trim($request->get('username'));
             $password = trim($request->get('password'));
@@ -69,6 +88,7 @@ class LoginController extends Controller
 
             // 更新登录信息
             $remember_token = "";
+            User::query()->where('id', $user->id)->update(['last_login' => time()]);
             if ($request->get('remember')) {
                 $remember_token = makeRandStr(20);
 
@@ -128,8 +148,16 @@ class LoginController extends Controller
             $view['website_analytics'] = self::$systemConfig['website_analytics'];
             $view['website_customer_service'] = self::$systemConfig['website_customer_service'];
 
+            if ($lang == true)
+            {
+                Response::view('login', $view);
+                return Redirect::back();
+            }
+            else
+            {
             return Response::view('login', $view);
         }
+    }
     }
 
     // 退出
@@ -146,7 +174,12 @@ class LoginController extends Controller
         // 解析IP信息
         $qqwry = new QQWry();
         $ipInfo = $qqwry->ip($ip);
-        if (!$ipInfo || !is_array($ipInfo)) {
+        if (isset($ipInfo['error'])) {
+            Log::info('无法识别IP，可能是IPv6，尝试解析：' . $ip);
+            $ipInfo = getIPv6($ip);
+        }
+
+        if (empty($ipInfo) || empty($ipInfo['country'])) {
             \Log::warning("获取IP地址信息异常：" . $ip);
         }
 
@@ -157,7 +190,7 @@ class LoginController extends Controller
         $log->province = $ipInfo['province'] ?? '';
         $log->city = $ipInfo['city'] ?? '';
         $log->county = $ipInfo['county'] ?? '';
-        $log->isp = $ipInfo['isp'] ?? '';
+        $log->isp = $ipInfo['isp'] ?? ($ipInfo['organization'] ?? '');
         $log->area = $ipInfo['area'] ?? '';
         $log->save();
     }

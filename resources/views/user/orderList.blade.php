@@ -34,18 +34,12 @@
                                 <tbody>
                                 @if($orderList->isEmpty())
                                     <tr>
-                                        <td colspan="8">{{trans('home.invoice_table_none')}}</td>
+                                        <td colspan="6">{{trans('home.invoice_table_none')}}</td>
                                     </tr>
                                 @else
                                     @foreach($orderList as $key => $order)
                                         <tr class="odd gradeX">
                                             <td>{{$key + 1}}</td>
-                                            <td><a href="{{url('invoice/' . $order->order_sn)}}">{{$order->order_sn}}</a></td>
-                                            <td>{{empty($order->goods) ? trans('home.invoice_table_goods_deleted') : $order->goods->name}}</td>
-                                            <td>{{$order->pay_way === 1 ? trans('home.service_pay_button') : trans('home.online_pay')}}</td>
-                                            <td>￥{{$order->amount}}</td>
-                                            <td>{{$order->created_at}}</td>
-					                        <td>{{$order->expire_at}}</td>
                                             <td>
                                                 @if(!$order->is_expire)
                                                     @if($order->status == -1)
@@ -66,6 +60,14 @@
                                                     <a href="javascript:;" class="btn btn-sm default disabled"> {{trans('home.invoice_table_expired')}} </a>
                                                 @endif
                                             </td>
+                                            @if($order->goods->type != 4)
+                                                <td>{{empty($order->goods) ? '【商品已删除】' : $order->goods->name}} {{empty($order->goods) ? '' : trans('home.service_days')}} {{empty($order->goods) ? '' : $order->goods->days}}  {{empty($order->goods) ? '' : trans('home.day')}}</td>
+                                            @else
+                                                <td>{{empty($order->goods) ? '【商品已删除】' : $order->goods->name}}</td>
+                                            @endif
+                                            <td>{{$order->created_at}}</td>
+                                            <td>{{$order->expire_at}}</td>
+                                            <td><a href="{{url('invoice/' . $order->order_sn)}}">{{$order->order_sn}}</a></td>
                                         </tr>
                                     @endforeach
                                 @endif
