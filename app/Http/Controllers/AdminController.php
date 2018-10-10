@@ -347,9 +347,11 @@ class AdminController extends Controller
             $is_admin = $request->get('is_admin');
 
             // 校验username是否已存在
-            $exists = User::query()->where('id', '<>', $id)->where('username', $username)->first();
-            if ($exists) {
-                return Response::json(['status' => 'fail', 'data' => '', 'message' => '用户名已存在，请重新输入']);
+            if (strlen($username) > 0) {
+                $exists = User::query()->where('id', '<>', $id)->where('username', $username)->first();
+                if ($exists) {
+                    return Response::json(['status' => 'fail', 'data' => '', 'message' => '用户名已存在，请重新输入']);
+                }
             }
 
             // 校验端口是否已存在
