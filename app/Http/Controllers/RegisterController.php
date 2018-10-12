@@ -205,6 +205,9 @@ class RegisterController extends Controller
                 $activeUserUrl = self::$systemConfig['website_url'] . '/active/' . $token;
                 $this->addVerify($user->id, $username, $token);
 
+                $title = '注册激活';
+                $content = '请求地址：' . $activeUserUrl;
+
                 try {
                     Mail::to($username)->send(new activeUser(self::$systemConfig['website_name'], $activeUserUrl));
                     $this->sendEmailLog($user->id, $title, $content);
