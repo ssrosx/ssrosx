@@ -32,8 +32,26 @@ class RegisterController extends Controller
     }
 
     // 注册页
-    // TODO：改成点击发送验证码按钮，而不是到邮箱里去打开激活链接
     public function index(Request $request)
+    {
+        return $this->indexPublic($request, false);
+    }
+
+    // 中文注册页
+    public function indexCN(Request $request)
+    {
+        Session::put("locale", 'zh-CN');
+        return $this->indexPublic($request, true);
+    }
+
+    // 英文注册页
+    public function indexEN(Request $request)
+    {
+        Session::put("locale", 'en');
+        return $this->indexPublic($request, true);
+    }
+
+    private function indexPublic(Request $request, $lang)
     {
         $cacheKey = 'register_times_' . md5(getClientIp()); // 注册限制缓存key
 

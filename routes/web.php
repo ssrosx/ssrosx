@@ -9,6 +9,8 @@ Route::group(['middleware' => ['forbidden', 'affiliate']], function () {
     Route::any('loginEN', 'LoginController@indexEN'); // 语言登录
     Route::get('logout', 'LoginController@logout'); // 退出
     Route::any('register', 'RegisterController@index'); // 注册
+    Route::any('registerCN', 'RegisterController@indexCN'); // 注册
+    Route::any('registerEN', 'RegisterController@indexEN'); // 注册
     Route::any('resetPassword', 'UserController@resetPassword'); // 重设密码
     Route::any('reset/{token}', 'UserController@reset'); // 重设密码
     Route::any('activeUser', 'UserController@activeUser'); // 激活账号
