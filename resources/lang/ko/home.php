@@ -10,6 +10,9 @@ return [
     'username_placeholder'            => '아이디를 입력하세요',
     'system_down'                     => '서비스 점금중',
     'subscribe_baned'                 => '구독주소가 금지되였습니다,관리자에게 문의해주세요',
+    'download_platform_app'           => '다운로드',
+    'click_download'                  => '이곳을 클릭하다',
+    'download_client_and_startup'     => '클라이언트 다운로드 시작',
 
     // 菜单
     'home'                            => '개인 센터',

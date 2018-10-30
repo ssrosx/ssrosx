@@ -1964,7 +1964,7 @@ EOF;
         $filename = '邀请码' . date('Ymd') . '.xlsx';
 
         $spreadsheet = new Spreadsheet();
-        $spreadsheet->getProperties()->setCreator('SSRPanel')->setLastModifiedBy('SSRPanel')->setTitle('邀请码')->setSubject('邀请码')->setDescription('')->setKeywords('')->setCategory('');
+        $spreadsheet->getProperties()->setCreator('Patatas')->setLastModifiedBy('Patatas')->setTitle('邀请码')->setSubject('邀请码')->setDescription('')->setKeywords('')->setCategory('');
 
         $spreadsheet->setActiveSheetIndex(0);
         $sheet = $spreadsheet->getActiveSheet();

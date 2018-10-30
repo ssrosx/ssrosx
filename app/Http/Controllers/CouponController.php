@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Models\Coupon;
 use Illuminate\Http\Request;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Shared\File;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Response;
 use Redirect;
@@ -124,7 +125,7 @@ class CouponController extends Controller
 
         $filename = '卡券' . date('Ymd') . '.xlsx';
         $spreadsheet = new Spreadsheet();
-        $spreadsheet->getProperties()->setCreator('SSRPanel')->setLastModifiedBy('SSRPanel')->setTitle('邀请码')->setSubject('邀请码')->setDescription('')->setKeywords('')->setCategory('');
+        $spreadsheet->getProperties()->setCreator('Patatas')->setLastModifiedBy('Patatas')->setTitle('邀请码')->setSubject('邀请码')->setDescription('')->setKeywords('')->setCategory('');
 
         // 抵用券
         $spreadsheet->setActiveSheetIndex(0);

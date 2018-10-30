@@ -10,6 +10,9 @@ return [
     'username_placeholder'            => 'アカウントを入力してください',
     'system_down'                     => 'システムはメンテナンス中です',
     'subscribe_baned'                 => '購読が無効になっています。管理者にお問い合わせください。',
+    'download_platform_app'           => 'ダウンロード',
+    'click_download'                  => 'ここをクリック',
+    'download_client_and_startup'     => 'クライアントをダウンロードして起動する',
 
     // 菜单
     'home'                            => 'パーソナルセンター',

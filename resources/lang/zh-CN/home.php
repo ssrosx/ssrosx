@@ -10,6 +10,9 @@ return [
     'username_placeholder'            => '请输入用户名',
     'system_down'                     => '系统维护中',
     'subscribe_baned'                 => '您的订阅功能被禁用，请联系管理员恢复',
+    'download_platform_app'           => '下载',
+    'click_download'                  => '点击此处',
+    'download_client_and_startup'     => '下载客户端并启动',
 
     // 菜单
     'home'                            => '个人中心',

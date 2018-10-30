@@ -10,6 +10,9 @@ return [
     'username_placeholder'            => 'Please Enter E-mail',
     'system_down'                     => 'The system is being maintained',
     'subscribe_baned'                 => 'Your subscription function has been banned. Please contact the administrator.',
+    'download_platform_app'           => 'Download',
+    'click_download'                  => 'Click Here ',
+    'download_client_and_startup'     => 'download the client and start up',
 
     // 菜单
     'home'                            => 'Home',
