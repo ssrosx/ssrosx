@@ -83,12 +83,12 @@
                                             {{--<li>--}}
                                                 {{--<a href="#tools3" data-toggle="tab"> <i class="fa fa-linux"></i> Linux </a>--}}
                                             {{--</li>--}}
-                                            {{--<li>--}}
-                                                {{--<a href="#tools4" data-toggle="tab"> <i class="fa fa-apple"></i> iOS </a>--}}
-                                            {{--</li>--}}
-                                            {{--<li>--}}
-                                                {{--<a href="#tools5" data-toggle="tab"> <i class="fa fa-android"></i> Android </a>--}}
-                                            {{--</li>--}}
+                                            <li>
+                                                <a href="#tools4" data-toggle="tab"> <i class="fa fa-apple"></i> iOS </a>
+                                            </li>
+                                            <li>
+                                                <a href="#tools5" data-toggle="tab"> <i class="fa fa-android"></i> Android </a>
+                                            </li>
                                         </ul>
                                         <div class="tab-content" style="font-size:16px;">
                                             <div class="tab-pane active" id="tools1">
@@ -102,6 +102,7 @@
                                             </div>
                                             {{--<div class="tab-pane" id="tools2">--}}
                                                 {{--<ol>--}}
+                                                    {{--<li> Windows coming soon. </li>--}}
                                                     {{--<li> <a href="{{asset('clients/Shadowsocks-4.1.2.zip')}}" target="_blank">点击此处</a>下载客户端并启动 </li>--}}
                                                     {{--<li> 单击状态栏小飞机，找到服务器->订阅->订阅设置，复制黏贴订阅地址 </li>--}}
                                                     {{--<li> 点击状态栏小飞机，找到模式，选中PAC </li>--}}
@@ -115,23 +116,24 @@
                                                     {{--<li> 更新订阅设置即可 </li>--}}
                                                 {{--</ol>--}}
                                             {{--</div>--}}
-                                            {{--<div class="tab-pane" id="tools4">--}}
-                                                {{--<ol>--}}
+                                            <div class="tab-pane" id="tools4">
+                                                <ol>
                                                     {{--@if(Agent::is('iPhone') || Agent::is('iPad'))--}}
                                                         {{--<li> <a href="{{$ipa_list}}" target="_blank">点击此处在线安装</a></li>--}}
                                                     {{--@endif--}}
-                                                    {{--<li> 请从站长处获取App Store美区ID及教程 </li>--}}
-                                                {{--</ol>--}}
-                                            {{--</div>--}}
-                                            {{--<div class="tab-pane" id="tools5">--}}
-                                                {{--<ol>--}}
+                                                    <li> iOS coming soon. </li>
+                                                </ol>
+                                            </div>
+                                            <div class="tab-pane" id="tools5">
+                                                <ol>
+                                                    <li> Android coming soon. </li>
                                                     {{--<li> Android <a href="{{asset('clients/Shadowsocks-universal-4.6.1.apk')}}" target="_blank">{{trans('home.click_download')}}</a>{{trans('home.download_client_and_startup')}} </li>--}}
                                                     {{--<li> 单击左上角的shadowsocksR进入配置文件页，点击右下角的“+”号，点击“添加/升级SSR订阅”，填入订阅信息并保存 </li>--}}
                                                     {{--<li> 选中任意一个节点，返回软件首页 </li>--}}
                                                     {{--<li> 在软件首页处找到“路由”选项，并将其改为“绕过局域网及中国大陆地址” </li>--}}
                                                     {{--<li> 点击右上角的小飞机图标进行连接，提示是否添加（或创建）VPN连接，点同意（或允许） </li>--}}
-                                                {{--</ol>--}}
-                                            {{--</div>--}}
+                                                </ol>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
