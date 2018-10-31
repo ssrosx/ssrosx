@@ -13,6 +13,9 @@ return [
     'download_platform_app'           => '下載',
     'click_download'                  => '點擊此處',
     'download_client_and_startup'     => '下載用戶端並啟動',
+    'recharge_amount'                 => '充值金額',
+    'recharge_prev'                   => '充值',
+    'amount_ext'                      => '元',
 
     // 菜单
     'home'                            => '個人中心',

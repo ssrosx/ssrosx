@@ -13,6 +13,9 @@ return [
     'download_platform_app'           => 'Download',
     'click_download'                  => 'Click Here ',
     'download_client_and_startup'     => 'download the client and start up',
+    'recharge_amount'                 => 'Recharge Amount',
+    'recharge_prev'                   => 'Recharge ',
+    'amount_ext'                      => ' RMB',
 
     // 菜单
     'home'                            => 'Home',
@@ -51,7 +54,7 @@ return [
     'never_loggedin'                  => 'Never logged in',
     'announcement'                    => 'Announcement',
     'recharge_balance'                => 'Recharge Balance',
-    'payment_method'                  => 'charge method',
+    'payment_method'                  => 'Charge Method',
     'close'                           => 'Close',
     'redeem_score'                    => 'Redeem for bandwidth',
     'redeem'                          => 'Redeem',

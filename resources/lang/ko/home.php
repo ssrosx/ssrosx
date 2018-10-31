@@ -13,6 +13,9 @@ return [
     'download_platform_app'           => '다운로드',
     'click_download'                  => '이곳을 클릭하다',
     'download_client_and_startup'     => '클라이언트 다운로드 시작',
+    'recharge_amount'                 => '충전 금액',
+    'recharge_prev'                   => '충전',
+    'amount_ext'                      => 'RMB',
 
     // 菜单
     'home'                            => '개인 센터',

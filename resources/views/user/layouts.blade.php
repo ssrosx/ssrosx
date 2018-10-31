@@ -117,6 +117,7 @@
                         <span class="selected"></span>
                     </a>
                 </li>
+                @if(Session::get('is_open_shop'))
                 <li class="nav-item {{in_array(Request::path(), ['services']) || in_array(Request::segment(1), ['buy','payment']) ? 'active open' : ''}}">
                     <a href="{{url('services')}}" class="nav-link nav-toggle">
                         <i class="icon-basket"></i>
@@ -129,12 +130,15 @@
                         <span class="title">{{trans('home.invoices')}}</span>
                     </a>
                 </li>
+                @endif
+                @if(Session::get('is_open_ticket'))
                 <li class="nav-item {{in_array(Request::path(), ['tickets', 'replyTicket']) ? 'active open' : ''}}">
                     <a href="{{url('tickets')}}" class="nav-link nav-toggle">
                         <i class="icon-question"></i>
                         <span class="title">{{trans('home.tickets')}}</span>
                     </a>
                 </li>
+                @endif
                 @if(Session::get('referral_status'))
                 <li class="nav-item {{in_array(Request::path(), ['referral']) ? 'active open' : ''}}">
                     <a href="{{url('referral')}}" class="nav-link nav-toggle">

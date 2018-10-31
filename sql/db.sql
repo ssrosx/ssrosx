@@ -360,6 +360,8 @@ INSERT INTO `config` VALUES ('72', 'is_tcp_check', 0);
 INSERT INTO `config` VALUES ('73', 'tcp_check_warning_times', 3);
 INSERT INTO `config` VALUES ('74', 'is_forbid_china', 0);
 INSERT INTO `config` VALUES ('75', 'is_forbid_oversea', 0);
+INSERT INTO `config` VALUES ('76', 'is_open_shop', 1);
+INSERT INTO `config` VALUES ('77', 'is_open_ticket', 1);
 
 -- ----------------------------
 -- Table structure for `article`

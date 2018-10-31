@@ -13,6 +13,9 @@ return [
     'download_platform_app'           => 'ダウンロード',
     'click_download'                  => 'ここをクリック',
     'download_client_and_startup'     => 'クライアントをダウンロードして起動する',
+    'recharge_amount'                 => '金額を充填する',
+    'recharge_prev'                   => '充填する ',
+    'amount_ext'                      => 'RMB',
 
     // 菜单
     'home'                            => 'パーソナルセンター',

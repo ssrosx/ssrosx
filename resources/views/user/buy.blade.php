@@ -23,7 +23,7 @@
                                 <tr>
                                     <td style="padding: 10px;">
                                         <h2>{{$goods->name}}</h2>
-                                        充值金额：{{$goods->price}}元
+                                        {{trans('home.recharge_amount')}}：{{$goods->price}}{{trans('home.amount_ext')}}
                                         </td>
                                     <td class="text-center"> ￥{{$goods->price}} </td>
                                 </tr>

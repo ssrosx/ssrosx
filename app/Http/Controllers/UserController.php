@@ -76,6 +76,9 @@ class UserController extends Controller
             Session::put('referral_status', self::$systemConfig['referral_status']);
         }
 
+        Session::put('is_open_shop', self::$systemConfig['is_open_shop']);
+        Session::put('is_open_ticket', self::$systemConfig['is_open_ticket']);
+
         // 如果没有唯一码则生成一个
         $subscribe = UserSubscribe::query()->where('user_id', $user['id'])->first();
         if (!$subscribe) {

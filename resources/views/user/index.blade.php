@@ -93,7 +93,9 @@
                                         <div class="tab-content" style="font-size:16px;">
                                             <div class="tab-pane active" id="tools1">
                                                 <ol>
-                                                    <li> Mac <a href="{{asset('clients/Patatas.dmg')}}" target="_blank">{{trans('home.click_download')}}</a>{{trans('home.download_client_and_startup')}} </li>
+                                                    <li> Mac coming soon. </li>
+                                                    {{--{{asset('clients/Patatas.dmg')}}--}}
+                                                    {{--<li> Mac: 8.54 MB <a href="https://raw.githubusercontent.com/ssrosx/ssrosx/master/public/clients/Patatas.dmg" target="_blank">{{trans('home.click_download')}}</a>{{trans('home.download_client_and_startup')}} </li>--}}
                                                     {{--<li> 单击状态栏小飞机，找到服务器->编辑订阅，复制黏贴订阅地址 </li>--}}
                                                     {{--<li> 点击服务器->手动更新订阅，更新您的服务信息 </li>--}}
                                                     {{--<li> 更新成功后，请在服务器菜单处选择线路，并点击打开ShadowsocksR </li>--}}
@@ -243,11 +245,11 @@
                                 </div>
                                 @if(!$goodsList->isEmpty())
                                     <div class="form-group" id="charge_balance" style="display: none;">
-                                        <label for="online_pay" class="col-md-4 control-label">充值金额</label>
+                                        <label for="online_pay" class="col-md-4 control-label">{{trans('home.recharge_amount')}}</label>
                                         <div class="col-md-6">
                                             <select class="form-control" name="online_pay" id="online_pay">
                                                 @foreach($goodsList as $key => $goods)
-                                                    <option value="{{$goods->id}}">充值{{$goods->price}}元</option>
+                                                    <option value="{{$goods->id}}">{{trans('home.recharge_prev')}}{{$goods->price}}{{trans('home.amount_ext')}}</option>
                                                 @endforeach
                                             </select>
                                         </div>

@@ -349,6 +349,22 @@
                                                                 <span class="help-block"> 是否限制用户重复购买商品，限制后用户不可重复购买已购买的、尚在有效期的商品 </span>
                                                             </div>
                                                         </div>
+                                                        <div class="form-group">
+                                                            <div class="col-md-6">
+                                                                <label for="is_open_shop" class="col-md-3 control-label">启用商店</label>
+                                                                <div class="col-md-9">
+                                                                    <input type="checkbox" class="make-switch" @if($is_open_shop) checked @endif id="is_open_shop" data-on-color="success" data-off-color="danger" data-on-text="启用" data-off-text="关闭">
+                                                                    <span class="help-block"> 显示商店和订单模块 </span>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <label for="is_open_ticket" class="col-md-3 control-label">启用服务单</label>
+                                                                <div class="col-md-9">
+                                                                    <input type="checkbox" class="make-switch" @if($is_open_ticket) checked @endif id="is_open_ticket" data-on-color="success" data-off-color="danger" data-on-text="启用" data-off-text="关闭">
+                                                                    <span class="help-block"> 显示服务单模块 </span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </form>
@@ -943,6 +959,36 @@
                 var is_rand_port = state ? 1 : 0;
 
                 $.post("{{url('admin/setConfig')}}", {_token:'{{csrf_token()}}', name:'is_rand_port', value:is_rand_port}, function (ret) {
+                    layer.msg(ret.message, {time:1000}, function() {
+                        if (ret.status == 'fail') {
+                            window.location.reload();
+                        }
+                    });
+                });
+            }
+        });
+
+        // 启用、禁用商店模块
+        $('#is_open_shop').on({
+            'switchChange.bootstrapSwitch': function(event, state) {
+                var is_open_shop = state ? 1 : 0;
+
+                $.post("{{url('admin/setConfig')}}", {_token:'{{csrf_token()}}', name:'is_open_shop', value:is_open_shop}, function (ret) {
+                    layer.msg(ret.message, {time:1000}, function() {
+                        if (ret.status == 'fail') {
+                            window.location.reload();
+                        }
+                    });
+                });
+            }
+        });
+
+        // 启用、禁用服务单模块
+        $('#is_open_ticket').on({
+            'switchChange.bootstrapSwitch': function(event, state) {
+                var is_open_ticket = state ? 1 : 0;
+
+                $.post("{{url('admin/setConfig')}}", {_token:'{{csrf_token()}}', name:'is_open_ticket', value:is_open_ticket}, function (ret) {
                     layer.msg(ret.message, {time:1000}, function() {
                         if (ret.status == 'fail') {
                             window.location.reload();
