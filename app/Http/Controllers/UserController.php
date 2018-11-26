@@ -64,6 +64,7 @@ class UserController extends Controller
         $view['wechat_qrcode'] = self::$systemConfig['wechat_qrcode'];
         $view['alipay_qrcode'] = self::$systemConfig['alipay_qrcode'];
         $view['login_add_score'] = self::$systemConfig['login_add_score'];
+        $view['is_open_shop'] = self::$systemConfig['is_open_shop'];
         $view['website_logo'] = self::$systemConfig['website_logo'];
         $view['website_analytics'] = self::$systemConfig['website_analytics'];
         $view['website_customer_service'] = self::$systemConfig['website_customer_service'];

@@ -35,20 +35,6 @@ class LoginController extends Controller
         return $this->indexPublic($request, false);
     }
 
-    // 中文登录页
-    public function indexCN(Request $request)
-    {
-        Session::put("locale", 'zh-CN');
-        return $this->indexPublic($request, true);
-    }
-
-    // 英文登录页
-    public function indexEN(Request $request)
-    {
-        Session::put("locale", 'en');
-        return $this->indexPublic($request, true);
-    }
-
     private function indexPublic(Request $request, $lang)
     {
         if ($request->method() == 'POST') {
@@ -158,6 +144,131 @@ class LoginController extends Controller
             return Response::view('login', $view);
         }
     }
+    }
+
+    // 中文登录页
+    public function indexCN(Request $request)
+    {
+        Session::put("locale", 'zh-CN');
+        return $this->indexPublicWithLanguage($request, true);
+    }
+
+    // 英文登录页
+    public function indexEN(Request $request)
+    {
+        Session::put("locale", 'en');
+        return $this->indexPublicWithLanguage($request, true);
+    }
+
+    private function indexPublicWithLanguage(Request $request, $lang)
+    {
+        if ($request->method() == 'GET') {
+            $token = trim($request->get('token'));
+            $userid = intval($request->get('userid', 0));
+            $page = trim($request->get('page', ''));
+            if (!$token || $userid <= 0) {
+                if ($request->cookie("remember")) {
+                    $u = User::query()->where('status', '>=', 0)->where("remember_token", $request->cookie("remember"))->first();
+                    if ($u) {
+                        Session::put('user', $u->toArray());
+
+                        if ($u->is_admin) {
+                            return Redirect::to('admin');
+                        }
+
+                        return Redirect::to('/');
+                    }
+                }
+
+                $view['is_captcha'] = self::$systemConfig['is_captcha'];
+                $view['is_register'] = self::$systemConfig['is_register'];
+                $view['website_home_logo'] = self::$systemConfig['website_home_logo'];
+                $view['website_analytics'] = self::$systemConfig['website_analytics'];
+                $view['website_customer_service'] = self::$systemConfig['website_customer_service'];
+
+                if ($lang == true)
+                {
+                    Response::view('login', $view);
+                    return Redirect::back();
+                }
+                else
+                {
+                    return Response::view('login', $view);
+                }
+            }
+
+            // 校验用户名是否已存在
+            $user = User::query()->where('id', $userid)->where('status', '>=', 0)->first();
+            if (!$user) {
+                return Redirect::back();
+            }
+
+            if (!$user->is_admin && $user->status < 0) {
+                Session::flash('errorMsg', 'home.account_can_not_use');
+
+                return Redirect::back();
+            }
+
+            if (!$user->remember_token_ios || $user->remember_token_ios != $token) {
+                return Redirect::back();
+            }
+
+            // 更新登录信息
+            $remember_token = "";
+            User::query()->where('id', $user->id)->update(['last_login' => time()]);
+            if ($request->get('remember')) {
+                $remember_token = makeRandStr(20);
+
+                User::query()->where('id', $user->id)->update(['last_login' => time(), 'remember_token' => $remember_token]);
+            } else {
+                User::query()->where('id', $user->id)->update(['last_login' => time(), 'remember_token' => $remember_token]);
+            }
+
+            // 重新取出用户信息
+            $userInfo = User::query()->where('id', $user->id)->first();
+
+            Session::put('user', $userInfo->toArray());
+            Session::put('is_open_shop', self::$systemConfig['is_open_shop']);
+            Session::put('is_open_ticket', self::$systemConfig['is_open_ticket']);
+            // 根据权限跳转
+            if ($user->is_admin) {
+                return Redirect::to('admin')->cookie('remember', $remember_token, 36000);
+            }
+
+            return Redirect::to('/' . $page)->cookie('remember', $remember_token, 36000);
+        }
+        else
+        {
+            if ($request->cookie("remember")) {
+                $u = User::query()->where('status', '>=', 0)->where("remember_token", $request->cookie("remember"))->first();
+                if ($u) {
+                    Session::put('user', $u->toArray());
+                    Session::put('is_open_shop', self::$systemConfig['is_open_shop']);
+                    Session::put('is_open_ticket', self::$systemConfig['is_open_ticket']);
+                    if ($u->is_admin) {
+                        return Redirect::to('admin');
+                    }
+
+                    return Redirect::to('/');
+                }
+            }
+
+            $view['is_captcha'] = self::$systemConfig['is_captcha'];
+            $view['is_register'] = self::$systemConfig['is_register'];
+            $view['website_home_logo'] = self::$systemConfig['website_home_logo'];
+            $view['website_analytics'] = self::$systemConfig['website_analytics'];
+            $view['website_customer_service'] = self::$systemConfig['website_customer_service'];
+
+            if ($lang == true)
+            {
+                Response::view('login', $view);
+                return Redirect::back();
+            }
+            else
+            {
+                return Response::view('login', $view);
+            }
+        }
     }
 
     // 退出

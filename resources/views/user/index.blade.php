@@ -77,9 +77,9 @@
                                             <li class="active">
                                                 <a href="#tools1" data-toggle="tab"> <i class="fa fa-apple"></i> Mac </a>
                                             </li>
-                                            {{--<li>--}}
-                                                {{--<a href="#tools2" data-toggle="tab"> <i class="fa fa-windows"></i> Windows </a>--}}
-                                            {{--</li>--}}
+                                            <li>
+                                                <a href="#tools2" data-toggle="tab"> <i class="fa fa-windows"></i> Windows </a>
+                                            </li>
                                             {{--<li>--}}
                                                 {{--<a href="#tools3" data-toggle="tab"> <i class="fa fa-linux"></i> Linux </a>--}}
                                             {{--</li>--}}
@@ -95,22 +95,23 @@
                                                 <ol>
                                                     <li> Mac coming soon. </li>
                                                     {{--{{asset('clients/Patatas.dmg')}}--}}
-                                                    {{--<li> Mac: 8.54 MB <a href="https://raw.githubusercontent.com/ssrosx/ssrosx/master/public/clients/Patatas.dmg" target="_blank">{{trans('home.click_download')}}</a>{{trans('home.download_client_and_startup')}} </li>--}}
+                                                    {{--<li> Mac: 7.9 MB <a href="https://raw.githubusercontent.com/ssrosx/ssrosx/master/public/clients/Patatas.dmg" target="_blank">{{trans('home.click_download')}}</a>{{trans('home.download_client_and_startup')}} </li>--}}
                                                     {{--<li> 单击状态栏小飞机，找到服务器->编辑订阅，复制黏贴订阅地址 </li>--}}
                                                     {{--<li> 点击服务器->手动更新订阅，更新您的服务信息 </li>--}}
                                                     {{--<li> 更新成功后，请在服务器菜单处选择线路，并点击打开ShadowsocksR </li>--}}
                                                     {{--<li> 单击小飞机，选择PAC自动模式 </li>--}}
                                                 </ol>
                                             </div>
-                                            {{--<div class="tab-pane" id="tools2">--}}
-                                                {{--<ol>--}}
-                                                    {{--<li> Windows coming soon. </li>--}}
+                                            <div class="tab-pane" id="tools2">
+                                                <ol>
+                                                    <li> Windows coming soon. </li>
                                                     {{--<li> <a href="{{asset('clients/Shadowsocks-4.1.2.zip')}}" target="_blank">点击此处</a>下载客户端并启动 </li>--}}
                                                     {{--<li> 单击状态栏小飞机，找到服务器->订阅->订阅设置，复制黏贴订阅地址 </li>--}}
                                                     {{--<li> 点击状态栏小飞机，找到模式，选中PAC </li>--}}
                                                     {{--<li> 点击状态栏小飞机，找到PAC，选中更新PAC为GFWList </li>--}}
-                                                {{--</ol>--}}
-                                            {{--</div>--}}
+                                                    {{--<li> Windows: 18.54 MB <a href="https://raw.githubusercontent.com/ssrosx/ssrosx/master/public/clients/Patatas.exe" target="_blank">{{trans('home.click_download')}}</a>{{trans('home.download_client_and_startup')}} </li>--}}
+                                                </ol>
+                                            </div>
                                             {{--<div class="tab-pane" id="tools3">--}}
                                                 {{--<ol>--}}
                                                     {{--<li> <a href="{{asset('clients/Shadowsocks-qt5-3.0.1.zip')}}" target="_blank">点击此处</a>下载客户端并启动 </li>--}}
@@ -124,6 +125,7 @@
                                                         {{--<li> <a href="{{$ipa_list}}" target="_blank">点击此处在线安装</a></li>--}}
                                                     {{--@endif--}}
                                                     <li> iOS coming soon. </li>
+                                                    {{--<li> iOS: 28.54 MB <a href="https://raw.githubusercontent.com/ssrosx/ssrosx/master/public/clients/Patatas.ipa" target="_blank">{{trans('home.click_download')}}</a>{{trans('home.download_client_and_startup')}} </li>--}}
                                                 </ol>
                                             </div>
                                             <div class="tab-pane" id="tools5">
@@ -134,6 +136,7 @@
                                                     {{--<li> 选中任意一个节点，返回软件首页 </li>--}}
                                                     {{--<li> 在软件首页处找到“路由”选项，并将其改为“绕过局域网及中国大陆地址” </li>--}}
                                                     {{--<li> 点击右上角的小飞机图标进行连接，提示是否添加（或创建）VPN连接，点同意（或允许） </li>--}}
+                                                    {{--<li> Android: 6.54 MB <a href="https://raw.githubusercontent.com/ssrosx/ssrosx/master/public/clients/Patatas.apk" target="_blank">{{trans('home.click_download')}}</a>{{trans('home.download_client_and_startup')}} </li>--}}
                                                 </ol>
                                             </div>
                                         </div>
@@ -163,12 +166,14 @@
                         </span>
                         </li>
                     @endif
+                    @if($is_open_shop)
                     <li class="list-group-item">
                         {{trans('home.account_balance')}}：{{$info['balance']}}
                         <span class="badge badge-danger">
                             <a href="javascript:;" data-toggle="modal" data-target="#charge_modal" style="color:#FFF;">{{trans('home.recharge')}}</a>
                         </span>
                     </li>
+                    @endif
                     @if(date('Y-m-d') > $info['expire_time'])
                         <li class="list-group-item list-group-item-danger">
                             {{trans('home.account_expire')}}：{{trans('home.expired')}}
