@@ -77,6 +77,7 @@ class UserController extends Controller
             Session::put('referral_status', self::$systemConfig['referral_status']);
         }
 
+        Session::put('is_web_shop', self::$systemConfig['is_web_shop']);
         Session::put('is_open_shop', self::$systemConfig['is_open_shop']);
         Session::put('is_open_ticket', self::$systemConfig['is_open_ticket']);
 
@@ -579,6 +580,18 @@ class UserController extends Controller
     {
         $view['website_logo'] = self::$systemConfig['website_logo'];
         return Response::view('user.privacy', $view);
+    }
+
+    public function privacy_traditional(Request $request)
+    {
+        $view['website_logo'] = self::$systemConfig['website_logo'];
+        return Response::view('user.privacy_traditional', $view);
+    }
+
+    public function privacy_simplified(Request $request)
+    {
+        $view['website_logo'] = self::$systemConfig['website_logo'];
+        return Response::view('user.privacy_simplified', $view);
     }
 
     // 生成邀请码

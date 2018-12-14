@@ -364,6 +364,13 @@
                                                                     <span class="help-block"> 显示服务单模块 </span>
                                                                 </div>
                                                             </div>
+                                                            <div class="col-md-6">
+                                                                <label for="is_china_local" class="col-md-3 control-label">启用网页商店</label>
+                                                                <div class="col-md-9">
+                                                                    <input type="checkbox" class="make-switch" @if($is_china_local) checked @endif id="is_china_local" data-on-color="success" data-off-color="danger" data-on-text="启用" data-off-text="关闭">
+                                                                    <span class="help-block"> iOS无法显示苹果商店物品时显示网页商店 </span>
+                                                                </div>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -989,6 +996,21 @@
                 var is_open_ticket = state ? 1 : 0;
 
                 $.post("{{url('admin/setConfig')}}", {_token:'{{csrf_token()}}', name:'is_open_ticket', value:is_open_ticket}, function (ret) {
+                    layer.msg(ret.message, {time:1000}, function() {
+                        if (ret.status == 'fail') {
+                            window.location.reload();
+                        }
+                    });
+                });
+            }
+        });
+
+        // 启用、禁用网页商店模块
+        $('#is_china_local').on({
+            'switchChange.bootstrapSwitch': function(event, state) {
+                var is_china_local = state ? 1 : 0;
+
+                $.post("{{url('admin/setConfig')}}", {_token:'{{csrf_token()}}', name:'is_china_local', value:is_china_local}, function (ret) {
                     layer.msg(ret.message, {time:1000}, function() {
                         if (ret.status == 'fail') {
                             window.location.reload();

@@ -78,14 +78,14 @@
                                                 <a href="#tools1" data-toggle="tab"> <i class="fa fa-apple"></i> Mac </a>
                                             </li>
                                             <li>
+                                                <a href="#tools4" data-toggle="tab"> <i class="fa fa-apple"></i> iOS </a>
+                                            </li>
+                                            <li>
                                                 <a href="#tools2" data-toggle="tab"> <i class="fa fa-windows"></i> Windows </a>
                                             </li>
                                             {{--<li>--}}
                                                 {{--<a href="#tools3" data-toggle="tab"> <i class="fa fa-linux"></i> Linux </a>--}}
                                             {{--</li>--}}
-                                            <li>
-                                                <a href="#tools4" data-toggle="tab"> <i class="fa fa-apple"></i> iOS </a>
-                                            </li>
                                             <li>
                                                 <a href="#tools5" data-toggle="tab"> <i class="fa fa-android"></i> Android </a>
                                             </li>
@@ -93,9 +93,12 @@
                                         <div class="tab-content" style="font-size:16px;">
                                             <div class="tab-pane active" id="tools1">
                                                 <ol>
-                                                    <li> Mac coming soon. </li>
+                                                    @if($is_open_shop)
                                                     {{--{{asset('clients/Patatas.dmg')}}--}}
-                                                    {{--<li> Mac: 7.9 MB <a href="https://raw.githubusercontent.com/ssrosx/ssrosx/master/public/clients/Patatas.dmg" target="_blank">{{trans('home.click_download')}}</a>{{trans('home.download_client_and_startup')}} </li>--}}
+                                                        <li> Mac: 7.9 MB <a href="https://raw.githubusercontent.com/ssrosx/ssrosx/master/public/clients/Patatas.dmg" target="_blank">{{trans('home.click_download')}}</a>{{trans('home.download_client_and_startup')}} </li>
+                                                    @else
+                                                    <li> Mac coming soon. </li>
+                                                    @endif
                                                     {{--<li> 单击状态栏小飞机，找到服务器->编辑订阅，复制黏贴订阅地址 </li>--}}
                                                     {{--<li> 点击服务器->手动更新订阅，更新您的服务信息 </li>--}}
                                                     {{--<li> 更新成功后，请在服务器菜单处选择线路，并点击打开ShadowsocksR </li>--}}
@@ -124,8 +127,8 @@
                                                     {{--@if(Agent::is('iPhone') || Agent::is('iPad'))--}}
                                                         {{--<li> <a href="{{$ipa_list}}" target="_blank">点击此处在线安装</a></li>--}}
                                                     {{--@endif--}}
-                                                    <li> iOS coming soon. </li>
-                                                    {{--<li> iOS: 28.54 MB <a href="https://raw.githubusercontent.com/ssrosx/ssrosx/master/public/clients/Patatas.ipa" target="_blank">{{trans('home.click_download')}}</a>{{trans('home.download_client_and_startup')}} </li>--}}
+                                                    {{--<li> iOS coming soon. </li>--}}
+                                                    <li> iOS: 40.8 MB <a href="https://itunes.apple.com/us/app/patatas/id1433743886?l=zh&ls=1&mt=8" target="_blank">{{trans('home.click_download')}}</a>{{trans('home.download_client_and_startup')}} </li>
                                                 </ol>
                                             </div>
                                             <div class="tab-pane" id="tools5">

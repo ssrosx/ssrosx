@@ -107,7 +107,6 @@ class LoginController extends Controller
             $userInfo = User::query()->where('id', $user->id)->first();
 
             Session::put('user', $userInfo->toArray());
-
             // 根据权限跳转
             if ($user->is_admin) {
                 return Redirect::to('admin')->cookie('remember', $remember_token, 36000);
@@ -119,7 +118,6 @@ class LoginController extends Controller
                 $u = User::query()->where('status', '>=', 0)->where("remember_token", $request->cookie("remember"))->first();
                 if ($u) {
                     Session::put('user', $u->toArray());
-
                     if ($u->is_admin) {
                         return Redirect::to('admin');
                     }
@@ -171,11 +169,6 @@ class LoginController extends Controller
                     $u = User::query()->where('status', '>=', 0)->where("remember_token", $request->cookie("remember"))->first();
                     if ($u) {
                         Session::put('user', $u->toArray());
-
-                        if ($u->is_admin) {
-                            return Redirect::to('admin');
-                        }
-
                         return Redirect::to('/');
                     }
                 }
@@ -228,13 +221,9 @@ class LoginController extends Controller
             $userInfo = User::query()->where('id', $user->id)->first();
 
             Session::put('user', $userInfo->toArray());
+            Session::put('is_web_shop', 0);
             Session::put('is_open_shop', self::$systemConfig['is_open_shop']);
             Session::put('is_open_ticket', self::$systemConfig['is_open_ticket']);
-            // 根据权限跳转
-            if ($user->is_admin) {
-                return Redirect::to('admin')->cookie('remember', $remember_token, 36000);
-            }
-
             return Redirect::to('/' . $page)->cookie('remember', $remember_token, 36000);
         }
         else
@@ -243,12 +232,9 @@ class LoginController extends Controller
                 $u = User::query()->where('status', '>=', 0)->where("remember_token", $request->cookie("remember"))->first();
                 if ($u) {
                     Session::put('user', $u->toArray());
+                    Session::put('is_web_shop', 0);
                     Session::put('is_open_shop', self::$systemConfig['is_open_shop']);
                     Session::put('is_open_ticket', self::$systemConfig['is_open_ticket']);
-                    if ($u->is_admin) {
-                        return Redirect::to('admin');
-                    }
-
                     return Redirect::to('/');
                 }
             }

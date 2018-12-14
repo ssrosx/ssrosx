@@ -362,6 +362,8 @@ INSERT INTO `config` VALUES ('74', 'is_forbid_china', 0);
 INSERT INTO `config` VALUES ('75', 'is_forbid_oversea', 0);
 INSERT INTO `config` VALUES ('76', 'is_open_shop', 1);
 INSERT INTO `config` VALUES ('77', 'is_open_ticket', 1);
+INSERT INTO `config` VALUES ('78', 'is_web_shop', 1);
+INSERT INTO `config` VALUES ('79', 'is_china_local', 1);
 
 -- ----------------------------
 -- Table structure for `article`

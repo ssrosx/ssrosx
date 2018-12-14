@@ -17,6 +17,8 @@ Route::group(['middleware' => ['forbidden', 'affiliate']], function () {
     Route::get('active/{token}', 'UserController@active'); // 激活账号
     Route::get('free', 'UserController@free'); // 免费邀请码
     Route::any('privacy', 'UserController@privacy'); // privacy
+    Route::any('privacy_traditional', 'UserController@privacy_traditional'); // privacy_traditional
+    Route::any('privacy_simplified', 'UserController@privacy_simplified'); // privacy_simplified
 });
 
 Route::group(['middleware' => ['forbidden', 'user', 'admin']], function () {

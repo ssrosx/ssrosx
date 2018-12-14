@@ -29,7 +29,7 @@
                                 @else
                                     @foreach($articleList as $key => $article)
                                         <tr class="odd gradeX">
-                                            <td><a href="{{url('article?id=') . $article->id}}"> [{{date('m/d', strtotime($article->created_at))}}] {{str_limit($article->title, 300)}}</a></td>
+                                            <td><a href="{{url('article?id=') . $article->id}}"> [{{$article->id}}]  {{str_limit($article->title, 300)}}</a></td>
                                         </tr>
                                     @endforeach
                                 @endif

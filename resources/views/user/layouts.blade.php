@@ -35,6 +35,7 @@
 
 <body class="page-container-bg-solid page-header-fixed page-sidebar-closed-hide-logo">
 <!-- BEGIN HEADER -->
+@if(Session::get('is_web_shop'))
 <div class="page-header navbar navbar-fixed-top">
     <!-- BEGIN HEADER INNER -->
     <div class="page-header-inner ">
@@ -90,6 +91,7 @@
     </div>
     <!-- END HEADER INNER -->
 </div>
+@endif
 <!-- END HEADER -->
 <!-- BEGIN HEADER & CONTENT DIVIDER -->
 <div class="clearfix"> </div>
@@ -97,6 +99,7 @@
 <!-- BEGIN CONTAINER -->
 <div class="page-container">
     <!-- BEGIN SIDEBAR -->
+    @if(Session::get('is_web_shop'))
     <div class="page-sidebar-wrapper">
         <!-- BEGIN SIDEBAR -->
         <!-- DOC: Set data-auto-scroll="false" to disable the sidebar from auto scrolling/focusing -->
@@ -130,6 +133,12 @@
                         <span class="title">{{trans('home.invoices')}}</span>
                     </a>
                 </li>
+                <li class="nav-item {{in_array(Request::path(), ['trafficLog']) ? 'active open' : ''}}">
+                    <a href="{{url('trafficLog')}}" class="nav-link nav-toggle">
+                        <i class="icon-speedometer"></i>
+                        <span class="title">{{trans('home.traffic_log')}}</span>
+                    </a>
+                </li>
                 @endif
                 @if(Session::get('is_open_ticket'))
                 <li class="nav-item {{in_array(Request::path(), ['tickets', 'replyTicket']) ? 'active open' : ''}}">
@@ -158,6 +167,7 @@
         </div>
         <!-- END SIDEBAR -->
     </div>
+    @endif
     <!-- END SIDEBAR -->
     <!-- BEGIN CONTENT -->
     <div class="page-content-wrapper">
