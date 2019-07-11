@@ -167,8 +167,8 @@ class AdminController extends Controller
             }
             $query->whereIn('id', $tempUsers);
         }
-
-        $userList = $query->orderBy('enable', 'desc')->orderBy('status', 'desc')->orderBy('id', 'desc')->paginate(15)->appends($request->except('page'));
+//        ->orderBy('enable', 'desc')->orderBy('status', 'desc')
+        $userList = $query->orderBy('id', 'desc')->paginate(15)->appends($request->except('page'));
         foreach ($userList as &$user) {
             $user->transfer_enable = flowAutoShow($user->transfer_enable);
             $user->used_flow = flowAutoShow($user->u + $user->d);

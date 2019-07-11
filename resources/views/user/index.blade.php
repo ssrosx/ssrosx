@@ -152,7 +152,7 @@
             </div>
             <div class="col-md-4">
                 <ul class="list-group">
-                    @if($info['enable'])
+                    @if($info['status'] != -1)
                     <li class="list-group-item">
                             {{trans('home.account_status')}}：{{trans('home.enabled')}}
                         </li>

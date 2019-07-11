@@ -39,7 +39,8 @@
                                 <thead>
                                 <tr>
                                     <th> # </th>
-                                    <th> 用户 </th>
+                                    <th> 用户ID </th>
+                                    <th> 用户名 </th>
                                     <th> 节点 </th>
                                     <th> 流量比例 </th>
                                     <th> 上传流量 </th>
@@ -57,6 +58,7 @@
                                         @foreach($trafficLogList as $trafficLog)
                                             <tr class="odd gradeX">
                                                 <td> {{$trafficLog->id}} </td>
+                                                <td> {{$trafficLog->user->id}} </td>
                                                 <td> <a href="{{url('admin/userList?username=') . $trafficLog->user->username}}" target="_blank"> <span class="label label-info"> {{$trafficLog->user->username}} </span> </a> </td>
                                                 <td> {{$trafficLog->ssnode->name}} </td>
                                                 <td> {{$trafficLog->rate}} </td>
